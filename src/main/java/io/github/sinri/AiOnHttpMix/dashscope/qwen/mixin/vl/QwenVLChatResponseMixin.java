@@ -1,7 +1,6 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.embedding.TextEmbeddingGenerateResponseImpl;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.vl.VLChatResponseImpl;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;

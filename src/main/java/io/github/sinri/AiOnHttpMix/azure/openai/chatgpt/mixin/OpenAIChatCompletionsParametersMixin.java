@@ -2,6 +2,8 @@ package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.mixin;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.impl.request.ChatCompletionToolChoiceOptionImpl;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.impl.request.ToolDefinitionImpl;
+import io.github.sinri.AiOnHttpMix.utils.FunctionToolDefinition;
 import io.github.sinri.keel.core.SelfInterface;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.Handler;
@@ -109,8 +111,14 @@ public interface OpenAIChatCompletionsParametersMixin<E> extends JsonifiableEnti
      */
     E addTool(ChatGPTKit.ToolDefinition toolDefinition);
 
-    default E addTool(Handler<ChatGPTKit.ToolDefinition.Builder> handler) {
-        ChatGPTKit.ToolDefinition.Builder builder = ChatGPTKit.ToolDefinition.builder();
+//    default E addTool(Handler<OpenAIToolDefinitionMixin.FunctionToolDefinitionBuilder> handler) {
+//        OpenAIToolDefinitionMixin.FunctionToolDefinitionBuilder builder = ChatGPTKit.ToolDefinition.builder();
+//        handler.handle(builder);
+//        return addTool(builder.build());
+//    }
+
+    default E addTool(Handler<FunctionToolDefinition.FunctionToolDefinitionBuilder<ToolDefinitionImpl.Builder, ToolDefinitionImpl>> handler) {
+        var builder = new ToolDefinitionImpl.Builder();
         handler.handle(builder);
         return addTool(builder.build());
     }

@@ -1,10 +1,8 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.vl.VLChatResponseImpl;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 

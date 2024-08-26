@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.core.impl.filter;
 
-import io.github.sinri.AiOnHttpMix.azure.openai.core.ContentFilterDetectedResult;
+import io.github.sinri.AiOnHttpMix.azure.openai.core.mixin.filter.ContentFilterDetectedResult;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.mixin.ContentFilterPromptResults;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;

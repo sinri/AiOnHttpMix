@@ -230,6 +230,7 @@ public class QwenKit {
     }
 
 
+
     public interface ToolDefinition extends JsonifiableEntity<ToolDefinition> {
 
         /**

@@ -34,7 +34,7 @@ public final class ChatGPTKit {
             String requestId
     ) {
         String api = "/chat/completions";
-        return serviceMeta.postRequest(api, parameters, requestId);
+        return serviceMeta.request(api, parameters, requestId);
     }
 
     public Future<CreateChatCompletionResponse> callChatCompletions(
@@ -70,7 +70,7 @@ public final class ChatGPTKit {
 
         String api = "/chat/completions";
 
-        serviceMeta.postRequestSSE(api, parameters, promise, cutter, requestId);
+        serviceMeta.requestSSE(api, parameters, promise, cutter, requestId);
 
         return promise.future();
     }
@@ -157,7 +157,7 @@ public final class ChatGPTKit {
     }
 
     public Future<EmbeddingResponse> callEmbeddings(AzureOpenAIServiceMeta serviceMeta, String input, String requestId) {
-        return serviceMeta.postRequest(
+        return serviceMeta.request(
                         "/embeddings",
                         new JsonObject().put("input", input),
                         requestId
@@ -190,9 +190,12 @@ public final class ChatGPTKit {
 
     public interface ToolDefinition extends OpenAIToolDefinitionMixin<ToolDefinition> {
 
-        static Builder builder() {
-            return new ToolDefinitionImpl.FunctionToolDefinitionBuilder();
+        static ToolDefinitionImpl.Builder builder() {
+            return new ToolDefinitionImpl.Builder();
         }
+//        static FunctionToolDefinitionBuilder builder() {
+//            return new ToolDefinitionImpl.FunctionToolDefinitionBuilder();
+//        }
     }
 
     public interface ToolCall extends OpenAIToolCallMixin {

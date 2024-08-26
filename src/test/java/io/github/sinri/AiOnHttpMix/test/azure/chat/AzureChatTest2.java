@@ -184,9 +184,6 @@ public class AzureChatTest2 extends AzureChatTestCore {
 
         getLogger().info("REQ", parameters.toJsonObject());
 
-        AtomicReference<String> currentToolCallIdRef = new AtomicReference<>();
-        AtomicReference<String> currentToolCallTypeRef = new AtomicReference<>();
-
         return ChatGPTKit.getInstance()
                 .callChatCompletionsStream(
                         getServiceMeta(),

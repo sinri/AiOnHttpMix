@@ -1,8 +1,8 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.mixin;
 
-import io.github.sinri.AiOnHttpMix.azure.openai.core.ContentFilterDetectedResult;
-import io.github.sinri.AiOnHttpMix.azure.openai.core.ContentFilterSeverityResult;
-import io.github.sinri.AiOnHttpMix.azure.openai.core.OpenAIErrorMixin;
+import io.github.sinri.AiOnHttpMix.azure.openai.core.mixin.filter.ContentFilterDetectedResult;
+import io.github.sinri.AiOnHttpMix.azure.openai.core.mixin.filter.ContentFilterSeverityResult;
+import io.github.sinri.AiOnHttpMix.azure.openai.core.mixin.error.OpenAIErrorMixin;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import org.jetbrains.annotations.Nullable;
 

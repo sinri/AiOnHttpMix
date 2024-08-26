@@ -1,12 +1,8 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.embedding;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
-import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class TextEmbeddingGenerateRequestImpl implements QwenKit.TextEmbeddingGenerateRequest {
 

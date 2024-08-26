@@ -1,9 +1,7 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl;
 
-import io.github.sinri.AiOnHttpMix.azure.openai.dalle.Dalle3Kit;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.vl.VLChatRequestImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.vl.QwenVLInput;
 import io.github.sinri.keel.core.SelfInterface;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;

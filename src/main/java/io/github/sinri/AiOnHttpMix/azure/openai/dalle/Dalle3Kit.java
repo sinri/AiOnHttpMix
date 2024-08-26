@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.dalle;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
-import io.github.sinri.AiOnHttpMix.azure.openai.core.ContentFilterSeverityResult;
+import io.github.sinri.AiOnHttpMix.azure.openai.core.mixin.filter.ContentFilterSeverityResult;
 import io.github.sinri.AiOnHttpMix.azure.openai.core.impl.filter.ContentFilterSeverityResultImpl;
 import io.github.sinri.AiOnHttpMix.azure.openai.dalle.impl.Dalle3ResponseImpl;
 import io.github.sinri.AiOnHttpMix.azure.openai.dalle.impl.DalleContentFilterResultsImpl;
@@ -23,7 +23,7 @@ public class Dalle3Kit {
             JsonObject parameters,
             String requestId
     ) {
-        return serviceMeta.postRequest(
+        return serviceMeta.request(
                 "/images/generations",
                 parameters,
                 requestId

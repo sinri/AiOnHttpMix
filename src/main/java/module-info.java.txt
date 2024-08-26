@@ -1,0 +1,16 @@
+module AiOnHttpMix {
+    exports io.github.sinri.AiOnHttpMix.azure.bing.search;
+    exports io.github.sinri.AiOnHttpMix.azure.openai.chatgpt;
+    exports io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.mixin;
+    exports io.github.sinri.AiOnHttpMix.azure.openai.core;
+    exports io.github.sinri.AiOnHttpMix.azure.openai.core.mixin.error;
+    exports io.github.sinri.AiOnHttpMix.azure.openai.core.mixin.filter;
+    exports io.github.sinri.AiOnHttpMix.azure.openai.dalle;
+    exports io.github.sinri.AiOnHttpMix.dashscope.core;
+    exports io.github.sinri.AiOnHttpMix.dashscope.qwen;
+    exports io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.txt;
+    exports io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.embedding;
+    exports io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl;
+
+    requires org.jetbrains.annotations;
+}

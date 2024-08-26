@@ -1,7 +1,6 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.chunk;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
-import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 

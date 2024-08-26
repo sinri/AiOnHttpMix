@@ -1,7 +1,6 @@
 package io.github.sinri.AiOnHttpMix.test.azure.dalle3;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.dalle.Dalle3Kit;
-import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 
