@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message;
 
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -9,16 +10,6 @@ import java.util.List;
 public interface OpenAIChatGptMessage extends JsonifiableEntity<OpenAIChatGptMessage> {
     static Builder builder() {
         return new Builder();
-    }
-    /**
-     * <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chatcompletionrequestmessagerole">chatCompletionRequestMessageRole</a>
-     */
-    enum ChatCompletionRequestMessageRole {
-        system,
-        user,
-        assistant,
-        @Deprecated function,
-        tool
     }
 
     final class Builder {
@@ -91,8 +82,8 @@ public interface OpenAIChatGptMessage extends JsonifiableEntity<OpenAIChatGptMes
         image_url,
     }
 
-    default ChatCompletionRequestMessageRole getRole() {
+    default ChatGptRole getRole() {
         String role = readString("role");
-        return ChatCompletionRequestMessageRole.valueOf(role);
+        return ChatGptRole.valueOf(role);
     }
 }

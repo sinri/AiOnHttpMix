@@ -2,11 +2,10 @@ package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptResponseChunkChoice;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptResponseChunkChoiceDelta;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptStreamBuffer;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIResponseChunk;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.TempAssistantMessage;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.embeddings.OpenAIEmbeddingResponse;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.AssistantMessage;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.OpenAIChatGptMessage;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponse;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseFunctionCall;
@@ -123,7 +122,7 @@ public final class ChatGPTKit {
             OpenAIChatGptRequest parameters,
             String requestId
     ) {
-        TempAssistantMessage tempAssistantMessage = new TempAssistantMessage();
+        OpenAIChatGptStreamBuffer tempAssistantMessage = new OpenAIChatGptStreamBuffer();
         return this.chatStream(
                         serviceMeta,
                         parameters.toJsonObject(),
@@ -142,7 +141,7 @@ public final class ChatGPTKit {
                                     tempAssistantMessage.acceptContentFragment(contentAsText);
                                 }
 
-                                OpenAIChatGptMessage.ChatCompletionRequestMessageRole role = delta.getRole();
+                                ChatGptRole role = delta.getRole();
                                 if (role != null) {
                                     tempAssistantMessage.acceptRole(role);
                                 }
@@ -156,11 +155,11 @@ public final class ChatGPTKit {
                                             tempAssistantMessage.acceptToolCall(toolCall);
                                         } else {
                                             Integer index = toolCall.getIndex();
-                                            TempAssistantMessage.TempToolCall tempToolCall = tempAssistantMessage.getTempToolCall(index);
+                                            OpenAIChatGptStreamBuffer.TempToolCall tempToolCall = tempAssistantMessage.getTempToolCall(index);
                                             if (tempToolCall != null) {
                                                 OpenAIChatGptResponseFunctionCall function = toolCall.getFunction();
                                                 if (function != null) {
-                                                    TempAssistantMessage.TempFunctionCall tempFunctionCall = tempToolCall.getFunction();
+                                                    OpenAIChatGptStreamBuffer.TempFunctionCall tempFunctionCall = tempToolCall.getFunction();
                                                     String arguments = function.getArguments();
                                                     if (arguments != null) {
                                                         tempFunctionCall.acceptArgumentFragment(arguments);

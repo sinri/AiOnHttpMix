@@ -1,10 +1,11 @@
 package io.github.sinri.AiOnHttpMix.test.dashscope;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.txt.QwenChatMessageResponseInChunkMixin;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.txt.QwenChatMessageResponseMixin;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.txt.QwenChatRequestMixin;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.txt.QwenMessageMixin;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenRole;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenResponseChunk;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.message.QwenMessage;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.response.QwenResponseInMessageFormat;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
@@ -14,21 +15,21 @@ import java.util.UUID;
 
 public class QwenTest3 extends DashscopeTestCore {
     private QwenKit qwenKit;
-    private QwenKit.ChatRequest chatRequest;
+    private QwenRequest chatRequest;
 
     @Override
     protected @NotNull Future<Void> starting() {
         return super.starting()
                 .compose(v -> {
                     qwenKit = new QwenKit();
-                    chatRequest = QwenKit.ChatRequest.create()
+                    chatRequest = QwenRequest.create()
                             .setModel(QwenKit.QwenModel.QWEN_PLUS)
                             .handleInput(input -> input
                                     .addSystemMessage("你是个IT专家")
                                     .addUserMessage("IPv4的内网网段划分策略")
                             )
                             .handleParameters(p -> p
-                                    .setResultFormat(QwenChatRequestMixin.Parameters.ResultFormat.message)
+                                    .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
                                     .setIncrementalOutput(true)
                             );
                     return Future.succeededFuture();
@@ -62,10 +63,10 @@ public class QwenTest3 extends DashscopeTestCore {
                 chatRequest,
                 chatMessageResponseInChunk -> {
                     getLogger().info("ChatMessageResponseInChunk");
-                    QwenChatMessageResponseInChunkMixin.OutputChunkForMessageResponse output = chatMessageResponseInChunk.getOutput();
-                    List<QwenChatMessageResponseInChunkMixin.OutputChunkForMessageResponse.Choice> choices = output.getChoices();
-                    QwenChatMessageResponseInChunkMixin.OutputChunkForMessageResponse.Choice choice = choices.get(0);
-                    QwenKit.Message message = choice.getMessage();
+                    QwenResponseChunk.OutputChunkForMessageResponse output = chatMessageResponseInChunk.getOutput();
+                    List<QwenResponseChunk.OutputChunkForMessageResponse.Choice> choices = output.getChoices();
+                    QwenResponseChunk.OutputChunkForMessageResponse.Choice choice = choices.get(0);
+                    QwenMessage message = choice.getMessage();
                     getLogger().info("ROLE: " + message.getRole() + " | " + message.getContent());
                     getLogger().info("Finish Reason: " + choice.getFinishReason());
                 },
@@ -84,12 +85,12 @@ public class QwenTest3 extends DashscopeTestCore {
                 )
                 .compose(chatMessageResponse -> {
                     getLogger().info("resp buffered");
-                    QwenChatMessageResponseMixin.OutputForMessageResponse output = chatMessageResponse.getOutput();
-                    List<QwenChatMessageResponseMixin.OutputForMessageResponse.Choice> choices = output.getChoices();
+                    QwenResponseInMessageFormat.OutputForMessageResponse output = chatMessageResponse.getOutput();
+                    List<QwenResponseInMessageFormat.OutputForMessageResponse.Choice> choices = output.getChoices();
                     if (choices != null && !choices.isEmpty()) {
-                        QwenChatMessageResponseMixin.OutputForMessageResponse.Choice choice = choices.get(0);
-                        QwenKit.Message message = choice.getMessage();
-                        QwenMessageMixin.Role role = message.getRole();
+                        QwenResponseInMessageFormat.OutputForMessageResponse.Choice choice = choices.get(0);
+                        QwenMessage message = choice.getMessage();
+                        QwenRole role = message.getRole();
                         String content = message.getContent();
                         getLogger().info(role + " | " + content + " | " + choice.getFinishReason());
                     }

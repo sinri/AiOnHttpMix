@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk;
 
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.OpenAIChatGptMessage;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
@@ -20,10 +20,10 @@ public interface OpenAIChatGptResponseChunkChoiceDelta extends UnmodifiableJsoni
     }
 
     @Nullable
-    default OpenAIChatGptMessage.ChatCompletionRequestMessageRole getRole() {
+    default ChatGptRole getRole() {
         String role = readString("role");
         if (role == null) return null;
-        return OpenAIChatGptMessage.ChatCompletionRequestMessageRole.valueOf(role);
+        return ChatGptRole.valueOf(role);
     }
 
     @Nullable

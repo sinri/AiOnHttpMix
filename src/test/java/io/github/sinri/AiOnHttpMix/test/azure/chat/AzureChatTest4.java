@@ -1,9 +1,9 @@
 package io.github.sinri.AiOnHttpMix.test.azure.chat;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptResponseChunkChoice;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptResponseChunkChoiceDelta;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.OpenAIChatGptMessage;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseFunctionCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
@@ -73,7 +73,7 @@ public class AzureChatTest4 extends AzureChatTestCore {
                                 OpenAIChatGptResponseChunkChoice choiceInChunk = choices.get(0);
                                 OpenAIChatGptResponseChunkChoiceDelta delta = choiceInChunk.getDelta();
                                 if (delta == null) return;
-                                OpenAIChatGptMessage.ChatCompletionRequestMessageRole role = delta.getRole();
+                                ChatGptRole role = delta.getRole();
                                 if (role != null) {
                                     getLogger().info("Role: " + role);
                                 }

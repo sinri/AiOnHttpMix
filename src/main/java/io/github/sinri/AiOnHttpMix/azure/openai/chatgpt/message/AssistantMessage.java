@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message;
 
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ public final class AssistantMessage implements OpenAIChatGptMessage {
 
     public AssistantMessage(JsonObject jsonObject) {
         this.jsonObject = jsonObject;
-        this.jsonObject.put("role", ChatCompletionRequestMessageRole.assistant);
+        this.jsonObject.put("role", ChatGptRole.assistant);
     }
 
     @Override

@@ -1,33 +1,22 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen;
 
 import io.github.sinri.AiOnHttpMix.dashscope.core.DashscopeServiceMeta;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.MessageImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.chunk.ChatMessageResponseInChunkImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.chunk.ChatResponseChunkImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.chunk.TempOutput;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.embedding.TextEmbeddingGenerateRequestImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.embedding.TextEmbeddingGenerateResponseImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.request.QwenChatRequestImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.response.ChatMessageResponseImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.response.ChatTextResponseImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.tool.ToolCallImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.tool.ToolDefinitionImpl;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.impl.vl.*;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.embedding.DashscopeTextEmbeddingGenerateRequestMixin;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.embedding.DashscopeTextEmbeddingGenerateResponseMixin;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.txt.*;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl.*;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateRequest;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateResponse;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenResponseChunk;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenResponseFragment;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.response.QwenResponseInMessageFormat;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLRequest;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLResponse;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLStreamBuffer;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.core.cutter.CutterOnString;
-import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class QwenKit {
 
@@ -39,21 +28,31 @@ public class QwenKit {
         return serviceMeta.callQwenTextGenerate(chatRequest, requestId);
     }
 
-    public Future<ChatMessageResponse> chatForMessageResponse(
+    public Future<QwenResponseInMessageFormat> chatForMessageResponse(
             DashscopeServiceMeta serviceMeta,
-            ChatRequest chatRequest,
+            Handler<QwenRequest> chatRequestHandler,
+            String requestId
+    ) {
+        QwenRequest chatRequest = QwenRequest.create();
+        chatRequestHandler.handle(chatRequest);
+        return chatForMessageResponse(serviceMeta, chatRequest, requestId);
+    }
+
+    public Future<QwenResponseInMessageFormat> chatForMessageResponse(
+            DashscopeServiceMeta serviceMeta,
+            QwenRequest chatRequest,
             String requestId
     ) {
         if (chatRequest.getParameters() == null) {
-            chatRequest.setParameters(QwenChatRequestMixin.Parameters.create()
-                    .setResultFormat(QwenChatRequestMixin.Parameters.ResultFormat.message)
+            chatRequest.setParameters(QwenRequest.Parameters.create()
+                    .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
             );
         } else {
-            chatRequest.getParameters().setResultFormat(QwenChatRequestMixin.Parameters.ResultFormat.message);
+            chatRequest.getParameters().setResultFormat(QwenRequest.Parameters.ResultFormat.message);
         }
         return serviceMeta.callQwenTextGenerate(chatRequest.toJsonObject(), requestId)
                 .compose(jsonObject -> {
-                    ChatMessageResponse chatMessageResponse = ChatMessageResponse.wrap(jsonObject);
+                    QwenResponseInMessageFormat chatMessageResponse = QwenResponseInMessageFormat.wrap(jsonObject);
                     return Future.succeededFuture(chatMessageResponse);
                 });
     }
@@ -77,37 +76,58 @@ public class QwenKit {
 
     public Future<Void> chatStreamWithChunkHandler(
             DashscopeServiceMeta serviceMeta,
-            ChatRequest chatRequest,
-            Handler<ChatMessageResponseInChunk> handler,
+            Handler<QwenRequest> chatRequestHandler,
+            Handler<QwenResponseChunk> handler,
+            String requestId
+    ) {
+        QwenRequest chatRequest = QwenRequest.create();
+        chatRequestHandler.handle(chatRequest);
+        return chatStreamWithChunkHandler(serviceMeta, chatRequest, handler, requestId);
+    }
+
+    public Future<Void> chatStreamWithChunkHandler(
+            DashscopeServiceMeta serviceMeta,
+            QwenRequest chatRequest,
+            Handler<QwenResponseChunk> handler,
             String requestId
     ) {
         return chatStreamWithStringHandler(
                 serviceMeta,
                 chatRequest.toJsonObject(),
                 s -> {
-                    ChatResponseChunk chatResponseChunk = ChatResponseChunk.parse(s);
+                    QwenResponseFragment chatResponseChunk = QwenResponseFragment.parse(s);
                     String dataAsString = chatResponseChunk.getDataAsString();
-                    ChatMessageResponseInChunk chatMessageResponseInChunk = ChatMessageResponseInChunk.parse(dataAsString);
+                    QwenResponseChunk chatMessageResponseInChunk = QwenResponseChunk.parse(dataAsString);
                     handler.handle(chatMessageResponseInChunk);
                 },
                 requestId
         );
     }
 
-    public Future<ChatMessageResponse> chatStreamWithBuffer(
+    public Future<QwenResponseInMessageFormat> chatStreamWithBuffer(
             DashscopeServiceMeta serviceMeta,
-            ChatRequest chatRequest,
+            Handler<QwenRequest> chatRequestHandler,
             String requestId
     ) {
-        TempOutput tempOutput = new TempOutput();
+        QwenRequest qwenRequest = QwenRequest.create();
+        chatRequestHandler.handle(qwenRequest);
+        return chatStreamWithBuffer(serviceMeta, qwenRequest, requestId);
+    }
+
+    public Future<QwenResponseInMessageFormat> chatStreamWithBuffer(
+            DashscopeServiceMeta serviceMeta,
+            QwenRequest chatRequest,
+            String requestId
+    ) {
+        QwenStreamBuffer qwenStreamBuffer = new QwenStreamBuffer();
         return chatStreamWithChunkHandler(
                 serviceMeta,
                 chatRequest,
-                tempOutput::acceptChunkData,
+                qwenStreamBuffer::acceptChunkData,
                 requestId
         )
                 .compose(v -> {
-                    return Future.succeededFuture(tempOutput.toChatMessageResponse());
+                    return Future.succeededFuture(qwenStreamBuffer.toChatMessageResponse());
                 });
     }
 
@@ -119,14 +139,119 @@ public class QwenKit {
         return serviceMeta.callTextEmbeddingGeneration(requestBody, requestId);
     }
 
-    public Future<TextEmbeddingGenerateResponse> generateTextEmbedding(
+    public Future<DashscopeTextEmbeddingGenerateResponse> generateTextEmbedding(
             DashscopeServiceMeta serviceMeta,
-            TextEmbeddingGenerateRequest requestBody,
+            Handler<DashscopeTextEmbeddingGenerateRequest> requestBodyHandler,
+            String requestId
+    ) {
+        DashscopeTextEmbeddingGenerateRequest request = DashscopeTextEmbeddingGenerateRequest.create();
+        requestBodyHandler.handle(request);
+        return generateTextEmbedding(serviceMeta, request, requestId);
+    }
+
+    public Future<DashscopeTextEmbeddingGenerateResponse> generateTextEmbedding(
+            DashscopeServiceMeta serviceMeta,
+            DashscopeTextEmbeddingGenerateRequest requestBody,
             String requestId
     ) {
         return serviceMeta.callTextEmbeddingGeneration(requestBody.toJsonObject(), requestId)
                 .compose(jsonObject -> {
-                    return Future.succeededFuture(TextEmbeddingGenerateResponse.wrap(jsonObject));
+                    return Future.succeededFuture(DashscopeTextEmbeddingGenerateResponse.wrap(jsonObject));
+                });
+    }
+
+    public Future<JsonObject> chatVL(DashscopeServiceMeta serviceMeta, JsonObject jsonObject, String requestId) {
+        return serviceMeta.callQwenMultiModalGenerate(jsonObject, requestId);
+    }
+
+    public Future<QwenVLResponse> chatVL(
+            DashscopeServiceMeta serviceMeta,
+            Handler<QwenVLRequest> chatRequestHandler,
+            String requestId
+    ) {
+        QwenVLRequest request = QwenVLRequest.create();
+        chatRequestHandler.handle(request);
+        return chatVL(serviceMeta, request, requestId);
+    }
+
+    public Future<QwenVLResponse> chatVL(DashscopeServiceMeta serviceMeta, QwenVLRequest chatRequest, String requestId) {
+        return serviceMeta.callQwenMultiModalGenerate(chatRequest.toJsonObject(), requestId)
+                .compose(jsonObject -> {
+                    return Future.succeededFuture(QwenVLResponse.wrap(jsonObject));
+                });
+    }
+
+    public Future<Void> chatVLStreamWithStringHandler(
+            DashscopeServiceMeta serviceMeta,
+            JsonObject jsonObject,
+            Handler<String> handler,
+            String requestId
+    ) {
+        Promise<Void> promise = Promise.promise();
+        CutterOnString cutterOnString = new CutterOnString();
+        cutterOnString.setComponentHandler(handler);
+        return serviceMeta.callQwenMultiModalGenerateStream(
+                jsonObject,
+                promise,
+                cutterOnString,
+                requestId
+        );
+    }
+
+    public Future<Void> chatVLStreamWithChunkHandler(
+            DashscopeServiceMeta serviceMeta,
+            Handler<QwenVLRequest> chatRequestHandler,
+            Handler<QwenVLResponse> handler,
+            String requestId
+    ) {
+        QwenVLRequest request = QwenVLRequest.create();
+        chatRequestHandler.handle(request);
+        return chatVLStreamWithChunkHandler(serviceMeta, request, handler, requestId);
+    }
+
+    public Future<Void> chatVLStreamWithChunkHandler(
+            DashscopeServiceMeta serviceMeta,
+            QwenVLRequest chatRequest,
+            Handler<QwenVLResponse> handler,
+            String requestId
+    ) {
+        return this.chatVLStreamWithStringHandler(
+                serviceMeta,
+                chatRequest.toJsonObject(),
+                s -> {
+                    QwenResponseFragment responseChunk = QwenResponseFragment.parse(s);
+                    String dataAsString = responseChunk.getDataAsString();
+                    QwenVLResponse vlChatResponse = QwenVLResponse.wrap(new JsonObject(dataAsString));
+                    handler.handle(vlChatResponse);
+                },
+                requestId
+        );
+    }
+
+    public Future<QwenVLResponse> chatVLStreamWithBuffer(
+            DashscopeServiceMeta serviceMeta,
+            Handler<QwenVLRequest> chatRequestHandler,
+            String requestId
+    ) {
+        QwenVLRequest request = QwenVLRequest.create();
+        chatRequestHandler.handle(request);
+        return chatVLStreamWithBuffer(serviceMeta, request, requestId);
+    }
+
+    public Future<QwenVLResponse> chatVLStreamWithBuffer(
+            DashscopeServiceMeta serviceMeta,
+            QwenVLRequest chatRequest,
+            String requestId
+    ) {
+        QwenVLStreamBuffer qwenVLStreamBuffer = new QwenVLStreamBuffer();
+        return chatVLStreamWithChunkHandler(
+                serviceMeta,
+                chatRequest,
+                qwenVLStreamBuffer::accept,
+                requestId
+        )
+                .compose(v -> {
+                    return Future.succeededFuture(qwenVLStreamBuffer.toVLChatResponse());
                 });
     }
 
@@ -141,10 +266,6 @@ public class QwenKit {
             this.modelCode = modelCode;
         }
 
-        public String getModelCode() {
-            return modelCode;
-        }
-
         public static TextEmbeddingModel fromModelCode(String modelCode) {
             for (TextEmbeddingModel textEmbeddingModel : TextEmbeddingModel.values()) {
                 if (textEmbeddingModel.getModelCode().equals(modelCode)) {
@@ -152,6 +273,10 @@ public class QwenKit {
                 }
             }
             throw new IllegalArgumentException("Unknown model code: " + modelCode);
+        }
+
+        public String getModelCode() {
+            return modelCode;
         }
     }
 
@@ -175,10 +300,6 @@ public class QwenKit {
             this.modelCode = modelCode;
         }
 
-        public String getModelCode() {
-            return modelCode;
-        }
-
         public static QwenModel fromModelCode(String modelCode) {
             return switch (modelCode) {
                 case "qwen-max" -> QwenModel.QWEN_MAX;
@@ -190,186 +311,10 @@ public class QwenKit {
             };
         }
 
-    }
-
-    public interface TextEmbeddingGenerateRequest extends DashscopeTextEmbeddingGenerateRequestMixin<TextEmbeddingGenerateRequest> {
-        static TextEmbeddingGenerateRequest create() {
-            return new TextEmbeddingGenerateRequestImpl();
+        public String getModelCode() {
+            return modelCode;
         }
 
-        static TextEmbeddingGenerateRequest wrap(JsonObject requestBody) {
-            return new TextEmbeddingGenerateRequestImpl(requestBody);
-        }
-    }
-
-    public interface TextEmbeddingGenerateResponse extends DashscopeTextEmbeddingGenerateResponseMixin {
-        static TextEmbeddingGenerateResponse wrap(JsonObject response) {
-            return new TextEmbeddingGenerateResponseImpl(response);
-        }
-    }
-
-    public interface ChatRequest extends QwenChatRequestMixin<ChatRequest> {
-        static ChatRequest create() {
-            return new QwenChatRequestImpl();
-        }
-
-        static ChatRequest wrap(JsonObject jsonObject) {
-            return new QwenChatRequestImpl(jsonObject);
-        }
-    }
-
-
-    public interface Message extends QwenMessageMixin<Message> {
-        static Message create() {
-            return new MessageImpl();
-        }
-
-        static Message wrap(JsonObject jsonObject) {
-            return new MessageImpl(jsonObject);
-        }
-    }
-
-
-
-    public interface ToolDefinition extends JsonifiableEntity<ToolDefinition> {
-
-        /**
-         * @param name        function的名称，必须是字母、数字，或包含下划线和短划线，最大长度为64。
-         * @param description function的描述，供模型选择何时以及如何调用function。
-         * @param parameters  表示function的参数描述，需要是一个合法的json schema。缺省表示function没有入参。
-         */
-        static ToolDefinition asFunction(
-                @NotNull String name,
-                @NotNull String description,
-                @Nullable JsonObject parameters
-        ) {
-            return new ToolDefinitionImpl()
-                    .setType(ToolType.function)
-                    .setFunction(name, description, parameters);
-        }
-
-        static ToolDefinition asFunction(
-                @NotNull String name,
-                @NotNull String description,
-                @Nullable List<FunctionArgument> parameters
-        ) {
-            return new ToolDefinitionImpl()
-                    .setType(ToolType.function)
-                    .setFunction(name, description, parameters);
-        }
-
-        /**
-         * 表示tools的类型
-         */
-        enum ToolType {
-            function
-        }
-
-        record FunctionArgument(
-                String argumentName,
-                String argumentType,
-                String argumentDesc,
-                boolean required
-        ) {
-        }
-    }
-
-    public interface ChatTextResponse extends QwenChatTextResponseMixin {
-        static QwenKit.ChatTextResponse wrap(JsonObject jsonObject) {
-            return new ChatTextResponseImpl(jsonObject);
-        }
-    }
-
-    public interface ChatMessageResponse extends QwenChatMessageResponseMixin {
-        static QwenKit.ChatMessageResponse wrap(JsonObject jsonObject) {
-            return new ChatMessageResponseImpl(jsonObject);
-        }
-    }
-
-    public interface ToolCall extends QwenToolCallMixin {
-        static ToolCall wrap(JsonObject jsonObject) {
-            return new ToolCallImpl(jsonObject);
-        }
-    }
-
-    public interface ChatResponseChunk extends QwenChatResponseChunkMixin {
-        static QwenKit.ChatResponseChunk parse(String string) {
-            return new ChatResponseChunkImpl(string);
-        }
-    }
-
-    public interface ChatMessageResponseInChunk extends QwenChatMessageResponseInChunkMixin {
-        static ChatMessageResponseInChunk parse(String string) {
-            return wrap(new JsonObject(string));
-        }
-
-        static ChatMessageResponseInChunk wrap(JsonObject jsonObject) {
-            return new ChatMessageResponseInChunkImpl(jsonObject);
-        }
-    }
-
-    public Future<JsonObject> chatVL(DashscopeServiceMeta serviceMeta, JsonObject jsonObject, String requestId) {
-        return serviceMeta.callQwenMultiModalGenerate(jsonObject, requestId);
-    }
-
-    public Future<VLChatResponse> chatVL(DashscopeServiceMeta serviceMeta, VLChatRequest chatRequest, String requestId) {
-        return serviceMeta.callQwenMultiModalGenerate(chatRequest.toJsonObject(), requestId)
-                .compose(jsonObject -> {
-                    return Future.succeededFuture(VLChatResponse.wrap(jsonObject));
-                });
-    }
-
-    public Future<Void> chatVLStreamWithStringHandler(
-            DashscopeServiceMeta serviceMeta,
-            JsonObject jsonObject,
-            Handler<String> handler,
-            String requestId
-    ) {
-        Promise<Void> promise = Promise.promise();
-        CutterOnString cutterOnString = new CutterOnString();
-        cutterOnString.setComponentHandler(handler);
-        return serviceMeta.callQwenMultiModalGenerateStream(
-                jsonObject,
-                promise,
-                cutterOnString,
-                requestId
-        );
-    }
-
-    public Future<Void> chatVLStreamWithChunkHandler(
-            DashscopeServiceMeta serviceMeta,
-            VLChatRequest chatRequest,
-            Handler<VLChatResponse> handler,
-            String requestId
-    ) {
-        return this.chatVLStreamWithStringHandler(
-                serviceMeta,
-                chatRequest.toJsonObject(),
-                s -> {
-                    ChatResponseChunk responseChunk = ChatResponseChunk.parse(s);
-                    String dataAsString = responseChunk.getDataAsString();
-                    VLChatResponse vlChatResponse = VLChatResponse.wrap(new JsonObject(dataAsString));
-                    handler.handle(vlChatResponse);
-                },
-                requestId
-        );
-    }
-
-    public Future<VLChatResponse> chatVLStreamWithBuffer(
-            DashscopeServiceMeta serviceMeta,
-            VLChatRequest chatRequest,
-            String requestId
-    ) {
-        TempQwenVLChatResponse tempQwenVLChatResponse = new TempQwenVLChatResponse();
-        return chatVLStreamWithChunkHandler(
-                serviceMeta,
-                chatRequest,
-                tempQwenVLChatResponse::accept,
-                requestId
-        )
-                .compose(v -> {
-                    return Future.succeededFuture(tempQwenVLChatResponse.toVLChatResponse());
-                });
     }
 
     public enum QwenVLModel {
@@ -383,10 +328,6 @@ public class QwenKit {
             this.modelCode = modelCode;
         }
 
-        public String getModelCode() {
-            return modelCode;
-        }
-
         public static QwenVLModel fromModelCode(String modelCode) {
             return switch (modelCode) {
                 case "qwen-vl-plus" -> QWEN_VL_PLUS;
@@ -394,35 +335,9 @@ public class QwenKit {
                 default -> throw new IllegalArgumentException(modelCode);
             };
         }
-    }
 
-    public interface VLChatRequest extends QwenVLChatRequestMixin<VLChatRequest> {
-        static VLChatRequest create() {
-            return new VLChatRequestImpl();
-        }
-    }
-
-    public interface VLChatInputMessage extends QwenVLChatInputMessageMixin<VLChatInputMessage> {
-        static VLChatInputMessage create() {
-            return new VLChatInputMessageImpl();
-        }
-    }
-
-    public interface VLChatOutputMessage extends QwenVLChatOutputMessageMixin {
-        static VLChatOutputMessage wrap(JsonObject jsonObject) {
-            return new VLChatOutputMessageImpl(jsonObject);
-        }
-    }
-
-    public interface VLChatResponse extends QwenVLChatResponseMixin {
-        static VLChatResponse wrap(JsonObject jsonObject) {
-            return new VLChatResponseImpl(jsonObject);
-        }
-    }
-
-    public interface VLChatUsage extends QwenVLChatUsageMixin {
-        static VLChatUsage wrap(JsonObject jsonObject) {
-            return new VLChatUsageImpl(jsonObject);
+        public String getModelCode() {
+            return modelCode;
         }
     }
 

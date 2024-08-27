@@ -1,10 +1,7 @@
 package io.github.sinri.AiOnHttpMix.test.dashscope;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl.QwenVLChatMessageContentItem;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl.QwenVLChatRequestMixin;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl.QwenVLChatResponseMixin;
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl.QwenVLChatRole;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.*;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -15,22 +12,22 @@ import java.util.UUID;
 
 public class QwenVLTest1 extends DashscopeTestCore {
     private QwenKit qwenKit;
-    private QwenKit.VLChatRequest chatRequest;
+    private QwenVLRequest chatRequest;
 
     @Override
     protected @NotNull Future<Void> starting() {
         return super.starting()
                 .compose(v -> {
                     qwenKit = new QwenKit();
-                    chatRequest = QwenKit.VLChatRequest.create()
+                    chatRequest = QwenVLRequest.create()
                             .setModel(QwenKit.QwenVLModel.QWEN_VL_PLUS)
-                            .setInput(QwenVLChatRequestMixin.Input.create()
-                                    .addMessage(QwenKit.VLChatInputMessage.create()
-                                            .setRole(QwenVLChatRole.user)
-                                            .addContentItem(QwenVLChatMessageContentItem.create()
+                            .setInput(QwenVLRequest.Input.create()
+                                    .addMessage(QwenVLInputMessage.create()
+                                            .setRole(QwenVLRole.user)
+                                            .addContentItem(QwenVLMessageContentItem.create()
                                                     .setImage("https://pics6.baidu.com/feed/8601a18b87d6277f6438cea9e7199b3ee924fc2e.jpeg@f_auto?token=cb586c2ff83aefa74a3365453f55eaba")
                                             )
-                                            .addContentItem(QwenVLChatMessageContentItem.create()
+                                            .addContentItem(QwenVLMessageContentItem.create()
                                                     .setText("图片中的人是谁")
                                             )
                                     ));
@@ -64,13 +61,13 @@ public class QwenVLTest1 extends DashscopeTestCore {
                 )
                 .compose(resp -> {
                     getLogger().info("resp");
-                    List<QwenVLChatResponseMixin.Choice> choices = resp.getOutput().getChoices();
-                    QwenVLChatResponseMixin.Choice choice = choices.get(0);
-                    QwenKit.VLChatOutputMessage message = choice.getMessage();
-                    QwenVLChatRole role = message.getRole();
+                    List<QwenVLResponse.Choice> choices = resp.getOutput().getChoices();
+                    QwenVLResponse.Choice choice = choices.get(0);
+                    QwenVLOutputMessage message = choice.getMessage();
+                    QwenVLRole role = message.getRole();
                     String finishReason = choice.getFinishReason();
                     getLogger().info("Role: " + role + " | Finish Reason: " + finishReason);
-                    List<QwenVLChatMessageContentItem> content = message.getContent();
+                    List<QwenVLMessageContentItem> content = message.getContent();
                     content.forEach(item -> {
                         getLogger().info("Content Item", new JsonObject()
                                 .put("text", item.getText())

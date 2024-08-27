@@ -1,8 +1,8 @@
 package io.github.sinri.AiOnHttpMix.test.azure.chat;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.AssistantMessage;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.OpenAIChatGptMessage;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseChoice;
 import io.github.sinri.keel.tesuto.TestUnit;
@@ -103,7 +103,7 @@ public class AzureChatTest3 extends AzureChatTestCore {
                 .compose(resp -> {
                     OpenAIChatGptResponseChoice choice = resp.getChoices().get(0);
                     AssistantMessage message = choice.getMessage();
-                    OpenAIChatGptMessage.ChatCompletionRequestMessageRole role = message.getRole();
+                    ChatGptRole role = message.getRole();
                     String content = message.getContent();
                     var toolCalls = message.getToolCalls();
 

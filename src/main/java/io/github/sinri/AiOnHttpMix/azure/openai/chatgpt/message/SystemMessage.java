@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message;
 
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +10,7 @@ public final class SystemMessage implements OpenAIChatGptMessage {
     public SystemMessage(String name, String content) {
         super();
         jsonObject = new JsonObject()
-                .put("role", ChatCompletionRequestMessageRole.system.name())
+                .put("role", ChatGptRole.system.name())
                 .put("name", name)
                 .put("content", content);
     }
@@ -17,7 +18,7 @@ public final class SystemMessage implements OpenAIChatGptMessage {
     public SystemMessage(String content) {
         super();
         jsonObject = new JsonObject()
-                .put("role", ChatCompletionRequestMessageRole.system.name())
+                .put("role", ChatGptRole.system.name())
                 .put("content", content);
     }
 
