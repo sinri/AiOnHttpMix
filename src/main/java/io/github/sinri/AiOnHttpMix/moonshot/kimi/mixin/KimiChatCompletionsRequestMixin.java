@@ -5,7 +5,6 @@ import io.github.sinri.keel.core.SelfInterface;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface KimiChatCompletionsRequestMixin<E> extends JsonifiableEntity<E>, SelfInterface<E> {

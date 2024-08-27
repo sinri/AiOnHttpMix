@@ -4,8 +4,6 @@ import io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit;
 import io.github.sinri.AiOnHttpMix.volces.v3.mixin.tool.SharedMessageToolCall;
 import io.github.sinri.keel.core.SelfInterface;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
-import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.Nullable;
 
 public interface VolcesChatMessageToolCallParamMixin<E> extends SharedMessageToolCall, JsonifiableEntity<E>, SelfInterface<E> {
     default E setId(String id) {

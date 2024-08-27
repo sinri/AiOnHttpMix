@@ -1,14 +1,17 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt;
 
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptResponseChunkChoice;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptResponseChunkChoiceDelta;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIResponseChunk;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.TempAssistantMessage;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.embeddings.OpenAIEmbeddingResponse;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.AssistantMessage;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.OpenAIChatGptMessage;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponse;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseFunctionCall;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.impl.chunk.ResponseChunkImpl;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.impl.chunk.TempAssistantMessage;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.impl.embeddings.EmbeddingResponseImpl;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.impl.message.AssistantMessage;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.impl.request.ChatCompletionsParametersImpl;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.impl.request.ToolDefinitionImpl;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.impl.response.CreateChatCompletionResponseImpl;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.mixin.*;
 import io.github.sinri.keel.core.cutter.CutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -16,19 +19,10 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.List;
 
 public final class ChatGPTKit {
-    private static final ChatGPTKit instance = new ChatGPTKit();
-
-    private ChatGPTKit() {
-    }
-
-    public static ChatGPTKit getInstance() {
-        return instance;
-    }
-
-    public Future<JsonObject> callChatCompletions(
+    public Future<JsonObject> chat(
             AzureOpenAIServiceMeta serviceMeta,
             JsonObject parameters,
             String requestId
@@ -37,18 +31,28 @@ public final class ChatGPTKit {
         return serviceMeta.request(api, parameters, requestId);
     }
 
-    public Future<CreateChatCompletionResponse> callChatCompletions(
+    public Future<OpenAIChatGptResponse> chat(
             AzureOpenAIServiceMeta serviceMeta,
-            ChatCompletionsParameters parameters,
+            OpenAIChatGptRequest parameters,
             String requestId
     ) {
-        return callChatCompletions(serviceMeta, parameters.toJsonObject(), requestId)
+        return chat(serviceMeta, parameters.toJsonObject(), requestId)
                 .compose(resp -> {
-                    return Future.succeededFuture(CreateChatCompletionResponse.wrap(resp));
+                    return Future.succeededFuture(OpenAIChatGptResponse.wrap(resp));
                 });
     }
 
-    public Future<Void> callChatCompletionsStream(
+    public Future<OpenAIChatGptResponse> chat(
+            AzureOpenAIServiceMeta serviceMeta,
+            Handler<OpenAIChatGptRequest> handler,
+            String requestId
+    ) {
+        OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
+        handler.handle(request);
+        return chat(serviceMeta, request, requestId);
+    }
+
+    public Future<Void> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
             JsonObject parameters,
             @NotNull Handler<String> chunkHandler,
@@ -75,41 +79,62 @@ public final class ChatGPTKit {
         return promise.future();
     }
 
-    public Future<Void> callChatCompletionsStream(
+    public Future<Void> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
-            ChatCompletionsParameters parameters,
-            @NotNull Handler<ResponseChunk> chunkHandler,
+            Handler<OpenAIChatGptRequest> handler,
+            @NotNull Handler<OpenAIResponseChunk> chunkHandler,
             String requestId
     ) {
-        return this.callChatCompletionsStream(
+        OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
+        handler.handle(request);
+        return chatStream(serviceMeta, request, chunkHandler, requestId);
+    }
+
+    public Future<Void> chatStream(
+            AzureOpenAIServiceMeta serviceMeta,
+            OpenAIChatGptRequest parameters,
+            @NotNull Handler<OpenAIResponseChunk> chunkHandler,
+            String requestId
+    ) {
+        return this.chatStream(
                 serviceMeta,
                 parameters.toJsonObject(),
                 s -> {
                     JsonObject entries = new JsonObject(s);
-                    ResponseChunkImpl responseChunk = new ResponseChunkImpl(entries);
+                    var responseChunk = OpenAIResponseChunk.wrap(entries);
                     chunkHandler.handle(responseChunk);
                 },
                 requestId
         );
     }
 
-    public Future<AssistantMessage> callChatCompletionsStream(
+    public Future<AssistantMessage> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
-            ChatCompletionsParameters parameters,
+            Handler<OpenAIChatGptRequest> handler,
+            String requestId
+    ) {
+        OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
+        handler.handle(request);
+        return chatStream(serviceMeta, request, requestId);
+    }
+
+    public Future<AssistantMessage> chatStream(
+            AzureOpenAIServiceMeta serviceMeta,
+            OpenAIChatGptRequest parameters,
             String requestId
     ) {
         TempAssistantMessage tempAssistantMessage = new TempAssistantMessage();
-        return this.callChatCompletionsStream(
+        return this.chatStream(
                         serviceMeta,
                         parameters.toJsonObject(),
                         s -> {
                             try {
                                 JsonObject entries = new JsonObject(s);
-                                ResponseChunkImpl responseChunk = new ResponseChunkImpl(entries);
-                                List<OpenAIResponseChunkMixin.ChoiceInChunk> choices = responseChunk.getChoices();
+                                var responseChunk = OpenAIResponseChunk.wrap(entries);
+                                List<OpenAIChatGptResponseChunkChoice> choices = responseChunk.getChoices();
                                 if (choices.isEmpty()) return;
-                                OpenAIResponseChunkMixin.ChoiceInChunk choiceInChunk = choices.get(0);
-                                OpenAIResponseChunkMixin.Delta delta = choiceInChunk.getDelta();
+                                OpenAIChatGptResponseChunkChoice choiceInChunk = choices.get(0);
+                                OpenAIChatGptResponseChunkChoiceDelta delta = choiceInChunk.getDelta();
                                 if (delta == null) return;
 
                                 String contentAsText = delta.getContentAsText();
@@ -117,12 +142,12 @@ public final class ChatGPTKit {
                                     tempAssistantMessage.acceptContentFragment(contentAsText);
                                 }
 
-                                OpenAIMessageMixin.ChatCompletionRequestMessageRole role = delta.getRole();
+                                OpenAIChatGptMessage.ChatCompletionRequestMessageRole role = delta.getRole();
                                 if (role != null) {
                                     tempAssistantMessage.acceptRole(role);
                                 }
 
-                                List<ToolCallInChunk> toolCalls = delta.getToolCalls();
+                                List<OpenAIChatGptResponseToolCall> toolCalls = delta.getToolCalls();
                                 if (toolCalls != null && !toolCalls.isEmpty()) {
                                     toolCalls.forEach(toolCall -> {
                                         String type = toolCall.getType();
@@ -133,7 +158,7 @@ public final class ChatGPTKit {
                                             Integer index = toolCall.getIndex();
                                             TempAssistantMessage.TempToolCall tempToolCall = tempAssistantMessage.getTempToolCall(index);
                                             if (tempToolCall != null) {
-                                                OpenAIToolCallMixin.FunctionCall function = toolCall.getFunction();
+                                                OpenAIChatGptResponseFunctionCall function = toolCall.getFunction();
                                                 if (function != null) {
                                                     TempAssistantMessage.TempFunctionCall tempFunctionCall = tempToolCall.getFunction();
                                                     String arguments = function.getArguments();
@@ -156,60 +181,14 @@ public final class ChatGPTKit {
                 });
     }
 
-    public Future<EmbeddingResponse> callEmbeddings(AzureOpenAIServiceMeta serviceMeta, String input, String requestId) {
+    public Future<OpenAIEmbeddingResponse> fetchEmbeddingTensorForText(AzureOpenAIServiceMeta serviceMeta, String input, String requestId) {
         return serviceMeta.request(
                         "/embeddings",
                         new JsonObject().put("input", input),
                         requestId
                 )
                 .compose(jsonObject -> {
-                    return Future.succeededFuture(EmbeddingResponse.wrap(jsonObject));
+                    return Future.succeededFuture(OpenAIEmbeddingResponse.wrap(jsonObject));
                 });
-    }
-
-    public interface EmbeddingResponse extends OpenAIEmbeddingResponseMixin {
-        static EmbeddingResponse wrap(JsonObject jsonObject) {
-            return new EmbeddingResponseImpl(jsonObject);
-        }
-    }
-
-    /**
-     * @see <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions">Chat completions</a>
-     */
-    public interface ChatCompletionsParameters extends OpenAIChatCompletionsParametersMixin<ChatCompletionsParameters> {
-        static ChatCompletionsParameters create() {
-            return new ChatCompletionsParametersImpl();
-        }
-    }
-
-    public interface Message extends OpenAIMessageMixin<Message> {
-        static Builder builder() {
-            return new Builder();
-        }
-    }
-
-    public interface ToolDefinition extends OpenAIToolDefinitionMixin<ToolDefinition> {
-
-        static ToolDefinitionImpl.Builder builder() {
-            return new ToolDefinitionImpl.Builder();
-        }
-//        static FunctionToolDefinitionBuilder builder() {
-//            return new ToolDefinitionImpl.FunctionToolDefinitionBuilder();
-//        }
-    }
-
-    public interface ToolCall extends OpenAIToolCallMixin {
-    }
-
-    public interface ToolCallInChunk extends ToolCall {
-    }
-
-    public interface CreateChatCompletionResponse extends OpenAICreateChatCompletionResponseMixin {
-        static CreateChatCompletionResponse wrap(JsonObject response) {
-            return new CreateChatCompletionResponseImpl(response);
-        }
-    }
-
-    public interface ResponseChunk extends OpenAIResponseChunkMixin {
     }
 }

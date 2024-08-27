@@ -1,7 +1,6 @@
 package io.github.sinri.AiOnHttpMix.moonshot.kimi.impl;
 
 import io.github.sinri.AiOnHttpMix.moonshot.kimi.KimiKit;
-import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 

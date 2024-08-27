@@ -1,8 +1,7 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.dalle;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
-import io.github.sinri.AiOnHttpMix.azure.openai.core.mixin.filter.ContentFilterSeverityResult;
-import io.github.sinri.AiOnHttpMix.azure.openai.core.impl.filter.ContentFilterSeverityResultImpl;
+import io.github.sinri.AiOnHttpMix.azure.openai.core.filter.OpenAIContentFilterSeverityResult;
 import io.github.sinri.AiOnHttpMix.azure.openai.dalle.impl.Dalle3ResponseImpl;
 import io.github.sinri.AiOnHttpMix.azure.openai.dalle.impl.DalleContentFilterResultsImpl;
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
@@ -202,7 +201,7 @@ public class Dalle3Kit {
                 return readString("revised_prompt");
             }
 
-            public DalleContentFilterResults getContentFilterResults(){
+            public DalleContentFilterResults getContentFilterResults() {
                 return DalleContentFilterResults.wrap(readJsonObject("content_filter_results"));
             }
         }
@@ -228,31 +227,31 @@ public class Dalle3Kit {
         }
 
         @Nullable
-        default ContentFilterSeverityResult getSexual() {
+        default OpenAIContentFilterSeverityResult getSexual() {
             JsonObject entries = readJsonObject("sexual");
             if (entries == null) return null;
-            return new ContentFilterSeverityResultImpl(entries);
+            return OpenAIContentFilterSeverityResult.wrap(entries);
         }
 
         @Nullable
-        default ContentFilterSeverityResult getViolence() {
+        default OpenAIContentFilterSeverityResult getViolence() {
             JsonObject entries = readJsonObject("violence");
             if (entries == null) return null;
-            return new ContentFilterSeverityResultImpl(entries);
+            return OpenAIContentFilterSeverityResult.wrap(entries);
         }
 
         @Nullable
-        default ContentFilterSeverityResult getHate() {
+        default OpenAIContentFilterSeverityResult getHate() {
             JsonObject entries = readJsonObject("hate");
             if (entries == null) return null;
-            return new ContentFilterSeverityResultImpl(entries);
+            return OpenAIContentFilterSeverityResult.wrap(entries);
         }
 
         @Nullable
-        default ContentFilterSeverityResult getSelfHarm() {
+        default OpenAIContentFilterSeverityResult getSelfHarm() {
             JsonObject entries = readJsonObject("self_harm");
             if (entries == null) return null;
-            return new ContentFilterSeverityResultImpl(entries);
+            return OpenAIContentFilterSeverityResult.wrap(entries);
         }
     }
 }

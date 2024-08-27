@@ -5,7 +5,6 @@ import io.github.sinri.AiOnHttpMix.volces.v3.mixin.chunk.VolcesChatCompletionsRe
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -73,7 +72,7 @@ public class TempVolcesChatCompletionsResponse {
     public static class TempChoice {
         private Integer index;
         private String finishReason;
-        private TempMessage tempMessage;
+        private final TempMessage tempMessage;
 
         public TempChoice() {
             tempMessage = new TempMessage();
@@ -100,8 +99,8 @@ public class TempVolcesChatCompletionsResponse {
 
     public static class TempMessage {
         private VolcesKit.ChatRole role;
-        private StringBuilder content;
-        private Map<Integer, TempToolCall> toolCallMap;
+        private final StringBuilder content;
+        private final Map<Integer, TempToolCall> toolCallMap;
 
         public TempMessage() {
             content = new StringBuilder();
@@ -150,8 +149,8 @@ public class TempVolcesChatCompletionsResponse {
         private String id;
         private String type;
         private Integer index;
-        private StringBuilder name;
-        private StringBuilder arguments;
+        private final StringBuilder name;
+        private final StringBuilder arguments;
 
         public TempToolCall() {
             name = new StringBuilder();

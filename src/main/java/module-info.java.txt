@@ -1,4 +1,4 @@
-module AiOnHttpMix {
+module io.github.sinri.AiOnHttpMix {
     exports io.github.sinri.AiOnHttpMix.azure.bing.search;
     exports io.github.sinri.AiOnHttpMix.azure.openai.chatgpt;
     exports io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.mixin;
@@ -13,4 +13,5 @@ module AiOnHttpMix {
     exports io.github.sinri.AiOnHttpMix.dashscope.qwen.mixin.vl;
 
     requires org.jetbrains.annotations;
+    requires io.github.sinri.keel;
 }
