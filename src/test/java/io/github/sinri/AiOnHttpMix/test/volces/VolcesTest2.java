@@ -1,10 +1,14 @@
 package io.github.sinri.AiOnHttpMix.test.volces;
 
+import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit;
-import io.github.sinri.AiOnHttpMix.volces.v3.mixin.response.VolcesChatResponseMessageToolCallMixin;
+import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatMessageForRequest;
+import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
+import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatToolDefinition;
+import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponseChoice;
+import io.github.sinri.AiOnHttpMix.volces.v3.tool.VolcesChatFunctionDefinition;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -12,24 +16,24 @@ import java.util.UUID;
 
 public class VolcesTest2 extends VolcesTestCore {
     private VolcesKit volcesKit;
-    private VolcesKit.ChatCompletionsRequest chatCompletionsRequest;
+    private VolcesChatRequest chatCompletionsRequest;
 
     @Override
     protected @NotNull Future<Void> starting() {
         return super.starting()
                 .compose(v -> {
                     volcesKit = new VolcesKit();
-                    chatCompletionsRequest = VolcesKit.ChatCompletionsRequest.create()
-                            .addMessage(VolcesKit.MessageParam.create()
-                                    .setRole(VolcesKit.ChatRole.system)
+                    chatCompletionsRequest = VolcesChatRequest.create()
+                            .addMessage(VolcesChatMessageForRequest.create()
+                                    .setRole(VolcesChatRole.system)
                                     .setContent("你现在负责为大家搜寻数据集。你需要根据用户的描述，识别出可能的数据集关键词，据此查找相关的数据集。")
                             )
-                            .addMessage(VolcesKit.MessageParam.create()
-                                    .setRole(VolcesKit.ChatRole.user)
+                            .addMessage(m -> m
+                                    .setRole(VolcesChatRole.user)
                                     .setContent("每年在天猫平台上达成的商品销售额")
                             )
-                            .addTool(VolcesKit.ToolParam.create(
-                                    VolcesKit.FunctionDefinition.builder()
+                            .addTool(VolcesChatToolDefinition.create(
+                                    VolcesChatFunctionDefinition.builder()
                                             .functionName("searchDataSet")
                                             .functionDescription("根据信息查询可能的数据集")
                                             .propertyAsString("keywords", "由一组关键字字符串组成的JSON数组")
@@ -66,8 +70,8 @@ public class VolcesTest2 extends VolcesTestCore {
                 )
                 .compose(resp -> {
                     getLogger().info("resp");
-                    List<VolcesKit.ChatCompletionsResponse.Choice> choices = resp.getChoices();
-                    VolcesKit.ChatCompletionsResponse.Choice choice = choices.get(0);
+                    List<VolcesChatResponseChoice> choices = resp.getChoices();
+                    VolcesChatResponseChoice choice = choices.get(0);
                     var message = choice.getMessage();
                     getLogger().info("role: " + message.getRole());
                     String content = message.getContent();
@@ -78,7 +82,7 @@ public class VolcesTest2 extends VolcesTestCore {
                     if (toolCalls != null) {
                         toolCalls.forEach(toolCall -> {
                             getLogger().info("toolCall: " + toolCall.getType() + " id: " + toolCall.getId());
-                            VolcesKit.FunctionParam function = toolCall.getFunction();
+                            var function = toolCall.getFunction();
                             if (function != null) {
                                 getLogger().info("function: " + function.getName() + " | " + function.getArguments());
                             }

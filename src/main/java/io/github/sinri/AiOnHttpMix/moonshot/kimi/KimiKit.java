@@ -9,6 +9,7 @@ import io.vertx.core.json.JsonObject;
 /**
  * Moonshot is not tested due to account lack of money.
  */
+@Deprecated
 public class KimiKit {
     public Future<JsonObject> getModels(MoonshotServiceMeta serviceMeta, String requestId) {
         return serviceMeta.requestGet("/v1/models", requestId);
