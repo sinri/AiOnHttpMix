@@ -17,7 +17,8 @@ public class BingSearchKit {
 //        String searchQuery = "赛能和阿司匹林能一起吃吗";
 //        String mkt = "zh-CN";
 
-        var x = WebClient.create(Keel.getVertx())
+        WebClient webClient = WebClient.create(Keel.getVertx());
+        var x = webClient
                 .get(443, "api.bing.microsoft.com", "/v7.0/search")
                 .ssl(true);
         parameters.forEach(e -> {
@@ -35,6 +36,9 @@ public class BingSearchKit {
                             .put("headers", headers)
                             .put("raw_body", body)
                     );
+                })
+                .andThen(ar -> {
+                    webClient.close();
                 });
     }
 }

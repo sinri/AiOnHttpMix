@@ -75,7 +75,8 @@ public class DashscopeServiceMeta implements ServiceMeta {
 
     @Override
     public final Future<JsonObject> request(String api, JsonObject requestBody, String requestId) {
-        var req = WebClient.create(Keel.getVertx())
+        WebClient webClient = WebClient.create(Keel.getVertx());
+        var req = webClient
                 .postAbs(api)
                 .putHeader("Content-Type", "application/json")
                 .putHeader("Authorization", "Bearer " + apiKey);
@@ -93,6 +94,9 @@ public class DashscopeServiceMeta implements ServiceMeta {
                     }
                     JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
                     return Future.succeededFuture(entries);
+                })
+                .andThen(ar -> {
+                    webClient.close();
                 });
     }
 
@@ -144,5 +148,9 @@ public class DashscopeServiceMeta implements ServiceMeta {
                 .onFailure(throwable -> {
                     promise.fail(new RuntimeException("HttpClient request exception for request: " + requestId, throwable));
                 });
+
+        promise.future().andThen(ar -> {
+            client.close();
+        });
     }
 }

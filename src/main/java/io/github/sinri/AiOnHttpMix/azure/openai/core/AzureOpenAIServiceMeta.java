@@ -51,7 +51,8 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
             String requestId
     ) {
         var url = generateUrl(api);
-        return WebClient.create(Keel.getVertx())
+        WebClient webClient = WebClient.create(Keel.getVertx());
+        return webClient
                 .postAbs(url)
                 .putHeader("Content-Type", "application/json")
                 .putHeader("api-key", apiKey)
@@ -66,6 +67,9 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
                         ));
                     }
                     return Future.succeededFuture(entries);
+                })
+                .andThen(ar -> {
+                    webClient.close();
                 });
     }
 
@@ -117,5 +121,9 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
                 .onFailure(throwable -> {
                     promise.tryFail(new RuntimeException("HttpClient request exception for request: " + requestId, throwable));
                 });
+
+        promise.future().andThen(ar -> {
+            client.close();
+        });
     }
 }

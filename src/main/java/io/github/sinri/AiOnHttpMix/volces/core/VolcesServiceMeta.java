@@ -17,8 +17,8 @@ public class VolcesServiceMeta implements ServiceMeta {
     private static final String hostOfV3ChatCompletions = "ark.cn-beijing.volces.com";
     public static final String pathOfV3ChatCompletions = "/api/v3/chat/completions";
     //private static final String endpointOfV3ChatCompletions = "https://" + hostOfV3ChatCompletions + pathOfV3ChatCompletions;
-    private @NotNull String apiKey;
-    private @NotNull String model;
+    private final @NotNull String apiKey;
+    private final @NotNull String model;
 
     public @NotNull String getModel() {
         return model;
@@ -31,7 +31,8 @@ public class VolcesServiceMeta implements ServiceMeta {
 
     @Override
     public Future<JsonObject> request(String api, JsonObject requestBody, String requestId) {
-        return WebClient.create(Keel.getVertx())
+        WebClient webClient = WebClient.create(Keel.getVertx());
+        return webClient
                 .postAbs("https://" + hostOfV3ChatCompletions + api)
                 .bearerTokenAuthentication(apiKey)
                 .sendJsonObject(requestBody)
@@ -43,6 +44,9 @@ public class VolcesServiceMeta implements ServiceMeta {
                     return Future.succeededFuture(respAsJsonObject);
                     //ChatCompletionsResponse chatCompletionsResponse = new ChatCompletionsResponse(respAsJsonObject);
                     //return Future.succeededFuture(chatCompletionsResponse);
+                })
+                .andThen(ar -> {
+                    webClient.close();
                 });
     }
 
@@ -83,5 +87,8 @@ public class VolcesServiceMeta implements ServiceMeta {
                     promise.fail(new RuntimeException("httpClient request exception", throwable));
                 });
 
+        promise.future().andThen(ar -> {
+            client.close();
+        });
     }
 }

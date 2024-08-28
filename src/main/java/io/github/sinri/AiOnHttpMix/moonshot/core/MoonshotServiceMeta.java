@@ -23,20 +23,25 @@ public class MoonshotServiceMeta implements ServiceMeta {
     }
 
     public Future<JsonObject> requestGet(String api,String requestId) {
-        return WebClient.create(Keel.getVertx())
+        WebClient webClient = WebClient.create(Keel.getVertx());
+        return webClient
                 .getAbs(endpoint + api)
                 .bearerTokenAuthentication(apiKey)
                 .send()
                 .compose(bufferHttpResponse -> {
                     return Future.succeededFuture(bufferHttpResponse.bodyAsJsonObject());
+                })
+                .andThen(ar -> {
+                    webClient.close();
                 });
     }
 
     @Override
     public Future<JsonObject> request(String api, JsonObject requestBody, String requestId) {
+        WebClient webClient = WebClient.create(Keel.getVertx());
         return Future.succeededFuture(endpoint + api)
                 .compose(url -> {
-                    var req = WebClient.create(Keel.getVertx())
+                    var req = webClient
                             .postAbs(url)
                             .bearerTokenAuthentication(apiKey);
                     return Future.succeededFuture(req);
@@ -51,6 +56,9 @@ public class MoonshotServiceMeta implements ServiceMeta {
                     } else {
                         return Future.failedFuture("MoonshotServiceMeta Request Failed, status code is " + statusCode + ", request id is " + requestId);
                     }
+                })
+                .andThen(ar -> {
+                    webClient.close();
                 });
     }
 
@@ -89,5 +97,9 @@ public class MoonshotServiceMeta implements ServiceMeta {
                 .onFailure(throwable -> {
                     promise.fail(new RuntimeException("httpClient request exception for request id " + requestId, throwable));
                 });
+
+        promise.future().andThen(ar -> {
+            client.close();
+        });
     }
 }
