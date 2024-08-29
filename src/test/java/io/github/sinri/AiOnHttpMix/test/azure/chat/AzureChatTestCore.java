@@ -9,10 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class AzureChatTestCore extends KeelTest {
-    private String apiKey;
-    private String resourceName;
-    private String deployment;
-    private String apiVersion;
     private AzureOpenAIServiceMeta serviceMeta;
 
     @Override
@@ -22,12 +18,12 @@ public class AzureChatTestCore extends KeelTest {
 //        var serviceName="Seventh-Tower-GPT4";
         var serviceName = "gpt-4-o";
 
-        this.apiKey = Keel.config("azure.openai." + serviceName + ".apiKey");
-        this.resourceName = Keel.config("azure.openai." + serviceName + ".resourceName");
-        this.deployment = Keel.config("azure.openai." + serviceName + ".deployment");
-        this.apiVersion = Keel.config("azure.openai." + serviceName + ".apiVersion");
+        String apiKey = Keel.config("azure.openai." + serviceName + ".apiKey");
+        String resourceName = Keel.config("azure.openai." + serviceName + ".resourceName");
+        String deployment = Keel.config("azure.openai." + serviceName + ".deployment");
+        String apiVersion = Keel.config("azure.openai." + serviceName + ".apiVersion");
 
-        this.serviceMeta =  AzureOpenAIServiceMeta.create(apiKey, resourceName, deployment, apiVersion);
+        this.serviceMeta = new AzureOpenAIServiceMeta(apiKey, resourceName, deployment, apiVersion);
 
         getLogger().setVisibleLevel(KeelLogLevel.DEBUG);
 

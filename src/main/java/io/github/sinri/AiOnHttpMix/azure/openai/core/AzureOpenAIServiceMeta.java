@@ -14,16 +14,13 @@ import org.jetbrains.annotations.NotNull;
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class AzureOpenAIServiceMeta implements ServiceMeta {
-    public static AzureOpenAIServiceMeta create(String apiKey, String resourceName, String deployment, String apiVersion) {
-        return new AzureOpenAIServiceMeta(apiKey, resourceName, deployment, apiVersion);
-    }
 
     private final String apiKey;
     private final String resourceName;
     private final String deployment;
     private final String apiVersion;
 
-    private AzureOpenAIServiceMeta(String apiKey, String resourceName, String deployment, String apiVersion) {
+    public AzureOpenAIServiceMeta(String apiKey, String resourceName, String deployment, String apiVersion) {
         this.apiKey = apiKey;
         this.resourceName = resourceName;
         this.deployment = deployment;

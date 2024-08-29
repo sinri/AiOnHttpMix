@@ -26,7 +26,7 @@ public class AzureDalle3TestCore extends KeelTest {
         this.deployment = Keel.config("azure.openai." + serviceName + ".deployment");
         this.apiVersion = Keel.config("azure.openai." + serviceName + ".apiVersion");
 
-        this.serviceMeta =  AzureOpenAIServiceMeta.create(apiKey, resourceName, deployment, apiVersion);
+        this.serviceMeta = new AzureOpenAIServiceMeta(apiKey, resourceName, deployment, apiVersion);
 
         getLogger().setVisibleLevel(KeelLogLevel.DEBUG);
 
