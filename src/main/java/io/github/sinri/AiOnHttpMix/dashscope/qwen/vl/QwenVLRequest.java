@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.dashscope.qwen.vl;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.Nullable;
@@ -24,13 +25,25 @@ public interface QwenVLRequest extends JsonifiableEntity<QwenVLRequest> {
     }
 
     default QwenVLRequest setInput(Input input) {
-        toJsonObject().put("input",input.toJsonObject());
+        toJsonObject().put("input", input.toJsonObject());
         return this;
     }
 
+    default QwenVLRequest handleInput(Handler<Input> inputHandler) {
+        Input input = Input.create();
+        inputHandler.handle(input);
+        return setInput(input);
+    }
+
     default QwenVLRequest setParameters(Parameters parameters) {
-        toJsonObject().put("parameters",parameters.toJsonObject());
+        toJsonObject().put("parameters", parameters.toJsonObject());
         return this;
+    }
+
+    default QwenVLRequest handleParameters(Handler<Parameters> parametersHandler) {
+        Parameters parameters = Parameters.create();
+        parametersHandler.handle(parameters);
+        return setParameters(parameters);
     }
 
     interface Input extends JsonifiableEntity<Input> {
@@ -38,6 +51,7 @@ public interface QwenVLRequest extends JsonifiableEntity<QwenVLRequest> {
         static Input create() {
             return new QwenVLRequestImpl.InputImpl();
         }
+
         static Input wrap(JsonObject input) {
             return new QwenVLRequestImpl.InputImpl(input);
         }
@@ -60,6 +74,7 @@ public interface QwenVLRequest extends JsonifiableEntity<QwenVLRequest> {
         static Parameters create() {
             return new QwenVLRequestImpl.ParametersImpl();
         }
+
         static Parameters wrap(JsonObject parameters) {
             return new QwenVLRequestImpl.ParametersImpl(parameters);
         }
