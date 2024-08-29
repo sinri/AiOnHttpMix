@@ -7,8 +7,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 class DashscopeTextEmbeddingGenerateResponseImpl extends UnmodifiableJsonifiableEntityImpl implements DashscopeTextEmbeddingGenerateResponse {
-    public DashscopeTextEmbeddingGenerateResponseImpl(@NotNull JsonObject jsonObject) {
+    private final int statusCode;
+
+    public DashscopeTextEmbeddingGenerateResponseImpl(int statusCode, @NotNull JsonObject jsonObject) {
         super(jsonObject);
+        this.statusCode = statusCode;
+    }
+
+    @Override
+    public int getStatusCode() {
+        return statusCode;
     }
 
     public static class OutputImpl extends UnmodifiableJsonifiableEntityImpl implements DashscopeTextEmbeddingGenerateResponseOutput {

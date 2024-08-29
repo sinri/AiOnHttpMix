@@ -165,7 +165,14 @@ public class QwenKit {
     ) {
         return serviceMeta.callTextEmbeddingGeneration(requestBody.toJsonObject(), requestId)
                 .compose(jsonObject -> {
-                    return Future.succeededFuture(DashscopeTextEmbeddingGenerateResponse.wrap(jsonObject));
+                    return Future.succeededFuture(DashscopeTextEmbeddingGenerateResponse.wrap(200, jsonObject));
+                }, throwable -> {
+                    if (throwable instanceof ServiceMeta.AbnormalResponse abnormalResponse) {
+                        int statusCode = abnormalResponse.getStatusCode();
+                        JsonObject responseBodyAsJson = abnormalResponse.getResponseBodyAsJson();
+                        return Future.succeededFuture(DashscopeTextEmbeddingGenerateResponse.wrap(statusCode, responseBodyAsJson));
+                    }
+                    return Future.failedFuture(throwable);
                 });
     }
 

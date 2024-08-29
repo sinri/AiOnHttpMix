@@ -4,9 +4,11 @@ import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
 public interface DashscopeTextEmbeddingGenerateResponse extends UnmodifiableJsonifiableEntity {
-    static DashscopeTextEmbeddingGenerateResponse wrap(JsonObject response) {
-        return new DashscopeTextEmbeddingGenerateResponseImpl(response);
+    static DashscopeTextEmbeddingGenerateResponse wrap(int statusCode, JsonObject response) {
+        return new DashscopeTextEmbeddingGenerateResponseImpl(statusCode, response);
     }
+
+    int getStatusCode();
 
     default DashscopeTextEmbeddingGenerateResponseOutput getOutput() {
         var x = readJsonObject("output");
