@@ -2,10 +2,15 @@ package io.github.sinri.AiOnHttpMix.dashscope.qwen.vl;
 
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 public interface QwenVLInputMessage extends JsonifiableEntity<QwenVLInputMessage> {
     static QwenVLInputMessage create() {
         return new QwenVLInputMessageImpl();
+    }
+
+    static QwenVLInputMessage wrap(JsonObject json) {
+        return new QwenVLInputMessageImpl(json);
     }
 
     default QwenVLRole getRole() {
