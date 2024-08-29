@@ -6,13 +6,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class QwenResponseChunkImpl extends UnmodifiableJsonifiableEntityImpl implements QwenResponseChunk {
-    public QwenResponseChunkImpl(@NotNull JsonObject jsonObject) {
+    private final int statusCode;
+
+    public QwenResponseChunkImpl(int statusCode, @NotNull JsonObject jsonObject) {
         super(jsonObject);
+        this.statusCode = statusCode;
     }
 
     @Override
     public OutputChunkForMessageResponse getOutput() {
         return OutputChunkForMessageResponse.wrap(readJsonObject("output"));
+    }
+
+    @Override
+    public int getStatusCode() {
+        return statusCode;
     }
 
     @Nullable

@@ -85,11 +85,12 @@ public class DashscopeServiceMeta implements ServiceMeta {
                 .compose(bufferHttpResponse -> {
                     int statusCode = bufferHttpResponse.statusCode();
                     if (statusCode != 200) {
-                        return Future.failedFuture(new Exception(
-                                "Dashscope Service Response Error,"
-                                        + " Status Code " + statusCode
-                                        + " for request " + requestId
-                                        + " Content: " + bufferHttpResponse.bodyAsString()
+                        return Future.failedFuture(new AbnormalResponse(
+                                statusCode, bufferHttpResponse.bodyAsString()
+//                                "Dashscope Service Response Error,"
+//                                        + " Status Code " + statusCode
+//                                        + " for request " + requestId
+//                                        + " Content: " + bufferHttpResponse.bodyAsString()
                         ));
                     }
                     JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
@@ -153,4 +154,6 @@ public class DashscopeServiceMeta implements ServiceMeta {
             client.close();
         });
     }
+
+
 }

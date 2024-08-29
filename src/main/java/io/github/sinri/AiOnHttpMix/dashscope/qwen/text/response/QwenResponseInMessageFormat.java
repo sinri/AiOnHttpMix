@@ -9,8 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public interface QwenResponseInMessageFormat extends QwenResponseBase {
-    static QwenResponseInMessageFormat wrap(JsonObject jsonObject) {
-        return new QwenResponseInMessageFormatImpl(jsonObject);
+    static QwenResponseInMessageFormat wrap(int statusCode, JsonObject jsonObject) {
+        return new QwenResponseInMessageFormatImpl(statusCode, jsonObject);
     }
 
     OutputForMessageResponse getOutput();

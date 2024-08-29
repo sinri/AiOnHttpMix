@@ -30,7 +30,7 @@ public class QwenStreamBuffer {
     }
 
     public QwenResponseInMessageFormat toChatMessageResponse() {
-        return QwenResponseInMessageFormat.wrap(new JsonObject()
+        return QwenResponseInMessageFormat.wrap(200, new JsonObject()
                 .put("usage", usage.cloneAsJsonObject())
                 .put("output", new JsonObject()
                         .put("choices", new JsonArray()

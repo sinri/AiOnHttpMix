@@ -11,6 +11,7 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.response.QwenResponseInMe
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLResponse;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLStreamBuffer;
+import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.core.cutter.CutterOnString;
 import io.vertx.core.Future;
@@ -52,8 +53,16 @@ public class QwenKit {
         }
         return serviceMeta.callQwenTextGenerate(chatRequest.toJsonObject(), requestId)
                 .compose(jsonObject -> {
-                    QwenResponseInMessageFormat chatMessageResponse = QwenResponseInMessageFormat.wrap(jsonObject);
+                    QwenResponseInMessageFormat chatMessageResponse = QwenResponseInMessageFormat.wrap(200, jsonObject);
                     return Future.succeededFuture(chatMessageResponse);
+                }, throwable -> {
+                    if (throwable instanceof ServiceMeta.AbnormalResponse abnormalResponse) {
+                        int statusCode = abnormalResponse.getStatusCode();
+                        JsonObject responseBodyAsJson = abnormalResponse.getResponseBodyAsJson();
+                        QwenResponseInMessageFormat chatMessageResponse = QwenResponseInMessageFormat.wrap(statusCode, responseBodyAsJson);
+                        return Future.succeededFuture(chatMessageResponse);
+                    }
+                    return Future.failedFuture(throwable);
                 });
     }
 

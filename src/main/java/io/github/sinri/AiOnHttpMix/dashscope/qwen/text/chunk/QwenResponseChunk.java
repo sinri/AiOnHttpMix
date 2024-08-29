@@ -16,8 +16,9 @@ public interface QwenResponseChunk extends QwenResponseBase {
     }
 
     static QwenResponseChunk wrap(JsonObject jsonObject) {
-        return new QwenResponseChunkImpl(jsonObject);
+        return new QwenResponseChunkImpl(200, jsonObject);
     }
+
     OutputChunkForMessageResponse getOutput();
 
     interface OutputChunkForMessageResponse extends UnmodifiableJsonifiableEntity {

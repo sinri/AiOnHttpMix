@@ -9,8 +9,16 @@ import java.util.List;
 import java.util.Objects;
 
 class QwenResponseInMessageFormatImpl extends UnmodifiableJsonifiableEntityImpl implements QwenResponseInMessageFormat {
-    public QwenResponseInMessageFormatImpl(@NotNull JsonObject jsonObject) {
+    private final int statusCode;
+
+    public QwenResponseInMessageFormatImpl(int statusCode, @NotNull JsonObject jsonObject) {
         super(jsonObject);
+        this.statusCode = statusCode;
+    }
+
+    @Override
+    public int getStatusCode() {
+        return statusCode;
     }
 
     @Override

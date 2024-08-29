@@ -7,8 +7,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 class QwenResponseInTextFormatImpl extends UnmodifiableJsonifiableEntityImpl implements QwenResponseInTextFormat {
-    public QwenResponseInTextFormatImpl(@NotNull JsonObject jsonObject) {
+    private final int statusCode;
+
+    public QwenResponseInTextFormatImpl(int statusCode, @NotNull JsonObject jsonObject) {
         super(jsonObject);
+        this.statusCode = statusCode;
     }
 
     @Override
@@ -16,6 +19,11 @@ class QwenResponseInTextFormatImpl extends UnmodifiableJsonifiableEntityImpl imp
         JsonObject output = readJsonObject("output");
         Objects.requireNonNull(output);
         return new OutputForTextResponseImpl(output);
+    }
+
+    @Override
+    public int getStatusCode() {
+        return statusCode;
     }
 
     @Override

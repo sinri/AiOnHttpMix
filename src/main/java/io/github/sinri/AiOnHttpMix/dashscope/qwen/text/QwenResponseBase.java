@@ -4,6 +4,16 @@ import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
 public interface QwenResponseBase extends UnmodifiableJsonifiableEntity {
+    int getStatusCode();
+
+    default String getErrorCode() {
+        return readString("code");
+    }
+
+    default String getErrorMessage() {
+        return readString("message");
+    }
+
     Usage getUsage();
 
     /**

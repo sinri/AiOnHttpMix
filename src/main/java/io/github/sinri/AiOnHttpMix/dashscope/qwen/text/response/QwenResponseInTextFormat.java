@@ -7,9 +7,10 @@ import org.jetbrains.annotations.Nullable;
 
 public interface QwenResponseInTextFormat extends QwenResponseBase {
 
-    static QwenResponseInTextFormat wrap(JsonObject jsonObject) {
-        return new QwenResponseInTextFormatImpl(jsonObject);
+    static QwenResponseInTextFormat wrap(int statusCode, JsonObject jsonObject) {
+        return new QwenResponseInTextFormatImpl(statusCode, jsonObject);
     }
+
     OutputForTextResponse getOutput();
 
     interface OutputForTextResponse extends UnmodifiableJsonifiableEntity {
