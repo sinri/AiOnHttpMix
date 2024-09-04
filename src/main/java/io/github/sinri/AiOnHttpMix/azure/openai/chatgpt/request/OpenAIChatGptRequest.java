@@ -4,6 +4,7 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.OpenAIChatGptMes
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolDefinition;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 /**
  * @see <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions">Chat completions</a>
@@ -11,6 +12,10 @@ import io.vertx.core.Handler;
 public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptRequest> {
     static OpenAIChatGptRequest create() {
         return new OpenAIChatGptRequestImpl();
+    }
+
+    static OpenAIChatGptRequest wrap(JsonObject jsonObject) {
+        return new OpenAIChatGptRequestImpl(jsonObject);
     }
 
     /**

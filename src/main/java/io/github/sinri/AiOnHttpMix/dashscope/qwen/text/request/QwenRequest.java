@@ -49,8 +49,8 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
     }
 
     default QwenKit.QwenModel getModel() {
-        var model=readString("model");
-        if(model==null)return null;
+        var model = readString("model");
+        if (model == null) return null;
         return QwenKit.QwenModel.fromModelCode(model);
     }
 
@@ -303,6 +303,83 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
                     )
             );
             return this;
+        }
+
+        /**
+         * 尝鲜功能，阿里云还没有正式发布文档。
+         */
+        default Parameters handleSearchOptions(Handler<SearchOptions> searchOptionsHandler) {
+            SearchOptions searchOptions = SearchOptions.create();
+            searchOptionsHandler.handle(searchOptions);
+            return this.setSearchOptions(searchOptions);
+        }
+
+        /**
+         * 尝鲜功能，阿里云还没有正式发布文档。
+         */
+        @Nullable
+        default SearchOptions getSearchOptions() {
+            JsonObject entries = readJsonObject("search_options");
+            if (entries == null) return null;
+            return SearchOptions.wrap(entries);
+        }
+
+        /**
+         * 尝鲜功能，阿里云还没有正式发布文档。
+         */
+        default Parameters setSearchOptions(SearchOptions searchOptions) {
+            this.toJsonObject().put("search_options", searchOptions.toJsonObject());
+            return this;
+        }
+
+        interface SearchOptions extends JsonifiableEntity<SearchOptions> {
+            static SearchOptions create() {
+                return new QwenRequestParametersSearchOptionsImpl()
+                        .setCitationFormat("[ref_<number>]");
+            }
+
+            static SearchOptions wrap(JsonObject jsonObject) {
+                return new QwenRequestParametersSearchOptionsImpl(jsonObject);
+            }
+
+            default boolean getEnableSource() {
+                return this.toJsonObject().getBoolean("enable_source");
+            }
+
+            default SearchOptions setEnableSource(boolean enable_source) {
+                this.toJsonObject().put("enable_source", enable_source);
+                return this;
+            }
+
+            default boolean getEnableCitation() {
+                return this.toJsonObject().getBoolean("enable_citation");
+            }
+
+            default SearchOptions setEnableCitation(boolean enable_citation) {
+                this.toJsonObject().put("enable_citation", enable_citation);
+                return this;
+            }
+
+            default String getCitationFormat() {
+                return this.toJsonObject().getString("citation_format");
+            }
+
+            /**
+             * @param citation_format {@code [ref_<number>]} or {@code [<number>] }
+             */
+            default SearchOptions setCitationFormat(String citation_format) {
+                this.toJsonObject().put("citation_format", citation_format);
+                return this;
+            }
+
+            default boolean getForcedSearch() {
+                return this.toJsonObject().getBoolean("forced_search");
+            }
+
+            default SearchOptions setForcedSearch(boolean forced_search) {
+                this.toJsonObject().put("forced_search", forced_search);
+                return this;
+            }
         }
     }
 }
