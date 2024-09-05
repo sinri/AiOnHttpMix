@@ -9,8 +9,8 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 public class BingSearchKit {
     private final String subscriptionKey;
 
-    public BingSearchKit(String instanceCode) {
-        subscriptionKey = Keel.config("azure.bing.search." + instanceCode + ".SubscriptionKey");
+    public BingSearchKit(String subscriptionKey) {
+        this.subscriptionKey = subscriptionKey;
     }
 
     public Future<JsonObject> callForRaw(JsonObject parameters) {
