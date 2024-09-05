@@ -6,7 +6,35 @@
 
     <groupId>io.github.sinri</groupId>
     <artifactId>AiOnHttpMix</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
+
+    <name>AiOnHttpMix</name>
+    <description>
+        A library to handle LLM APIs over HTTP service.
+    </description>
+
+    <url>https://github.com/sinri/AiOnHttpMix</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/sinri/AiOnHttpMix</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Sinri Edogawa</name>
+            <email>e.joshua.s.e@gmail.com</email>
+            <organization>Sinri Edogawa</organization>
+            <organizationUrl>https://sinri.github.io</organizationUrl>
+        </developer>
+    </developers>
+
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -184,7 +212,7 @@
             </distributionManagement>
         </profile>
         <profile>
-            <id>release-to-github</id>
+            <id>release-to-mvn</id>
             <build>
                 <plugins>
                     <plugin>
