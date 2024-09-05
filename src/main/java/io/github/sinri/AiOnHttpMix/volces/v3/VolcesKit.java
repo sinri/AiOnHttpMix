@@ -13,7 +13,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.Objects;
 
-public class VolcesKit {
+public final class VolcesKit {
     public Future<JsonObject> chat(VolcesServiceMeta serviceMeta, JsonObject requestBody, String requestId) {
         requestBody.put("model", serviceMeta.getModel());
         return serviceMeta.request(

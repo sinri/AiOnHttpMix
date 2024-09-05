@@ -8,6 +8,7 @@ import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntityImpl;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,63 +41,16 @@ public class Dalle3Kit {
                 });
     }
 
-//    /**
-//     * @param prompt  prompt text
-//     * @param size    supported values are “1792x1024”, “1024x1024” and “1024x1792”
-//     * @param n       The number of images to generate. Only n=1 is supported for DALL-E 3.
-//     * @param quality Options are “hd” and “standard”; defaults to standard
-//     * @param style   Options are “natural” and “vivid”; defaults to “vivid”
-//     */
-//    protected Future<Dalle3Response> draw(
-//            AzureOpenAIServiceMeta serviceMeta,
-//            String prompt,
-//            String size,
-//            int n,
-//            String quality,
-//            String style,
-//            String requestId
-//    ) {
-//        return serviceMeta.postRequest(
-//                        "/images/generations",
-//                        new JsonObject()
-//                                .put("prompt", prompt)
-//                                .put("size", size)
-//                                .put("n", n)
-//                                .put("quality", quality)
-//                                .put("style", style),
-//                        requestId
-//                )
-//                .compose(resp -> {
-//                    var x = new Dalle3Response(resp);
-//                    return Future.succeededFuture(x);
-//                });
-//    }
-//
-//    public Future<String> drawOneImageForUrl(
-//            AzureOpenAIServiceMeta serviceMeta,
-//            String prompt,
-//            Dalle3Size size,
-//            Dalle3Quality quality,
-//            Dalle3Style style,
-//            String requestId
-//    ) {
-//        return draw(serviceMeta, prompt, size.size(), 1, quality.name(), style.name(), requestId)
-//                .compose(resp -> {
-//                    var data = resp.data();
-//                    if (data == null || data.isEmpty()) {
-//                        Dalle3Response.Error error = resp.error();
-//                        if (error != null) {
-//                            String msg = error.code() + " " + error.message();
-//                            return Future.failedFuture(msg);
-//                        } else {
-//                            return Future.failedFuture("Data contains nothing");
-//                        }
-//                    } else {
-//                        var url = data.get(0).url();
-//                        return Future.succeededFuture(url);
-//                    }
-//                });
-//    }
+    public Future<Dalle3Response> draw(
+            AzureOpenAIServiceMeta serviceMeta,
+            Handler<Parameters> parametersHandler,
+            String requestId
+    ) {
+        Parameters parameters = new Parameters();
+        parametersHandler.handle(parameters);
+        return this.draw(serviceMeta, parameters, requestId);
+    }
+
 
     public enum Dalle3Size {
         LANDSCAPE("1792x1024"),
@@ -126,13 +80,17 @@ public class Dalle3Kit {
     }
 
     public static class Parameters extends SimpleJsonifiableEntity {
-        public Parameters(String prompt) {
+        public Parameters() {
             super();
-            setPrompt(prompt);
             setN(1);
             setQuality(Dalle3Quality.standard);
             setStyle(Dalle3Style.natural);
             setSize(Dalle3Size.SQUARE);
+        }
+
+        public Parameters(String prompt) {
+            this();
+            setPrompt(prompt);
         }
 
         public Parameters setPrompt(String prompt) {

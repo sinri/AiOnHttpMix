@@ -19,7 +19,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 
-public class QwenKit {
+public final class QwenKit {
 
     public Future<JsonObject> chat(
             DashscopeServiceMeta serviceMeta,
