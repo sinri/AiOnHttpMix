@@ -15,7 +15,6 @@ public class AzureChatTestCore extends KeelTest {
     protected @NotNull Future<Void> starting() {
         Keel.getConfiguration().loadPropertiesFile("config.properties");
 
-//        var serviceName="Seventh-Tower-GPT4";
         var serviceName = "gpt-4-o";
 
         String apiKey = Keel.config("azure.openai." + serviceName + ".apiKey");
