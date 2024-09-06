@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class ContentFilterResultsBaseImpl extends UnmodifiableJsonifiableEntityImpl implements OpenAIContentFilterResultsBase {
+class ContentFilterResultsBaseImpl extends UnmodifiableJsonifiableEntityImpl implements OpenAIContentFilterResultsBase {
     public ContentFilterResultsBaseImpl(@NotNull JsonObject jsonObject) {
         super(jsonObject);
     }

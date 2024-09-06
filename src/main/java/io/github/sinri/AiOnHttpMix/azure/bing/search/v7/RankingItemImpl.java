@@ -4,7 +4,7 @@ import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
-public class RankingItemImpl extends UnmodifiableJsonifiableEntityImpl implements BingSearchResponse.RankingItem {
+class RankingItemImpl extends UnmodifiableJsonifiableEntityImpl implements BingSearchResponse.RankingItem {
     public RankingItemImpl(@NotNull JsonObject jsonObject) {
         super(jsonObject);
     }

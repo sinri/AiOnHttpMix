@@ -6,6 +6,8 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptReq
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponse;
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
 import io.github.sinri.AiOnHttpMix.azure.openai.dalle.Dalle3Kit;
+import io.github.sinri.AiOnHttpMix.azure.openai.dalle.v3.Dalle3Parameters;
+import io.github.sinri.AiOnHttpMix.azure.openai.dalle.v3.Dalle3Response;
 import io.github.sinri.AiOnHttpMix.dashscope.core.DashscopeServiceMeta;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
@@ -69,9 +71,9 @@ public class AigcMix {
         return getChatGPTKit().chatStream(serviceMeta, handler, requestId);
     }
 
-    public static Future<Dalle3Kit.Dalle3Response> dalle3(
+    public static Future<Dalle3Response> dalle3(
             AzureOpenAIServiceMeta serviceMeta,
-            Handler<Dalle3Kit.Parameters> parametersHandler,
+            Handler<Dalle3Parameters> parametersHandler,
             String requestId
     ) {
         return getDalle3Kit().draw(serviceMeta, parametersHandler, requestId);
