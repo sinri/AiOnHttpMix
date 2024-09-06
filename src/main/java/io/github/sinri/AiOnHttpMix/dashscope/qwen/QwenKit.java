@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.dashscope.core.DashscopeServiceMeta;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateResponse;
@@ -74,7 +75,15 @@ public final class QwenKit {
     ) {
         Promise<Void> promise = Promise.promise();
         CutterOnString cutter = new CutterOnString();
-        cutter.setComponentHandler(handler);
+        cutter.setComponentHandler(s -> {
+            AigcMix.getVerboseLogger().debug(
+                    "Component Handler in QwenKit.chatStreamWithStringHandler",
+                    j -> j
+                            .put("component", s)
+                            .put("request_id", requestId)
+            );
+            handler.handle(s);
+        });
         return serviceMeta.callQwenTextGenerateStream(
                 chatRequest,
                 promise,
@@ -205,7 +214,15 @@ public final class QwenKit {
     ) {
         Promise<Void> promise = Promise.promise();
         CutterOnString cutterOnString = new CutterOnString();
-        cutterOnString.setComponentHandler(handler);
+        cutterOnString.setComponentHandler(s -> {
+            AigcMix.getVerboseLogger().debug(
+                    "Component Handler in QwenKit.chatVLStreamWithStringHandler",
+                    j -> j
+                            .put("component", s)
+                            .put("request_id", requestId)
+            );
+            handler.handle(s);
+        });
         return serviceMeta.callQwenMultiModalGenerateStream(
                 jsonObject,
                 promise,

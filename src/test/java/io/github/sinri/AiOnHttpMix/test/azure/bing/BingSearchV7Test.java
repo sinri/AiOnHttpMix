@@ -7,6 +7,8 @@ import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class BingSearchV7Test extends KeelTest {
@@ -26,9 +28,11 @@ public class BingSearchV7Test extends KeelTest {
 
     @TestUnit
     public Future<Void> test1() {
-        return bingSearchInFirstTower.callBingSearch(BingSearchParameters.create()
-                        .setQ("日本东北地区的大城市")
-                        .toJsonObject()
+        return bingSearchInFirstTower.callBingSearch(
+                        BingSearchParameters.create()
+                                .setQ("日本东北地区的大城市")
+                                .toJsonObject(),
+                        UUID.randomUUID().toString()
                 )
                 .compose(response -> {
 //                    getLogger().info("resp " + jsonObject.getInteger("status_code"));

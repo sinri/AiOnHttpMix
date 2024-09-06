@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.volces.v3;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import io.github.sinri.AiOnHttpMix.volces.v3.chunk.VolcesChatResponseChunk;
 import io.github.sinri.AiOnHttpMix.volces.v3.chunk.VolcesChatStreamBuffer;
@@ -50,7 +51,15 @@ public final class VolcesKit {
         requestBody.put("model", serviceMeta.getModel());
         Promise<Void> promise = Promise.promise();
         CutterOnString cutter = new CutterOnString();
-        cutter.setComponentHandler(handler);
+        cutter.setComponentHandler(s -> {
+            AigcMix.getVerboseLogger().debug(
+                    "Component Handler in VolcesKit.chatStreamWithStringHandler",
+                    j -> j
+                            .put("component", s)
+                            .put("request_id", requestId)
+            );
+            handler.handle(s);
+        });
         requestBody.put("model", serviceMeta.getModel());
         serviceMeta.requestSSE(
                 VolcesServiceMeta.pathOfV3ChatCompletions,
@@ -92,6 +101,7 @@ public final class VolcesKit {
                         }
                     } catch (Throwable e) {
                         e.printStackTrace();
+                        AigcMix.getVerboseLogger().exception(e, "chunk handler exception in VolcesKit.chatStreamWithChunkHandler", j -> j.put("request_id", requestId));
                     }
                 },
                 requestId

@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.dashscope.core;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.keel.core.cutter.CutterOnString;
 import io.vertx.core.Future;
@@ -75,6 +76,14 @@ public class DashscopeServiceMeta implements ServiceMeta {
 
     @Override
     public final Future<JsonObject> request(String api, JsonObject requestBody, String requestId) {
+        AigcMix.getVerboseLogger().info(
+                "Start DashscopeServiceMeta.request",
+                j -> j
+                        .put("api", api)
+                        .put("requestId", requestId)
+                        .put("input", requestBody)
+        );
+
         WebClient webClient = WebClient.create(Keel.getVertx());
         var req = webClient
                 .postAbs(api)
@@ -85,28 +94,45 @@ public class DashscopeServiceMeta implements ServiceMeta {
                 .compose(bufferHttpResponse -> {
                     int statusCode = bufferHttpResponse.statusCode();
                     if (statusCode != 200) {
+                        AigcMix.getVerboseLogger().error(
+                                "Unexpected bufferHttpResponse in DashscopeServiceMeta.request",
+                                j -> j
+                                        .put("requestId", requestId)
+                                        .put("status_code", statusCode)
+                                        .put("detail", bufferHttpResponse.bodyAsString())
+                        );
+
                         return Future.failedFuture(new AbnormalResponse(
                                 statusCode, bufferHttpResponse.bodyAsString()
-//                                "Dashscope Service Response Error,"
-//                                        + " Status Code " + statusCode
-//                                        + " for request " + requestId
-//                                        + " Content: " + bufferHttpResponse.bodyAsString()
                         ));
+                    } else {
+                        JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
+
+                        AigcMix.getVerboseLogger().info(
+                                "bufferHttpResponse in DashscopeServiceMeta.request",
+                                j -> j
+                                        .put("requestId", requestId)
+                                        .put("output", entries)
+                        );
+
+                        return Future.succeededFuture(entries);
                     }
-                    JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
-                    return Future.succeededFuture(entries);
                 })
                 .andThen(ar -> {
                     webClient.close();
                 });
     }
 
-    public long getStreamTimeout() {
-        return 180_000L;
-    }
-
     @Override
     public final void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, CutterOnString cutter, String requestId) {
+        AigcMix.getVerboseLogger().info(
+                "Start DashscopeServiceMeta.requestSSE",
+                j -> j
+                        .put("api", api)
+                        .put("requestId", requestId)
+                        .put("input", parameters)
+        );
+
         HttpClientOptions options = new HttpClientOptions()
                 .setKeepAlive(true)
                 .setSsl(true)
@@ -125,6 +151,11 @@ public class DashscopeServiceMeta implements ServiceMeta {
                                 long timer = Keel.getVertx().setTimer(getStreamTimeout(), timeout -> {
                                     client.close();
                                     promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
+                                    AigcMix.getVerboseLogger().info(
+                                            "Timeout in DashscopeServiceMeta.requestSSE",
+                                            j -> j
+                                                    .put("requestId", requestId)
+                                    );
                                 });
                                 httpClientResponse
                                         .handler(cutter::handle)
@@ -133,21 +164,44 @@ public class DashscopeServiceMeta implements ServiceMeta {
                                                     .onSuccess(cutterEnded -> {
                                                         Keel.getVertx().cancelTimer(timer);
                                                         promise.complete();
+                                                        AigcMix.getVerboseLogger().info(
+                                                                "End Success in DashscopeServiceMeta.requestSSE",
+                                                                j -> j
+                                                                        .put("requestId", requestId)
+                                                        );
                                                     })
                                                     .onFailure(throwable -> {
                                                         Keel.getVertx().cancelTimer(timer);
                                                         promise.fail(throwable);
+                                                        AigcMix.getVerboseLogger().exception(
+                                                                throwable,
+                                                                "End Failure in DashscopeServiceMeta.requestSSE",
+                                                                j -> j
+                                                                        .put("requestId", requestId)
+                                                        );
                                                     });
                                         })
                                         .exceptionHandler(throwable -> {
                                             promise.fail(new RuntimeException("httpClientResponse exception", throwable));
                                             Keel.getVertx().cancelTimer(timer);
+                                            AigcMix.getVerboseLogger().exception(
+                                                    throwable,
+                                                    "Response Failure in DashscopeServiceMeta.requestSSE",
+                                                    j -> j
+                                                            .put("requestId", requestId)
+                                            );
                                         });
                                 return Future.succeededFuture();
                             });
                 })
                 .onFailure(throwable -> {
                     promise.fail(new RuntimeException("HttpClient request exception for request: " + requestId, throwable));
+                    AigcMix.getVerboseLogger().exception(
+                            throwable,
+                            "HttpClient Failure in DashscopeServiceMeta.requestSSE",
+                            j -> j
+                                    .put("requestId", requestId)
+                    );
                 });
 
         promise.future().andThen(ar -> {

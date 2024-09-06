@@ -18,10 +18,17 @@ import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponse;
+import io.github.sinri.keel.logger.KeelLogLevel;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
+import javax.annotation.Nonnull;
+
 public class AigcMix {
+    @Nonnull
+    private static KeelEventLogger verboseLogger = KeelIssueRecordCenter.silentCenter().generateEventLogger("");
     private static ChatGPTKit chatGPTKit;
     private static Dalle3Kit dalle3Kit;
     private static QwenKit qwenKit;
@@ -125,5 +132,50 @@ public class AigcMix {
             String requestId
     ) {
         return getVolcesKit().chatStreamWithBuffer(serviceMeta, requestBodyHandler, requestId);
+    }
+
+    /**
+     * 设定logger为按照给定的日志记录最低级别的对StdOut进行输出的日志记录器。
+     *
+     * @param level 日志记录最低级别
+     * @since 1.0.2
+     */
+    public static void enableVerboseLogger(@Nonnull KeelLogLevel level) {
+        verboseLogger = createLogger(level);
+    }
+
+    /**
+     * 设定logger为给定的日志记录器。
+     *
+     * @param logger 一个指定的日志记录器
+     * @since 1.0.2
+     */
+    public static void enableVerboseLogger(@Nonnull KeelEventLogger logger) {
+        verboseLogger = logger;
+    }
+
+    /**
+     * @since 1.0.2
+     */
+    public static void disableVerboseLogger() {
+        verboseLogger = createLogger(KeelLogLevel.SILENT);
+    }
+
+    /**
+     * @since 1.0.2
+     */
+    public static @Nonnull KeelEventLogger getVerboseLogger() {
+        return verboseLogger;
+    }
+
+    /**
+     * @since 1.0.2
+     */
+    private static @Nonnull KeelEventLogger createLogger(@Nonnull KeelLogLevel level) {
+        if (level == KeelLogLevel.SILENT) {
+            return KeelIssueRecordCenter.silentCenter().generateEventLogger("AigcMix");
+        } else {
+            return KeelIssueRecordCenter.outputCenter().generateEventLogger("AigcMix");
+        }
     }
 }

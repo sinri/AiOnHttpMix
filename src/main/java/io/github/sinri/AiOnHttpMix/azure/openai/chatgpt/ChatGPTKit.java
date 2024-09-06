@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptResponseChunkChoice;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptResponseChunkChoiceDelta;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptStreamBuffer;
@@ -62,6 +63,14 @@ public final class ChatGPTKit {
 
         CutterOnString cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
+            final String finalS = s;
+            AigcMix.getVerboseLogger().debug(
+                    "Component Handler in ChatGPTKit.chatStream",
+                    j -> j
+                            .put("component", finalS)
+                            .put("request_id", requestId)
+            );
+
             s = s.replaceFirst("^data:\\s*", "");
             if (s.startsWith("[DONE]")) {
                 promise.complete();
@@ -170,7 +179,7 @@ public final class ChatGPTKit {
                                     });
                                 }
                             } catch (Throwable e) {
-                                e.printStackTrace();
+                                AigcMix.getVerboseLogger().exception(e, "chunk handler exception in ChatGPTKit.chatStream", j -> j.put("request_id", requestId));
                             }
                         },
                         requestId
