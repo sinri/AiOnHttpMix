@@ -125,8 +125,8 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
 //        return addTool(builder.build());
 //    }
 
-    default OpenAIChatGptRequest addTool(Handler<FunctionToolDefinition.FunctionToolDefinitionBuilder<OpenAIChatGptToolDefinitionImpl.Builder, OpenAIChatGptToolDefinition>> handler) {
-        var builder = new OpenAIChatGptToolDefinitionImpl.Builder();
+    default OpenAIChatGptRequest addTool(Handler<FunctionToolDefinition.FunctionToolDefinitionBuilder<OpenAIChatGptToolDefinition.Builder, OpenAIChatGptToolDefinition>> handler) {
+        var builder = new OpenAIChatGptToolDefinition.Builder();
         handler.handle(builder);
         return addTool(builder.build());
     }

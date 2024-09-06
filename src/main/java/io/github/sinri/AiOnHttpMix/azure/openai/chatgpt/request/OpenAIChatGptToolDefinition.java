@@ -5,8 +5,8 @@ import io.github.sinri.keel.core.json.JsonifiableEntity;
 import org.jetbrains.annotations.NotNull;
 
 public interface OpenAIChatGptToolDefinition extends JsonifiableEntity<OpenAIChatGptToolDefinition> {
-    static OpenAIChatGptToolDefinitionImpl.Builder builder() {
-        return new OpenAIChatGptToolDefinitionImpl.Builder();
+    static OpenAIChatGptToolDefinition.Builder builder() {
+        return new OpenAIChatGptToolDefinition.Builder();
     }
 
     enum Type {
