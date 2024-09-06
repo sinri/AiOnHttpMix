@@ -75,7 +75,6 @@ public final class ChatGPTKit {
             if (s.startsWith("[DONE]")) {
                 promise.complete();
             } else {
-                //var parsed = new JsonObject(s);
                 chunkHandler.handle(s);
             }
         });

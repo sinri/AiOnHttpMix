@@ -169,13 +169,15 @@ public class AigcMix {
     }
 
     /**
-     * @since 1.0.2
+     * @since 1.0.3
      */
     private static @Nonnull KeelEventLogger createLogger(@Nonnull KeelLogLevel level) {
         if (level == KeelLogLevel.SILENT) {
             return KeelIssueRecordCenter.silentCenter().generateEventLogger("AigcMix");
         } else {
-            return KeelIssueRecordCenter.outputCenter().generateEventLogger("AigcMix");
+            var logger = KeelIssueRecordCenter.outputCenter().generateEventLogger("AigcMix");
+            logger.setVisibleLevel(level);
+            return logger;
         }
     }
 }
