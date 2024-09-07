@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public interface QwenToolDefinition extends JsonifiableEntity<QwenToolDefinition> {
+    static QwenToolDefinition wrap(JsonObject json) {
+        return new QwenToolDefinitionImpl(json);
+    }
 
     /**
      * @param name        function的名称，必须是字母、数字，或包含下划线和短划线，最大长度为64。

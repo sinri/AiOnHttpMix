@@ -22,7 +22,7 @@ public class QwenStreamBuffer {
         QwenResponseChunk.OutputChunkForMessageResponse output = chatMessageResponseInChunk.getOutput();
         if (output != null) {
             List<QwenResponseChunk.OutputChunkForMessageResponse.Choice> choices = output.getChoices();
-            if (!choices.isEmpty()) {
+            if (choices != null && !choices.isEmpty()) {
                 QwenResponseChunk.OutputChunkForMessageResponse.Choice choice = choices.get(0);
                 tempChoice.acceptChoice(choice);
             }
@@ -80,9 +80,12 @@ public class QwenStreamBuffer {
         }
 
         public JsonObject toJsonObject() {
-            return new JsonObject()
-                    .put("role", this.role.name())
-                    .put("content", this.content.toString());
+            JsonObject entries = new JsonObject();
+            if (this.role != null) {
+                entries.put("role", this.role.name());
+            }
+            entries.put("content", this.content.toString());
+            return entries;
         }
     }
 }

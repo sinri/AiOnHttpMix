@@ -1,19 +1,13 @@
-package io.github.sinri.AiOnHttpMix.test.mix.azure;
+package io.github.sinri.AiOnHttpMix.test.mix;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
-import io.github.sinri.AiOnHttpMix.test.mix.MixTestCore;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-public class MixTestCoreWithAzure extends MixTestCore {
-    private AnyLLMKit anyLLMKit;
-
-    public AnyLLMKit getAnyLLMKit() {
-        return anyLLMKit;
-    }
+public class MixAzureTest extends MixTestCore {
 
     @Override
     protected @NotNull Future<Void> starting() {

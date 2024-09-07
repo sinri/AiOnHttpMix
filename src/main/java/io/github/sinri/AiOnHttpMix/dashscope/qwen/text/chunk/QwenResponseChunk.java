@@ -4,11 +4,9 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.QwenResponseBase;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.message.QwenMessage;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 
 public interface QwenResponseChunk extends QwenResponseBase {
     static QwenResponseChunk parse(String string) {
@@ -62,10 +60,10 @@ public interface QwenResponseChunk extends QwenResponseBase {
          }
          */
 
-        @NotNull
+        @Nullable
         default List<Choice> getChoices() {
             List<JsonObject> choices = readJsonObjectArray("choices");
-            Objects.requireNonNull(choices);
+            if (choices == null) return null;
             return choices.stream().map(Choice::wrap).toList();
         }
 

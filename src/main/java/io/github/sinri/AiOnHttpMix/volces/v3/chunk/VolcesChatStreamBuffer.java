@@ -108,7 +108,10 @@ public class VolcesChatStreamBuffer {
         }
 
         public VolcesChatResponseMessage toMessage() {
-            JsonObject x = new JsonObject().put("role", role.name());
+            JsonObject x = new JsonObject();
+            if (role != null) {
+                x.put("role", role.name());
+            }
             if (content != null) {
                 x.put("content", content.toString());
             }
