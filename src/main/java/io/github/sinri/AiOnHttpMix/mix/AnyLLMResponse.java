@@ -12,6 +12,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface AnyLLMResponse {
+    static AnyLLMResponse from(AssistantMessage assistantMessage) {
+        List<AnyLLMResponseChoice> anyLLMResponseChoices = new ArrayList<>();
+
+        List<OpenAIChatGptResponseToolCall> toolCalls = assistantMessage.getToolCalls();
+        List<AnyLLMResponseToolFunctionCall> functionCalls = new ArrayList<>();
+        if (toolCalls != null) {
+            toolCalls.forEach(toolCall -> {
+                OpenAIChatGptResponseFunctionCall function = toolCall.getFunction();
+                if (function != null) {
+                    String name = function.getName();
+                    String arguments = function.getArguments();
+
+                    AnyLLMResponseToolFunctionCall fc = AnyLLMResponseToolFunctionCall.build(name, arguments);
+                    functionCalls.add(fc);
+                }
+            });
+        }
+
+        AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(null, assistantMessage.getContent(), functionCalls);
+        anyLLMResponseChoices.add(anyLLMResponseChoice);
+        return new AnyLLMResponseImpl(anyLLMResponseChoices);
+    }
 
     static AnyLLMResponse from(OpenAIChatGptResponse openAIChatGptResponse) {
         //Keel.getLogger().fatal("FROM OpenAIChatGptResponse: ", openAIChatGptResponse.cloneAsJsonObject());
@@ -56,6 +78,7 @@ public interface AnyLLMResponse {
     static AnyLLMResponse from(VolcesChatResponse volcesChatResponse) {
         return null;//todo
     }
+
 
     List<AnyLLMResponseChoice> getChoices();
 }

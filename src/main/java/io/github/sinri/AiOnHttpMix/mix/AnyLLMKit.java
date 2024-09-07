@@ -101,4 +101,46 @@ public class AnyLLMKit {
                     });
         };
     }
+
+    public Future<AnyLLMResponse> requestWithStreamBuffer(Handler<AnyLLMRequest> requestHandler) {
+        AnyLLMRequest anyLLMRequest = AnyLLMRequest.create();
+        requestHandler.handle(anyLLMRequest);
+        return requestWithStreamBuffer(anyLLMRequest);
+    }
+
+    public Future<AnyLLMResponse> requestWithStreamBuffer(AnyLLMRequest request) {
+        return switch (model.getSeries()) {
+            case ChatGPT -> new ChatGPTKit()
+                    .chatStream(
+                            (AzureOpenAIServiceMeta) serviceMeta,
+                            request.toChatGptRequest(),
+                            request.getRequestId()
+                    )
+                    .compose(resp -> {
+                        AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                        return Future.succeededFuture(anyLLMResponse);
+                    });
+            case Qwen -> new QwenKit()
+                    .chatStreamWithBuffer(
+                            (DashscopeServiceMeta) serviceMeta,
+                            request.toQwenRequest()
+                                    .setModel(model.asQwenModel()),
+                            request.getRequestId()
+                    )
+                    .compose(resp -> {
+                        AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                        return Future.succeededFuture(anyLLMResponse);
+                    });
+            case Volces -> new VolcesKit()
+                    .chatStreamWithBuffer(
+                            (VolcesServiceMeta) serviceMeta,
+                            request.toVolcesChatRequest(),
+                            request.getRequestId()
+                    )
+                    .compose(resp -> {
+                        AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                        return Future.succeededFuture(anyLLMResponse);
+                    });
+        };
+    }
 }
