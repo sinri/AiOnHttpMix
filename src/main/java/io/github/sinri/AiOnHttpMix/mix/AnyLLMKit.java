@@ -11,6 +11,9 @@ import io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
+/**
+ * @since 1.1.0
+ */
 public class AnyLLMKit {
     private SupportedModel model;
     private ServiceMeta serviceMeta;

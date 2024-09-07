@@ -128,8 +128,8 @@ public class AzureChatTest4 extends AzureChatTestCore {
                         parameters,
                         requestId
                 )
-                .compose(assistantMessage -> {
-                    getLogger().info("AssistantMessage", assistantMessage.toJsonObject());
+                .compose(choice -> {
+                    getLogger().info("choice", choice.cloneAsJsonObject());
                     return Future.succeededFuture();
                 });
     }

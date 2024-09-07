@@ -6,9 +6,9 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptRespo
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptStreamBuffer;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIResponseChunk;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.embeddings.OpenAIEmbeddingResponse;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.AssistantMessage;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponse;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseChoice;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseFunctionCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
@@ -116,7 +116,7 @@ public final class ChatGPTKit {
         );
     }
 
-    public Future<AssistantMessage> chatStream(
+    public Future<OpenAIChatGptResponseChoice> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
             Handler<OpenAIChatGptRequest> handler,
             String requestId
@@ -126,7 +126,7 @@ public final class ChatGPTKit {
         return chatStream(serviceMeta, request, requestId);
     }
 
-    public Future<AssistantMessage> chatStream(
+    public Future<OpenAIChatGptResponseChoice> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
             OpenAIChatGptRequest parameters,
             String requestId
@@ -142,6 +142,7 @@ public final class ChatGPTKit {
                                 List<OpenAIChatGptResponseChunkChoice> choices = responseChunk.getChoices();
                                 if (choices.isEmpty()) return;
                                 OpenAIChatGptResponseChunkChoice choiceInChunk = choices.get(0);
+                                String finishReason = choiceInChunk.getFinishReason();
                                 OpenAIChatGptResponseChunkChoiceDelta delta = choiceInChunk.getDelta();
                                 if (delta == null) return;
 
@@ -185,7 +186,7 @@ public final class ChatGPTKit {
                         requestId
                 )
                 .compose(v -> {
-                    return Future.succeededFuture(tempAssistantMessage.toAssistantMessage());
+                    return Future.succeededFuture(tempAssistantMessage.toResponseChoice());
                 });
     }
 

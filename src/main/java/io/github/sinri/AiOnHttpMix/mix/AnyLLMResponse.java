@@ -17,8 +17,13 @@ import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponseMessage;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @since 1.1.0
+ */
 public interface AnyLLMResponse {
-    static AnyLLMResponse from(AssistantMessage assistantMessage) {
+    static AnyLLMResponse from(OpenAIChatGptResponseChoice resp) {
+        AssistantMessage assistantMessage = resp.getMessage();
+
         List<AnyLLMResponseChoice> anyLLMResponseChoices = new ArrayList<>();
 
         List<OpenAIChatGptResponseToolCall> toolCalls = assistantMessage.getToolCalls();
@@ -36,21 +41,18 @@ public interface AnyLLMResponse {
             });
         }
 
-        AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(null, assistantMessage.getContent(), functionCalls);
+        AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(resp.getFinishReason(), assistantMessage.getContent(), functionCalls);
         anyLLMResponseChoices.add(anyLLMResponseChoice);
         return new AnyLLMResponseImpl(anyLLMResponseChoices);
     }
 
     static AnyLLMResponse from(OpenAIChatGptResponse openAIChatGptResponse) {
-        //Keel.getLogger().fatal("FROM OpenAIChatGptResponse: ", openAIChatGptResponse.cloneAsJsonObject());
         List<OpenAIChatGptResponseChoice> choices = openAIChatGptResponse.getChoices();
         if (choices == null || choices.isEmpty()) {
             return null;
         }
         List<AnyLLMResponseChoice> anyLLMResponseChoices = new ArrayList<>();
         for (OpenAIChatGptResponseChoice choice : choices) {
-            //Keel.getLogger().fatal("FROM OpenAIChatGptResponse.choices[].choice: ", choice.cloneAsJsonObject());
-
             String finishReason = choice.getFinishReason();
             AssistantMessage message = choice.getMessage();
             String content = message.getContent();
@@ -71,7 +73,6 @@ public interface AnyLLMResponse {
 
             AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(finishReason, content, functionCalls);
             anyLLMResponseChoices.add(anyLLMResponseChoice);
-            //Keel.getLogger().fatal("FROM OpenAIChatGptResponse.choices[].choice added to "+anyLLMResponseChoices.size());
         }
 
         return new AnyLLMResponseImpl(anyLLMResponseChoices);

@@ -5,6 +5,9 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.vertx.core.Handler;
 
+/**
+ * @since 1.1.0
+ */
 public interface AnyLLMRequest {
     static AnyLLMRequest create() {
         return new AnyLLMRequestImpl();

@@ -4,6 +4,9 @@ import io.github.sinri.AiOnHttpMix.utils.FunctionToolDefinition;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @since 1.1.0
+ */
 public class AnyLLMFunctionToolDefinition implements FunctionToolDefinition<AnyLLMFunctionToolDefinition> {
     private JsonObject jsonObject;
 

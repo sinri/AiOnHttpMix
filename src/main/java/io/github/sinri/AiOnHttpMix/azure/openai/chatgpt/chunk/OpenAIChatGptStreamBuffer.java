@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.AssistantMessage;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseChoice;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseFunctionCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
 import io.vertx.core.json.JsonArray;
@@ -11,11 +12,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class OpenAIChatGptStreamBuffer {
+    private String finishReason;
     private ChatGptRole role;
     private StringBuilder content;
     private final Map<Integer, TempToolCall> toolCallMap = new TreeMap<>();
 
     public OpenAIChatGptStreamBuffer() {
+    }
+
+    public void acceptFinishReason(String finishReason) {
+        this.finishReason = finishReason;
     }
 
     public void acceptRole(ChatGptRole role) {
@@ -111,6 +117,7 @@ public class OpenAIChatGptStreamBuffer {
         }
     }
 
+    @Deprecated(since = "1.1.0")
     public AssistantMessage toAssistantMessage() {
         JsonObject x = new JsonObject();
         x.put("role", role.name());
@@ -123,5 +130,24 @@ public class OpenAIChatGptStreamBuffer {
             x.put("tool_calls", tool_calls);
         }
         return new AssistantMessage(x);
+    }
+
+    public OpenAIChatGptResponseChoice toResponseChoice() {
+        JsonObject messageJsonObject = new JsonObject();
+        if (role != null) messageJsonObject.put("role", role.name());
+        if (content != null) messageJsonObject.put("content", content.toString());
+        if (!toolCallMap.isEmpty()) {
+            JsonArray tool_calls = new JsonArray();
+            toolCallMap.forEach((k, v) -> {
+                tool_calls.add(v.toJsonObject());
+            });
+            messageJsonObject.put("tool_calls", tool_calls);
+        }
+
+        return OpenAIChatGptResponseChoice.wrap(new JsonObject()
+                .put("index", 0)
+                .put("finish_reason", finishReason)
+                .put("message", messageJsonObject)
+        );
     }
 }

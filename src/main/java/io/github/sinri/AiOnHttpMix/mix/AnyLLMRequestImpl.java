@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * @since 1.1.0
+ */
 class AnyLLMRequestImpl implements AnyLLMRequest {
     private final String requestId;
     private final List<MessageItem> messageItems = new ArrayList<>();

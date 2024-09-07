@@ -1,5 +1,8 @@
 package io.github.sinri.AiOnHttpMix.mix;
 
+/**
+ * @since 1.1.0
+ */
 class AnyLLMResponseToolFunctionCallImpl implements AnyLLMResponseToolFunctionCall {
     String functionName;
     String functionArguments;
