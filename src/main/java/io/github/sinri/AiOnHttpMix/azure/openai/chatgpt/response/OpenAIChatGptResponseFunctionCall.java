@@ -14,6 +14,9 @@ public interface OpenAIChatGptResponseFunctionCall extends UnmodifiableJsonifiab
         return readString("name");
     }
 
+    /**
+     * @since 1.0.4 Fix the name
+     */
     @Nullable
     default String getArguments() {
         return readString("arguments");

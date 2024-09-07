@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.volces.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
-import io.github.sinri.keel.core.cutter.CutterOnString;
+import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClient;
@@ -72,7 +72,7 @@ public class VolcesServiceMeta implements ServiceMeta {
     }
 
     @Override
-    public void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, CutterOnString cutter, String requestId) {
+    public void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, Cutter<String> cutter, String requestId) {
         AigcMix.getVerboseLogger().info(
                 "Start VolcesServiceMeta.requestSSE",
                 j -> j

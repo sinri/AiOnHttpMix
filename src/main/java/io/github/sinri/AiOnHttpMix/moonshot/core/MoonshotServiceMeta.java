@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.moonshot.core;
 
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
-import io.github.sinri.keel.core.cutter.CutterOnString;
+import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClient;
@@ -63,7 +63,7 @@ public class MoonshotServiceMeta implements ServiceMeta {
     }
 
     @Override
-    public void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, CutterOnString cutter, String requestId) {
+    public void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, Cutter<String> cutter, String requestId) {
         HttpClientOptions options = new HttpClientOptions()
                 .setKeepAlive(true)
                 .setSsl(true)

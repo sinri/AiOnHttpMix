@@ -14,6 +14,7 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLResponse;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLStreamBuffer;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.keel.core.TechnicalPreview;
+import io.github.sinri.keel.core.cutter.Cutter;
 import io.github.sinri.keel.core.cutter.CutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -74,7 +75,7 @@ public final class QwenKit {
             String requestId
     ) {
         Promise<Void> promise = Promise.promise();
-        CutterOnString cutter = new CutterOnString();
+        Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
             AigcMix.getVerboseLogger().debug(
                     "Component Handler in QwenKit.chatStreamWithStringHandler",
@@ -213,7 +214,7 @@ public final class QwenKit {
             String requestId
     ) {
         Promise<Void> promise = Promise.promise();
-        CutterOnString cutterOnString = new CutterOnString();
+        Cutter<String> cutterOnString = new CutterOnString();
         cutterOnString.setComponentHandler(s -> {
             AigcMix.getVerboseLogger().debug(
                     "Component Handler in QwenKit.chatVLStreamWithStringHandler",

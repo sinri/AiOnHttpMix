@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.azure.openai.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
-import io.github.sinri.keel.core.cutter.CutterOnString;
+import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClient;
@@ -43,12 +43,13 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
         return "https://" + generateHost() + generateUri(api);
     }
 
+    @Override
     public Future<JsonObject> request(
             String api,
             JsonObject requestBody,
             String requestId
     ) {
-        AigcMix.getVerboseLogger().error(
+        AigcMix.getVerboseLogger().info(
                 "Start AzureOpenAIServiceMeta.request",
                 j -> j
                         .put("api", api)
@@ -80,7 +81,7 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
                                         + " body is " + bufferHttpResponse.bodyAsString()
                         ));
                     } else {
-                        AigcMix.getVerboseLogger().error(
+                        AigcMix.getVerboseLogger().info(
                                 "bufferHttpResponse in AzureOpenAIServiceMeta.request",
                                 j -> j
                                         .put("output", entries)
@@ -94,11 +95,12 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
                 });
     }
 
+    @Override
     public void requestSSE(
             String api,
             @NotNull JsonObject parameters,
             Promise<Void> promise,
-            CutterOnString cutter,
+            Cutter<String> cutter,
             String requestId
     ) {
         HttpClientOptions options = new HttpClientOptions()
@@ -108,7 +110,7 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
                 .setDefaultPort(443);
         HttpClient client = Keel.getVertx().createHttpClient(options);
 
-        AigcMix.getVerboseLogger().warning(
+        AigcMix.getVerboseLogger().info(
                 "Start AzureOpenAIServiceMeta.requestSSE",
                 j -> j
                         .put("api", api)
@@ -148,7 +150,8 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
                                                     .onFailure(throwable -> {
                                                         Keel.getVertx().cancelTimer(timer);
                                                         promise.tryFail(throwable);
-                                                        AigcMix.getVerboseLogger().error(
+                                                        AigcMix.getVerboseLogger().exception(
+                                                                throwable,
                                                                 "End Failure in AzureOpenAIServiceMeta.requestSSE",
                                                                 j -> j
                                                                         .put("requestId", requestId)

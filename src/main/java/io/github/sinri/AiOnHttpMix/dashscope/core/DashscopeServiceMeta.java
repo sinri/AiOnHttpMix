@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.dashscope.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
-import io.github.sinri.keel.core.cutter.CutterOnString;
+import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClient;
@@ -42,7 +42,7 @@ public class DashscopeServiceMeta implements ServiceMeta {
     public Future<Void> callQwenTextGenerateStream(
             @NotNull JsonObject parameters,
             Promise<Void> promise,
-            CutterOnString cutter,
+            Cutter<String> cutter,
             String requestId
     ) {
         requestSSE(pathOfDashscopeQwenTextGenerate, parameters, promise, cutter, requestId);
@@ -66,7 +66,7 @@ public class DashscopeServiceMeta implements ServiceMeta {
     public Future<Void> callQwenMultiModalGenerateStream(
             @NotNull JsonObject parameters,
             Promise<Void> promise,
-            CutterOnString cutter,
+            Cutter<String> cutter,
             String requestId
     ) {
         requestSSE(pathOfDashscopeQwenMultiModalGenerate, parameters, promise, cutter, requestId);
@@ -124,7 +124,7 @@ public class DashscopeServiceMeta implements ServiceMeta {
     }
 
     @Override
-    public final void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, CutterOnString cutter, String requestId) {
+    public final void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, Cutter<String> cutter, String requestId) {
         AigcMix.getVerboseLogger().info(
                 "Start DashscopeServiceMeta.requestSSE",
                 j -> j
@@ -151,7 +151,7 @@ public class DashscopeServiceMeta implements ServiceMeta {
                                 long timer = Keel.getVertx().setTimer(getStreamTimeout(), timeout -> {
                                     client.close();
                                     promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
-                                    AigcMix.getVerboseLogger().info(
+                                    AigcMix.getVerboseLogger().warning(
                                             "Timeout in DashscopeServiceMeta.requestSSE",
                                             j -> j
                                                     .put("requestId", requestId)

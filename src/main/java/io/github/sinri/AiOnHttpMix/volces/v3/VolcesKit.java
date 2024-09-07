@@ -6,6 +6,7 @@ import io.github.sinri.AiOnHttpMix.volces.v3.chunk.VolcesChatResponseChunk;
 import io.github.sinri.AiOnHttpMix.volces.v3.chunk.VolcesChatStreamBuffer;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponse;
+import io.github.sinri.keel.core.cutter.Cutter;
 import io.github.sinri.keel.core.cutter.CutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -50,7 +51,7 @@ public final class VolcesKit {
     ) {
         requestBody.put("model", serviceMeta.getModel());
         Promise<Void> promise = Promise.promise();
-        CutterOnString cutter = new CutterOnString();
+        Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
             AigcMix.getVerboseLogger().debug(
                     "Component Handler in VolcesKit.chatStreamWithStringHandler",
@@ -100,8 +101,11 @@ public final class VolcesKit {
                             handler.handle(chunk);
                         }
                     } catch (Throwable e) {
-                        e.printStackTrace();
-                        AigcMix.getVerboseLogger().exception(e, "chunk handler exception in VolcesKit.chatStreamWithChunkHandler", j -> j.put("request_id", requestId));
+                        AigcMix.getVerboseLogger().exception(
+                                e,
+                                "chunk handler exception in VolcesKit.chatStreamWithChunkHandler",
+                                j -> j.put("request_id", requestId)
+                        );
                     }
                 },
                 requestId

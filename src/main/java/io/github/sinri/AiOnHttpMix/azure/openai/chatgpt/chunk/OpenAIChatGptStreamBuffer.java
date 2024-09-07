@@ -107,7 +107,7 @@ public class OpenAIChatGptStreamBuffer {
         public JsonObject toJsonObject() {
             return new JsonObject()
                     .put("name", functionName)
-                    .put("argument", functionArgument.toString());
+                    .put("arguments", functionArgument.toString());
         }
     }
 

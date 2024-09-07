@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.utils;
 
-import io.github.sinri.keel.core.cutter.CutterOnString;
+import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
@@ -18,7 +18,7 @@ public interface ServiceMeta {
             String api,
             @NotNull JsonObject parameters,
             Promise<Void> promise,
-            CutterOnString cutter,
+            Cutter<String> cutter,
             String requestId
     );
 

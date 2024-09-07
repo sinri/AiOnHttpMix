@@ -12,6 +12,7 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptRe
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseFunctionCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
+import io.github.sinri.keel.core.cutter.Cutter;
 import io.github.sinri.keel.core.cutter.CutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -61,10 +62,10 @@ public final class ChatGPTKit {
         parameters.put("stream", true);
         Promise<Void> promise = Promise.promise();
 
-        CutterOnString cutter = new CutterOnString();
+        Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
             final String finalS = s;
-            AigcMix.getVerboseLogger().debug(
+            AigcMix.getVerboseLogger().info(
                     "Component Handler in ChatGPTKit.chatStream",
                     j -> j
                             .put("component", finalS)
