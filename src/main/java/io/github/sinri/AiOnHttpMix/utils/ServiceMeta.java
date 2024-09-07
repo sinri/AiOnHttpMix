@@ -22,6 +22,8 @@ public interface ServiceMeta {
             String requestId
     );
 
+    SupportedModelSeries getSupportedModelSeries();
+
     class AbnormalResponse extends Exception {
         private final int statusCode;
         private final String responseBody;

@@ -10,6 +10,7 @@ import io.vertx.json.schema.draft7.dsl.Schemas;
 import java.util.Objects;
 
 public interface FunctionToolDefinition<E> extends JsonifiableEntity<E>, SelfInterface<E> {
+
     default String getType() {
         return readString("type");
     }

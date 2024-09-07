@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.azure.openai.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
+import io.github.sinri.AiOnHttpMix.utils.SupportedModelSeries;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -184,5 +185,10 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
         promise.future().andThen(ar -> {
             client.close();
         });
+    }
+
+    @Override
+    public SupportedModelSeries getSupportedModelSeries() {
+        return SupportedModelSeries.ChatGPT;
     }
 }
