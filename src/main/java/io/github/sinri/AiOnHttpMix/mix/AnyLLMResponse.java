@@ -13,15 +13,21 @@ import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatMessageToolCallF
 import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponse;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponseChoice;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponseMessage;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 1.1.0
  */
 public interface AnyLLMResponse {
-    static AnyLLMResponse from(OpenAIChatGptResponseChoice resp) {
+    static @NotNull AnyLLMResponse from(OpenAIChatGptResponseChoice resp) {
         AssistantMessage assistantMessage = resp.getMessage();
 
         List<AnyLLMResponseChoice> anyLLMResponseChoices = new ArrayList<>();
@@ -46,7 +52,7 @@ public interface AnyLLMResponse {
         return new AnyLLMResponseImpl(anyLLMResponseChoices);
     }
 
-    static AnyLLMResponse from(OpenAIChatGptResponse openAIChatGptResponse) {
+    static @Nullable AnyLLMResponse from(OpenAIChatGptResponse openAIChatGptResponse) {
         List<OpenAIChatGptResponseChoice> choices = openAIChatGptResponse.getChoices();
         if (choices == null || choices.isEmpty()) {
             return null;
@@ -78,7 +84,7 @@ public interface AnyLLMResponse {
         return new AnyLLMResponseImpl(anyLLMResponseChoices);
     }
 
-    static AnyLLMResponse from(QwenResponseInMessageFormat qwenResponseInMessageFormat) {
+    static @Nullable AnyLLMResponse from(QwenResponseInMessageFormat qwenResponseInMessageFormat) {
         QwenResponseInMessageFormat.OutputForMessageResponse output = qwenResponseInMessageFormat.getOutput();
         List<QwenResponseInMessageFormat.OutputForMessageResponse.Choice> choices = output.getChoices();
         if (choices == null || choices.isEmpty()) {
@@ -87,6 +93,9 @@ public interface AnyLLMResponse {
         List<AnyLLMResponseChoice> anyLLMResponseChoices = new ArrayList<>();
 
         choices.forEach(choice -> {
+            // todo debugging
+            Keel.getLogger().fatal("AnyLLMResponse.from.choice", choice.cloneAsJsonObject());
+
             String finishReason = choice.getFinishReason();
             QwenMessage message = choice.getMessage();
             String content = message.getContent();
@@ -144,4 +153,18 @@ public interface AnyLLMResponse {
 
 
     List<AnyLLMResponseChoice> getChoices();
+
+    /**
+     * @since 1.1.1
+     */
+    default JsonObject toJsonObject() {
+        JsonArray array = new JsonArray();
+        getChoices().forEach(c -> {
+            array.add(c.toJsonObject());
+        });
+        return new JsonObject()
+                .put("choices", array);
+    }
+
+
 }

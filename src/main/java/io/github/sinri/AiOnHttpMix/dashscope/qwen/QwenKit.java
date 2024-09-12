@@ -47,9 +47,7 @@ public final class QwenKit {
             String requestId
     ) {
         if (chatRequest.getParameters() == null) {
-            chatRequest.setParameters(QwenRequest.Parameters.create()
-                    .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
-            );
+            chatRequest.handleParameters(p -> p.setResultFormat(QwenRequest.Parameters.ResultFormat.message));
         } else {
             chatRequest.getParameters().setResultFormat(QwenRequest.Parameters.ResultFormat.message);
         }
@@ -104,12 +102,20 @@ public final class QwenKit {
         return chatStreamWithChunkHandler(serviceMeta, chatRequest, handler, requestId);
     }
 
+    /**
+     * @since 1.1.1 Force use Message Format for response.
+     */
     public Future<Void> chatStreamWithChunkHandler(
             DashscopeServiceMeta serviceMeta,
             QwenRequest chatRequest,
             Handler<QwenResponseChunk> handler,
             String requestId
     ) {
+        if (chatRequest.getParameters() == null) {
+            chatRequest.handleParameters(p -> p.setResultFormat(QwenRequest.Parameters.ResultFormat.message));
+        } else {
+            chatRequest.getParameters().setResultFormat(QwenRequest.Parameters.ResultFormat.message);
+        }
         return chatStreamWithStringHandler(
                 serviceMeta,
                 chatRequest.toJsonObject(),

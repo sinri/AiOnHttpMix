@@ -21,4 +21,12 @@ class AnyLLMResponseToolFunctionCallImpl implements AnyLLMResponseToolFunctionCa
     public String getFunctionArguments() {
         return functionArguments;
     }
+
+    /**
+     * @since 1.1.1
+     */
+    @Override
+    public String toString() {
+        return toJsonObject().toString();
+    }
 }

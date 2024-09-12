@@ -17,4 +17,12 @@ class AnyLLMResponseImpl implements AnyLLMResponse {
     public List<AnyLLMResponseChoice> getChoices() {
         return choices;
     }
+
+    /**
+     * @since 1.1.1
+     */
+    @Override
+    public String toString() {
+        return toJsonObject().toString();
+    }
 }

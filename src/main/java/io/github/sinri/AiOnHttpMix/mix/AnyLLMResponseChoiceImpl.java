@@ -30,4 +30,12 @@ class AnyLLMResponseChoiceImpl implements AnyLLMResponseChoice {
     public List<AnyLLMResponseToolFunctionCall> getFunctionCalls() {
         return functionCalls;
     }
+
+    /**
+     * @since 1.1.1
+     */
+    @Override
+    public String toString() {
+        return toJsonObject().toString();
+    }
 }
