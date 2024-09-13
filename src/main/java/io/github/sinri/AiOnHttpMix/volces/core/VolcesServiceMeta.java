@@ -157,4 +157,19 @@ public class VolcesServiceMeta implements ServiceMeta {
     public SupportedModelSeries getSupportedModelSeries() {
         return SupportedModelSeries.Volces;
     }
+
+    private long streamTimeout = 180_000L;
+
+    @Override
+    public long getStreamTimeout() {
+        return streamTimeout;
+    }
+
+    @Override
+    public VolcesServiceMeta setStreamTimeout(long timeout) {
+        streamTimeout = timeout;
+        return this;
+    }
+
+
 }

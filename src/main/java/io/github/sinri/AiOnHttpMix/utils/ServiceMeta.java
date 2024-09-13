@@ -52,7 +52,7 @@ public interface ServiceMeta {
         }
     }
 
-    default long getStreamTimeout() {
-        return 180_000L;
-    }
+    long getStreamTimeout();
+
+    ServiceMeta setStreamTimeout(long timeout);
 }

@@ -22,12 +22,7 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
     private final String deployment;
     private final String apiVersion;
 
-    public AzureOpenAIServiceMeta(String apiKey, String resourceName, String deployment, String apiVersion) {
-        this.apiKey = apiKey;
-        this.resourceName = resourceName;
-        this.deployment = deployment;
-        this.apiVersion = apiVersion;
-    }
+    private long streamTimeout = 180_000L;
 
     public String generateHost() {
         return resourceName + ".openai.azure.com";
@@ -190,5 +185,23 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
     @Override
     public SupportedModelSeries getSupportedModelSeries() {
         return SupportedModelSeries.ChatGPT;
+    }
+
+    public AzureOpenAIServiceMeta(@NotNull String apiKey, @NotNull String resourceName, @NotNull String deployment, @NotNull String apiVersion) {
+        this.apiKey = apiKey;
+        this.resourceName = resourceName;
+        this.deployment = deployment;
+        this.apiVersion = apiVersion;
+    }
+
+    @Override
+    public long getStreamTimeout() {
+        return streamTimeout;
+    }
+
+    @Override
+    public AzureOpenAIServiceMeta setStreamTimeout(long timeout) {
+        streamTimeout = timeout;
+        return this;
     }
 }

@@ -35,6 +35,16 @@ public interface QwenVLRequest extends JsonifiableEntity<QwenVLRequest> {
         return setInput(input);
     }
 
+    /**
+     * @since 1.1.1
+     */
+    @Nullable
+    default Parameters getParameters() {
+        JsonObject x = readJsonObject("parameters");
+        if (x == null) return null;
+        return Parameters.wrap(x);
+    }
+
     default QwenVLRequest setParameters(Parameters parameters) {
         toJsonObject().put("parameters", parameters.toJsonObject());
         return this;

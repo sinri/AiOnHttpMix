@@ -85,7 +85,7 @@ public class MixTestCore extends KeelTest {
                 .requestWithStreamBuffer(
                         anyLLMRequest -> anyLLMRequest
                                 .addSystemMessage("你是一个日本旅游博主，最近刚开始学中文，准备向中国人民介绍如何在日本旅游。")
-                                .addUserMessage("大佬，介绍下筑波有什么好玩的")
+                                .addUserMessage("请介绍下筑波有什么好玩的地方，尽可能详细，形成一篇2000字以上的文案。")
                 )
                 .compose(anyLLMResponse -> {
                     List<AnyLLMResponseChoice> choices = anyLLMResponse.getChoices();

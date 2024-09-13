@@ -14,6 +14,7 @@ public interface VolcesChatResponseChunk extends UnmodifiableJsonifiableEntity {
     static VolcesChatResponseChunk wrap(JsonObject jsonObject) {
         return new VolcesChatResponseChunkImpl(jsonObject);
     }
+
     /**
      * @return 一次 chat completion 接口调用的唯一标识。
      */

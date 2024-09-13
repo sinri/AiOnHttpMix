@@ -23,19 +23,7 @@ public class MoonshotServiceMeta implements ServiceMeta {
         this.apiKey = apiKey;
     }
 
-    public Future<JsonObject> requestGet(String api,String requestId) {
-        WebClient webClient = WebClient.create(Keel.getVertx());
-        return webClient
-                .getAbs(endpoint + api)
-                .bearerTokenAuthentication(apiKey)
-                .send()
-                .compose(bufferHttpResponse -> {
-                    return Future.succeededFuture(bufferHttpResponse.bodyAsJsonObject());
-                })
-                .andThen(ar -> {
-                    webClient.close();
-                });
-    }
+    private long streamTimeout = 180_000L;
 
     @Override
     public Future<JsonObject> request(String api, JsonObject requestBody, String requestId) {
@@ -104,8 +92,33 @@ public class MoonshotServiceMeta implements ServiceMeta {
         });
     }
 
+    public Future<JsonObject> requestGet(String api, String requestId) {
+        WebClient webClient = WebClient.create(Keel.getVertx());
+        return webClient
+                .getAbs(endpoint + api)
+                .bearerTokenAuthentication(apiKey)
+                .send()
+                .compose(bufferHttpResponse -> {
+                    return Future.succeededFuture(bufferHttpResponse.bodyAsJsonObject());
+                })
+                .andThen(ar -> {
+                    webClient.close();
+                });
+    }
+
     @Override
     public SupportedModelSeries getSupportedModelSeries() {
         return null;
+    }
+
+    @Override
+    public ServiceMeta setStreamTimeout(long timeout) {
+        streamTimeout = timeout;
+        return this;
+    }
+
+    @Override
+    public long getStreamTimeout() {
+        return streamTimeout;
     }
 }

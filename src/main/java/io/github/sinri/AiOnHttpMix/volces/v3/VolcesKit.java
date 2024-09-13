@@ -49,7 +49,7 @@ public final class VolcesKit {
             Handler<String> handler,
             String requestId
     ) {
-        requestBody.put("model", serviceMeta.getModel());
+        requestBody.put("model", serviceMeta.getModel()).put("stream", true);
         Promise<Void> promise = Promise.promise();
         Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
@@ -89,6 +89,7 @@ public final class VolcesKit {
             Handler<VolcesChatResponseChunk> handler,
             String requestId
     ) {
+        // requestBody.setStream(true);
         return chatStreamWithStringHandler(
                 serviceMeta,
                 requestBody.toJsonObject(),

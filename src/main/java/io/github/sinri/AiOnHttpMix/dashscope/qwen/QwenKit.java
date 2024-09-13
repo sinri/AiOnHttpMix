@@ -145,6 +145,12 @@ public final class QwenKit {
             String requestId
     ) {
         QwenStreamBuffer qwenStreamBuffer = new QwenStreamBuffer();
+        QwenRequest.Parameters parameters = chatRequest.getParameters();
+        if (parameters == null) {
+            chatRequest.handleParameters(p -> p.setIncrementalOutput(true));
+        } else {
+            chatRequest.getParameters().setIncrementalOutput(true);
+        }
         return chatStreamWithChunkHandler(
                 serviceMeta,
                 chatRequest,
@@ -284,6 +290,12 @@ public final class QwenKit {
             String requestId
     ) {
         QwenVLStreamBuffer qwenVLStreamBuffer = new QwenVLStreamBuffer();
+        QwenVLRequest.Parameters parameters = chatRequest.getParameters();
+        if (parameters == null) {
+            chatRequest.handleParameters(p -> p.setIncrementalOutput(true));
+        } else {
+            chatRequest.getParameters().setIncrementalOutput(true);
+        }
         return chatVLStreamWithChunkHandler(
                 serviceMeta,
                 chatRequest,

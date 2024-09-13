@@ -21,8 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.github.sinri.keel.facade.KeelInstance.Keel;
-
 /**
  * @since 1.1.0
  */
@@ -93,9 +91,6 @@ public interface AnyLLMResponse {
         List<AnyLLMResponseChoice> anyLLMResponseChoices = new ArrayList<>();
 
         choices.forEach(choice -> {
-            // todo debugging
-            Keel.getLogger().fatal("AnyLLMResponse.from.choice", choice.cloneAsJsonObject());
-
             String finishReason = choice.getFinishReason();
             QwenMessage message = choice.getMessage();
             String content = message.getContent();

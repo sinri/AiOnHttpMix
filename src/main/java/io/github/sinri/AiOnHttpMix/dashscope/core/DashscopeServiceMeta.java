@@ -210,9 +210,22 @@ public class DashscopeServiceMeta implements ServiceMeta {
         });
     }
 
+    private long streamTimeout = 180_000L;
+
     @Override
     public SupportedModelSeries getSupportedModelSeries() {
         return SupportedModelSeries.Qwen;
+    }
+
+    @Override
+    public long getStreamTimeout() {
+        return streamTimeout;
+    }
+
+    @Override
+    public DashscopeServiceMeta setStreamTimeout(long timeout) {
+        streamTimeout = timeout;
+        return this;
     }
 
 

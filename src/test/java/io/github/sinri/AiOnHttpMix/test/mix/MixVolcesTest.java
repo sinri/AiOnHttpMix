@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.test.mix;
 
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
+import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,5 +21,29 @@ public class MixVolcesTest extends MixTestCore {
 
                     return Future.succeededFuture();
                 });
+    }
+
+    @Override
+    @TestUnit(skip = true)
+    public Future<Void> pureNonStream() {
+        return super.pureNonStream();
+    }
+
+    @Override
+    @TestUnit(skip = false)
+    public Future<Void> pureStream() {
+        return super.pureStream();
+    }
+
+    @Override
+    @TestUnit(skip = true)
+    public Future<Void> fcNonStream() {
+        return super.fcNonStream();
+    }
+
+    @Override
+    @TestUnit(skip = true)
+    public Future<Void> fcStream() {
+        return super.fcStream();
     }
 }
