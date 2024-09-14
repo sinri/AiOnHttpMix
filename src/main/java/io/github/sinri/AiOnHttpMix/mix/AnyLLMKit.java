@@ -10,11 +10,22 @@ import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @since 1.1.0
  */
 public class AnyLLMKit {
+    /**
+     * @since 1.1.2
+     */
+    private final Map<String, FunctionCallAdapter> fcMap = new HashMap<>();
+
     private SupportedModel model;
     private ServiceMeta serviceMeta;
 
@@ -61,6 +72,48 @@ public class AnyLLMKit {
         this.model = SupportedModel.Volces;
         this.serviceMeta = volcesServiceMeta;
         return this;
+    }
+
+    /**
+     * @since 1.1.2
+     */
+    public AnyLLMKit registerFunction(@NotNull FunctionCallAdapter functionCallAdapter) {
+        fcMap.put(functionCallAdapter.getFunctionName(), functionCallAdapter);
+        return this;
+    }
+
+    /**
+     * @since 1.1.2
+     */
+    public AnyLLMKit unregisterFunction(@NotNull String functionName) {
+        fcMap.remove(functionName);
+        return this;
+    }
+
+    /**
+     * @since 1.1.2
+     */
+    public AnyLLMKit unregisterAllFunctions() {
+        fcMap.clear();
+        return this;
+    }
+
+    /**
+     * @since 1.1.2
+     */
+    public @Nullable FunctionCallAdapter getRegisteredFunction(@NotNull String functionName) {
+        return fcMap.get(functionName);
+    }
+
+    /**
+     * @since 1.1.2
+     */
+    public Future<Object> callRegisterFunction(AnyLLMResponseToolFunctionCall anyLLMResponseToolFunctionCall) {
+        FunctionCallAdapter registeredFunction = this.getRegisteredFunction(anyLLMResponseToolFunctionCall.getFunctionName());
+        if (registeredFunction == null) {
+            return Future.failedFuture(new UnsupportedOperationException("Function not registered"));
+        }
+        return registeredFunction.callFunction(new JsonObject(anyLLMResponseToolFunctionCall.getFunctionArguments()));
     }
 
     public Future<AnyLLMResponse> request(Handler<AnyLLMRequest> requestHandler) {

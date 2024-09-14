@@ -19,6 +19,24 @@ public interface AnyLLMRequest {
 
     String getRequestId();
 
+    /**
+     * @since 1.1.2
+     */
+    default AnyLLMRequest addFunctionToolDefinition(FunctionCallAdapter functionCallAdapter) {
+        return addFunctionToolDefinition(functionCallAdapter.toFunctionToolDefinition());
+    }
+
+    /**
+     * @since 1.1.2
+     */
+    default AnyLLMRequest addFunctionToolDefinition(AnyLLMKit anyLLMKit, String registeredFunctionName) {
+        FunctionCallAdapter registeredFunction = anyLLMKit.getRegisteredFunction(registeredFunctionName);
+        if (registeredFunction == null) {
+            throw new IllegalArgumentException("No such function: " + registeredFunctionName);
+        }
+        return addFunctionToolDefinition(registeredFunction.toFunctionToolDefinition());
+    }
+
     default AnyLLMRequest addFunctionToolDefinition(Handler<AnyLLMFunctionToolDefinition.Builder> builderHandler) {
         AnyLLMFunctionToolDefinition.Builder builder = AnyLLMFunctionToolDefinition.builder();
         builderHandler.handle(builder);

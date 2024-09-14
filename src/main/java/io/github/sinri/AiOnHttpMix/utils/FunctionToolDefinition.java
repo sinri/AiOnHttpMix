@@ -80,6 +80,20 @@ public interface FunctionToolDefinition<E> extends JsonifiableEntity<E>, SelfInt
             return property(name, "boolean", desc);
         }
 
+        /**
+         * @since 1.1.2
+         */
+        public B property(FunctionToolArgumentType type, String name, String desc) {
+            return property(name, type.getCode(), desc);
+        }
+
+        /**
+         * @since 1.1.2
+         */
+        public B property(FunctionToolArgumentDefinition argumentDefinition) {
+            return property(argumentDefinition.name(), argumentDefinition.argumentType().getCode(), argumentDefinition.desc());
+        }
+
         protected B property(String name, String type, String desc) {
             if (Objects.equals(type, "string")) {
                 propertiesSchemaJson.property(name, Schemas.stringSchema()
@@ -109,4 +123,5 @@ public interface FunctionToolDefinition<E> extends JsonifiableEntity<E>, SelfInt
 
         abstract public D build();
     }
+
 }

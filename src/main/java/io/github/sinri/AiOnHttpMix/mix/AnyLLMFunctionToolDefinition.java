@@ -14,11 +14,11 @@ public class AnyLLMFunctionToolDefinition implements FunctionToolDefinition<AnyL
         jsonObject = new JsonObject();
     }
 
-    static Builder builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    static AnyLLMFunctionToolDefinition wrap(JsonObject jsonObject) {
+    public static AnyLLMFunctionToolDefinition wrap(JsonObject jsonObject) {
         return new AnyLLMFunctionToolDefinition().reloadDataFromJsonObject(jsonObject);
     }
 

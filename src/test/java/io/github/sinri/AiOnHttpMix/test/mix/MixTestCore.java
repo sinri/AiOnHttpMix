@@ -3,10 +3,14 @@ package io.github.sinri.AiOnHttpMix.test.mix;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseChoice;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseToolFunctionCall;
+import io.github.sinri.AiOnHttpMix.mix.FunctionCallAdapter;
+import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentDefinition;
+import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentType;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -126,5 +130,70 @@ public class MixTestCore extends KeelTest {
                     }
                     return Future.succeededFuture();
                 });
+    }
+
+    @TestUnit
+    public Future<Void> mixFcNonStream() {
+        var f = new FunctionToCheckPrice();
+        return getAnyLLMKit()
+                .unregisterAllFunctions()
+                .registerFunction(f)
+                .request(r -> r
+                        .addFunctionToolDefinition(f)
+                        .addSystemMessage("你是一个网店的客服，应对客人的售前咨询。")
+                        .addUserMessage("东方牌牛肉干怎么卖啊")
+                )
+                .compose(anyLLMResponse -> {
+                    List<AnyLLMResponseChoice> choices = anyLLMResponse.getChoices();
+                    getLogger().info("choices count: " + choices.size());
+                    if (!choices.isEmpty()) {
+                        AnyLLMResponseChoice choice = choices.get(0);
+                        String finishReason = choice.getFinishReason();
+                        String content = choice.getContent();
+                        getLogger().info("Response Choice | " + content + " | " + finishReason);
+                        List<AnyLLMResponseToolFunctionCall> functionCalls = choice.getFunctionCalls();
+
+                        if (!functionCalls.isEmpty()) {
+                            AnyLLMResponseToolFunctionCall functionCall = functionCalls.get(0);
+                            getLogger().info("Function Call | " + functionCall.getFunctionName() + " | " + functionCall.getFunctionArguments());
+                            FunctionCallAdapter registeredFunction = getAnyLLMKit().getRegisteredFunction(functionCall.getFunctionName());
+                            if (registeredFunction != null) {
+                                return registeredFunction.callFunction(new JsonObject(functionCall.getFunctionArguments()))
+                                        .compose(result -> {
+                                            getLogger().info("Function Call Result:" + result);
+                                            return Future.succeededFuture();
+                                        });
+                            }
+                        }
+                    }
+                    return Future.succeededFuture();
+                });
+    }
+
+    public static class FunctionToCheckPrice implements FunctionCallAdapter {
+
+        @Override
+        public @NotNull String getFunctionName() {
+            return "CheckPrice";
+        }
+
+        @Override
+        public @NotNull String getFunctionDescription() {
+            return "本函数用于按照给定的商品名称查找商品的价格。";
+        }
+
+        @Override
+        public @NotNull List<FunctionToolArgumentDefinition> getArguments() {
+            return List.of(
+                    new FunctionToolArgumentDefinition(FunctionToolArgumentType.STRING, "product_name", "商品名称")
+            );
+        }
+
+        @Override
+        public @NotNull Future<Object> callFunction(JsonObject arguments) {
+            String productName = arguments.getString("product_name");
+            int x = productName.length();
+            return Future.succeededFuture(x);
+        }
     }
 }
