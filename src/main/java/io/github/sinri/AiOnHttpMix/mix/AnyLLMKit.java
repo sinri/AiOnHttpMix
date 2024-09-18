@@ -158,6 +158,37 @@ public class AnyLLMKit {
         };
     }
 
+    /**
+     * @since 1.1.3
+     */
+    public Future<Void> request(AnyLLMRequest request, Handler<String> fragmentHandler) {
+        return switch (model.getSeries()) {
+            case ChatGPT -> new ChatGPTKit()
+                    .chatStream(
+                            (AzureOpenAIServiceMeta) serviceMeta,
+                            request.toChatGptRequest().toJsonObject(),
+                            fragmentHandler,
+                            request.getRequestId()
+                    );
+            case Qwen -> new QwenKit()
+                    .chatStreamWithStringHandler(
+                            (DashscopeServiceMeta) serviceMeta,
+                            request.toQwenRequest()
+                                    .setModel(model.asQwenModel())
+                                    .toJsonObject(),
+                            fragmentHandler,
+                            request.getRequestId()
+                    );
+            case Volces -> new VolcesKit()
+                    .chatStreamWithStringHandler(
+                            (VolcesServiceMeta) serviceMeta,
+                            request.toVolcesChatRequest().toJsonObject(),
+                            fragmentHandler,
+                            request.getRequestId()
+                    );
+        };
+    }
+
     public Future<AnyLLMResponse> requestWithStreamBuffer(Handler<AnyLLMRequest> requestHandler) {
         AnyLLMRequest anyLLMRequest = AnyLLMRequest.create();
         requestHandler.handle(anyLLMRequest);
