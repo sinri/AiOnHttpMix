@@ -146,6 +146,23 @@ public interface AnyLLMResponse {
         return new AnyLLMResponseImpl(anyLLMResponseChoices);
     }
 
+    /**
+     * @param jsonObject
+     * @return
+     * @since 1.1.4
+     */
+    static AnyLLMResponse wrap(JsonObject jsonObject) {
+        JsonArray jsonArray = jsonObject.getJsonArray("choices");
+        List<AnyLLMResponseChoice> choices = new ArrayList<>();
+        jsonArray.forEach(item -> {
+            if (item instanceof JsonObject) {
+                var c = AnyLLMResponseChoice.wrap((JsonObject) item);
+                choices.add(c);
+            }
+        });
+        return new AnyLLMResponseImpl(choices);
+    }
+
 
     List<AnyLLMResponseChoice> getChoices();
 

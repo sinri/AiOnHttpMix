@@ -25,7 +25,7 @@ public class MixQwenTest extends MixTestCore {
                 });
     }
 
-    @TestUnit(skip = true)
+    @TestUnit(skip = false)
     @Override
     public Future<Void> pureStream() {
         return super.pureStream();
@@ -49,9 +49,27 @@ public class MixQwenTest extends MixTestCore {
         return super.fcStream();
     }
 
-    @TestUnit(skip = false)
+    @TestUnit(skip = true)
     @Override
     public Future<Void> mixFcNonStream() {
         return super.mixFcNonStream();
+    }
+
+    @TestUnit(skip = false)
+    public Future<Void> mixFcNonStream2() {
+        return getAnyLLMKit()
+                .request(anyLLMRequest -> {
+                    anyLLMRequest.addFunctionToolDefinition(builder -> builder
+                                    .functionName("python_code_runner")
+                                    .functionDescription("执行给定的Python代码并给出结果")
+                                    .propertyAsString("code", "要执行的python代码")
+                            )
+                            .addSystemMessage("你是一个专业的程序员。")
+                            .addUserMessage("请帮我执行一行python计算代码 `35/5.0-1`，给我结果。");
+                })
+                .compose(anyLLMResponse -> {
+                    getLogger().info("RESP", anyLLMResponse.toJsonObject());
+                    return Future.succeededFuture();
+                });
     }
 }

@@ -4,6 +4,7 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
 import io.github.sinri.AiOnHttpMix.dashscope.core.DashscopeServiceMeta;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
@@ -175,6 +176,10 @@ public class AnyLLMKit {
                             (DashscopeServiceMeta) serviceMeta,
                             request.toQwenRequest()
                                     .setModel(model.asQwenModel())
+                                    .handleParameters(p -> p
+                                            .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
+                                            .setIncrementalOutput(true)
+                                    )
                                     .toJsonObject(),
                             fragmentHandler,
                             request.getRequestId()
@@ -211,7 +216,11 @@ public class AnyLLMKit {
                     .chatStreamWithBuffer(
                             (DashscopeServiceMeta) serviceMeta,
                             request.toQwenRequest()
-                                    .setModel(model.asQwenModel()),
+                                    .setModel(model.asQwenModel())
+                                    .handleParameters(p -> p
+                                            .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
+                                            .setIncrementalOutput(true)
+                                    ),
                             request.getRequestId()
                     )
                     .compose(resp -> {

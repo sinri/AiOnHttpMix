@@ -25,7 +25,13 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
     }
 
     default QwenRequest handleInput(Handler<Input> handler) {
-        Input input = Input.create();
+        Input input;
+        var i = this.toJsonObject().getJsonObject("input");
+        if (i != null) {
+            input = Input.wrap(i);
+        } else {
+            input = Input.create();
+        }
         handler.handle(input);
         return setInput(input);
     }
@@ -36,7 +42,13 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
     }
 
     default QwenRequest handleParameters(Handler<Parameters> handler) {
-        Parameters parameters = Parameters.create();
+        Parameters parameters;
+        var p = this.toJsonObject().getJsonObject("parameters");
+        if (p != null) {
+            parameters = Parameters.wrap(p);
+        } else {
+            parameters = Parameters.create();
+        }
         handler.handle(parameters);
         return setParameters(parameters);
     }

@@ -10,6 +10,18 @@ public interface AnyLLMResponseToolFunctionCall {
         return new AnyLLMResponseToolFunctionCallImpl(functionName, functionArguments);
     }
 
+    /**
+     * @param jsonObject
+     * @return
+     * @since 1.1.4
+     */
+    static AnyLLMResponseToolFunctionCall wrap(JsonObject jsonObject) {
+        return build(
+                jsonObject.getString("function_name"),
+                jsonObject.getString("function_arguments")
+        );
+    }
+
     String getFunctionName();
 
     String getFunctionArguments();
