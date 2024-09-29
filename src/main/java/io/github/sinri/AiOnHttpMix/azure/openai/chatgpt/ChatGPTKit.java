@@ -54,9 +54,6 @@ public final class ChatGPTKit {
     }
 
     /**
-     * @param tempAssistantMessage
-     * @param requestId
-     * @return
      * @since 1.1.5
      */
     public static Handler<String> getStreamBufferFragmentHandler(
@@ -85,9 +82,6 @@ public final class ChatGPTKit {
             try {
                 JsonObject entries = new JsonObject(s);
                 var responseChunk = OpenAIResponseChunk.wrap(entries);
-
-                //Keel.getLogger().fatal("DEBUG responseChunk", responseChunk.cloneAsJsonObject());
-
                 List<OpenAIChatGptResponseChunkChoice> choices = responseChunk.getChoices();
                 if (choices.isEmpty()) return;
                 OpenAIChatGptResponseChunkChoice choiceInChunk = choices.get(0);
@@ -156,20 +150,6 @@ public final class ChatGPTKit {
 
         Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
-//            final String finalS = s;
-//            AigcMix.getVerboseLogger().info(
-//                    "Component Handler in ChatGPTKit.chatStream",
-//                    j -> j
-//                            .put("component", finalS)
-//                            .put("request_id", requestId)
-//            );
-//
-//            s = s.replaceFirst("^data:\\s*", "");
-//            if (s.startsWith("[DONE]")) {
-//                promise.complete();
-//            } else {
-//                chunkHandler.handle(s);
-//            }
             chunkHandler.handle(s);
         });
 

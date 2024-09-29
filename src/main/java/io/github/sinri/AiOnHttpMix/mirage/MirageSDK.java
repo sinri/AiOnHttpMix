@@ -66,16 +66,13 @@ public class MirageSDK {
         var body = buildRequestBody(model, service, useNyaCode, llmRequestBody);
         return Keel.useWebClient(webClient -> {
             var url = "https://" + mirageDomain + "/mirage/aigc/llm/sync";
-//            Keel.getLogger().fatal(url);
             return webClient.postAbs(url)
                     .sendJsonObject(body)
                     .compose(bufferHttpResponse -> {
-//                        Keel.getLogger().fatal("DEBUG: "+bufferHttpResponse.bodyAsString());
                         if (bufferHttpResponse.statusCode() != 200) {
                             return Future.failedFuture(new Exception("Status Code:" + bufferHttpResponse.statusCode() + "; " + bufferHttpResponse.bodyAsString()));
                         }
                         var resp = bufferHttpResponse.bodyAsJsonObject();
-//                         Keel.getLogger().fatal("RESULT", bufferHttpResponse.bodyAsJsonObject());
                         MirageSyncResponse mirageSyncResponse = new MirageSyncResponse(resp);
                         AnyLLMResponse anyLLMResponse = mirageSyncResponse.toAnyLLMResponse();
                         return Future.succeededFuture(anyLLMResponse);

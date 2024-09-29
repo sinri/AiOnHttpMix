@@ -330,7 +330,6 @@ public class AnyLLMKit {
                             true,
                             request.toMirageRequestEntity(),
                             s -> {
-                                // Keel.getLogger().fatal("Mirage Chunk | " + s);
                                 fragmentHandler.handle(s);
                             }
                     )
