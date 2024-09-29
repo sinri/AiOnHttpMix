@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * Test for Azure with SSE query.
  */
-public class AzureChatTest2 extends AzureChatTestCore {
+public class AzureChatTest9 extends AzureChatTestCore {
     private OpenAIChatGptRequest parameters;
 
     @Override
@@ -19,8 +19,12 @@ public class AzureChatTest2 extends AzureChatTestCore {
         return super.starting()
                 .compose(v -> {
                     parameters = OpenAIChatGptRequest.create()
-                            .addMessage(m -> m.system("你是一个专业的IT工程师。"))
-                            .addMessage(m -> m.user("Java 17和Java 21的差别是什么？"));
+                            .addTool(t -> t.functionName("searchDataSet")
+                                    .functionDescription("根据信息查询可能的数据集")
+                                    .propertyAsString("keywords", "由一组关键字字符串组成的JSON数组")
+                            )
+                            .addMessage(m -> m.system("你现在负责为大家搜寻数据集。你需要根据用户的描述，识别出可能的数据集关键词，据此查找相关的数据集。"))
+                            .addMessage(m -> m.user("每年在天猫平台上达成的商品销售额"));
                     return Future.succeededFuture();
                 });
     }
@@ -33,11 +37,12 @@ public class AzureChatTest2 extends AzureChatTestCore {
         return new ChatGPTKit()
                 .chatStream(
                         getServiceMeta(),
-                        parameters.toJsonObject(),
-                        chunkString -> {
-                            getLogger().info("ChunkString | " + chunkString);
-                        },
+                        parameters,
                         requestId
-                );
+                )
+                .compose(choice -> {
+                    getLogger().info("choice", choice.cloneAsJsonObject());
+                    return Future.succeededFuture();
+                });
     }
 }

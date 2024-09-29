@@ -1,16 +1,11 @@
 package io.github.sinri.AiOnHttpMix.test.azure.chat;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.AssistantMessage;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseChoice;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -34,8 +29,8 @@ public class AzureChatTest3 extends AzureChatTestCore {
                 });
     }
 
-    @TestUnit(skip = false)
-    public Future<Void> test2() {
+    @TestUnit
+    public Future<Void> test() {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", parameters.toJsonObject());
 
@@ -93,40 +88,4 @@ public class AzureChatTest3 extends AzureChatTestCore {
          */
     }
 
-    @TestUnit(skip = false)
-    public Future<Void> test4() {
-        String requestId = UUID.randomUUID().toString();
-        getLogger().info("REQ", parameters.toJsonObject());
-
-        return new ChatGPTKit()
-                .chat(getServiceMeta(), parameters, requestId)
-                .compose(resp -> {
-                    OpenAIChatGptResponseChoice choice = resp.getChoices().get(0);
-                    AssistantMessage message = choice.getMessage();
-                    ChatGptRole role = message.getRole();
-                    String content = message.getContent();
-                    var toolCalls = message.getToolCalls();
-
-                    getLogger().info("RESP FROM " + role);
-                    if (content != null) {
-                        getLogger().info("Content: " + content);
-                    }
-                    if (toolCalls != null) {
-                        toolCalls.forEach(toolCall -> {
-                            String type = toolCall.getType();
-                            getLogger().info("ToolCall, ID: " + toolCall.getId() + " Type: " + type);
-                            if (Objects.equals("function", type)) {
-                                getLogger().info(
-                                        "As Function Tool Call",
-                                        new JsonObject()
-                                                .put("function_name", toolCall.getFunction().getName())
-                                                .put("arguments", toolCall.getFunction().getArguments())
-                                );
-                            }
-                        });
-                    }
-
-                    return Future.succeededFuture();
-                });
-    }
 }

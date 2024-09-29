@@ -1,7 +1,9 @@
 package io.github.sinri.AiOnHttpMix.test.azure.chat;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseChoice;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
@@ -9,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 /**
- * Test for Azure with SSE query.
+ * Test for Azure with Non SSE query.
  */
-public class AzureChatTest2 extends AzureChatTestCore {
+public class AzureChatTest5 extends AzureChatTestCore {
     private OpenAIChatGptRequest parameters;
 
     @Override
@@ -25,19 +27,23 @@ public class AzureChatTest2 extends AzureChatTestCore {
                 });
     }
 
+
     @TestUnit
     public Future<Void> test() {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", parameters.toJsonObject());
 
         return new ChatGPTKit()
-                .chatStream(
-                        getServiceMeta(),
-                        parameters.toJsonObject(),
-                        chunkString -> {
-                            getLogger().info("ChunkString | " + chunkString);
-                        },
-                        requestId
-                );
+                .chat(getServiceMeta(), parameters, requestId)
+                .compose(resp -> {
+                    OpenAIChatGptResponseChoice choice = resp.getChoices().get(0);
+                    var message = choice.getMessage();
+                    ChatGptRole role = message.getRole();
+                    String content = message.getContent();
+                    getLogger().info("RESP | " + role + " | " + content);
+                    return Future.succeededFuture();
+                });
     }
+
+
 }

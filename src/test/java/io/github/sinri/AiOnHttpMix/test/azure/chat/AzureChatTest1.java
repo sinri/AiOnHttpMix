@@ -1,9 +1,7 @@
 package io.github.sinri.AiOnHttpMix.test.azure.chat;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
-import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseChoice;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
@@ -27,8 +25,8 @@ public class AzureChatTest1 extends AzureChatTestCore {
                 });
     }
 
-    @TestUnit(skip = false)
-    public Future<Void> test1() {
+    @TestUnit
+    public Future<Void> test() {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", parameters.toJsonObject());
 
@@ -80,24 +78,5 @@ public class AzureChatTest1 extends AzureChatTestCore {
          */
 
     }
-
-
-    @TestUnit(skip = false)
-    public Future<Void> test3() {
-        String requestId = UUID.randomUUID().toString();
-        getLogger().info("REQ", parameters.toJsonObject());
-
-        return new ChatGPTKit()
-                .chat(getServiceMeta(), parameters, requestId)
-                .compose(resp -> {
-                    OpenAIChatGptResponseChoice choice = resp.getChoices().get(0);
-                    var message = choice.getMessage();
-                    ChatGptRole role = message.getRole();
-                    String content = message.getContent();
-                    getLogger().info("RESP | " + role + " | " + content);
-                    return Future.succeededFuture();
-                });
-    }
-
 
 }

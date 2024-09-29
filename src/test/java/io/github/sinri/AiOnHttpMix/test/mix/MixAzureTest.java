@@ -32,19 +32,19 @@ public class MixAzureTest extends MixTestCore {
 
     }
 
-    @TestUnit(skip = true)
+    @TestUnit(skip = false)
     @Override
     public Future<Void> pureStream() {
         return super.pureStream();
     }
 
-    @TestUnit(skip = true)
+    @TestUnit(skip = false)
     @Override
     public Future<Void> pureNonStream() {
         return super.pureNonStream();
     }
 
-    @TestUnit(skip = true)
+    @TestUnit(skip = false)
     @Override
     public Future<Void> fcNonStream() {
         return super.fcNonStream();
@@ -56,7 +56,7 @@ public class MixAzureTest extends MixTestCore {
         return super.fcStream();
     }
 
-    @TestUnit(skip = true)
+    @TestUnit(skip = false)
     @Override
     public Future<Void> mixFcNonStream() {
         return super.mixFcNonStream();
