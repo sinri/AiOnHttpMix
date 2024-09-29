@@ -36,13 +36,13 @@ public class MixVolcesTest extends MixTestCore {
     }
 
     @Override
-    @TestUnit(skip = true)
+    @TestUnit(skip = false)
     public Future<Void> fcNonStream() {
         return super.fcNonStream();
     }
 
     @Override
-    @TestUnit(skip = false)
+    @TestUnit(skip = true)
     public Future<Void> fcStream() {
         // NOTE: Volces now does not support FC in Stream.
         return super.fcStream();

@@ -33,6 +33,8 @@ public class MixTestCore extends KeelTest {
                     Keel.getConfiguration().loadPropertiesFile("config.properties");
                     getLogger().setVisibleLevel(KeelLogLevel.DEBUG);
 
+                    //AigcMix.enableVerboseLogger(getLogger());
+
                     var domain = Keel.config("mirage.domain");
                     var clientCode = Keel.config("mirage.client_code");
                     var clientSecret = Keel.config("mirage.client_secret");

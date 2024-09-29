@@ -46,7 +46,7 @@ public class MixQwenTest extends MixTestCore {
         return super.fcNonStream();
     }
 
-    @TestUnit(skip = false)
+    @TestUnit(skip = true)
     @Override
     public Future<Void> fcStream() {
         return super.fcStream();

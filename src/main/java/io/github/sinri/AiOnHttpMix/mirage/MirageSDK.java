@@ -1,5 +1,7 @@
 package io.github.sinri.AiOnHttpMix.mirage;
 
+import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
+import io.github.sinri.AiOnHttpMix.mix.AnyLLMRequest;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.github.sinri.keel.core.cutter.CutterOnString;
@@ -82,6 +84,7 @@ public class MirageSDK {
     }
 
     /**
+     * @param fragmentHandler 针对一个已经格式化好的SSE Chunk的JSON对象字符串表达的处理器
      * @since 1.1.5
      */
     public Future<Void> requestStream(
@@ -94,6 +97,10 @@ public class MirageSDK {
         return requestStream(model, service, useNyaCode, llmRequestBody, getMaxStreamTime(), fragmentHandler);
     }
 
+    /**
+     * @param fragmentHandler 针对一个已经格式化好的SSE Chunk的JSON对象字符串表达的处理器
+     * @see AnyLLMKit#request(AnyLLMRequest, Handler)
+     */
     public Future<Void> requestStream(
             String model,
             String service,
@@ -114,7 +121,17 @@ public class MirageSDK {
         HttpClient client = Keel.getVertx().createHttpClient(options);
 
         Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(fragmentHandler);
+        cutter.setComponentHandler(s -> {
+            //Keel.getLogger().fatal("MirageSDK.requestStream cut off: " + s);
+            var lines = s.split("[\r\n]+");
+            for (var line : lines) {
+                if (line.startsWith("data:")) {
+                    line = line.replaceAll("^data:\\s*", "");
+                    fragmentHandler.handle(line);
+                    break;
+                }
+            }
+        });
 
         client.request(HttpMethod.POST, "/mirage/aigc/llm/stream")
                 .compose(httpClientRequest -> {

@@ -53,79 +53,6 @@ public final class ChatGPTKit {
         return chat(serviceMeta, request, requestId);
     }
 
-    public Future<Void> chatStream(
-            AzureOpenAIServiceMeta serviceMeta,
-            JsonObject parameters,
-            @NotNull Handler<String> chunkHandler,
-            String requestId
-    ) {
-        parameters.put("stream", true);
-        Promise<Void> promise = Promise.promise();
-
-        Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(s -> {
-            final String finalS = s;
-            AigcMix.getVerboseLogger().info(
-                    "Component Handler in ChatGPTKit.chatStream",
-                    j -> j
-                            .put("component", finalS)
-                            .put("request_id", requestId)
-            );
-
-            s = s.replaceFirst("^data:\\s*", "");
-            if (s.startsWith("[DONE]")) {
-                promise.complete();
-            } else {
-                chunkHandler.handle(s);
-            }
-        });
-
-        String api = "/chat/completions";
-
-        serviceMeta.requestSSE(api, parameters, promise, cutter, requestId);
-
-        return promise.future();
-    }
-
-    public Future<Void> chatStream(
-            AzureOpenAIServiceMeta serviceMeta,
-            Handler<OpenAIChatGptRequest> handler,
-            @NotNull Handler<OpenAIResponseChunk> chunkHandler,
-            String requestId
-    ) {
-        OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
-        handler.handle(request);
-        return chatStream(serviceMeta, request, chunkHandler, requestId);
-    }
-
-    public Future<Void> chatStream(
-            AzureOpenAIServiceMeta serviceMeta,
-            OpenAIChatGptRequest parameters,
-            @NotNull Handler<OpenAIResponseChunk> chunkHandler,
-            String requestId
-    ) {
-        return this.chatStream(
-                serviceMeta,
-                parameters.toJsonObject(),
-                s -> {
-                    JsonObject entries = new JsonObject(s);
-                    var responseChunk = OpenAIResponseChunk.wrap(entries);
-                    chunkHandler.handle(responseChunk);
-                },
-                requestId
-        );
-    }
-
-    public Future<OpenAIChatGptResponseChoice> chatStream(
-            AzureOpenAIServiceMeta serviceMeta,
-            Handler<OpenAIChatGptRequest> handler,
-            String requestId
-    ) {
-        OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
-        handler.handle(request);
-        return chatStream(serviceMeta, request, requestId);
-    }
-
     /**
      * @param tempAssistantMessage
      * @param requestId
@@ -137,9 +64,30 @@ public final class ChatGPTKit {
             String requestId
     ) {
         return s -> {
+            final String finalS = s;
+            AigcMix.getVerboseLogger().info(
+                    "Component Handler in ChatGPTKit.chatStream",
+                    j -> j
+                            .put("component", finalS)
+                            .put("request_id", requestId)
+            );
+
+            s = s.replaceFirst("^data:\\s*", "");
+            if (s.startsWith("[DONE]")) {
+                AigcMix.getVerboseLogger().info(
+                        "Component Handler in ChatGPTKit.chatStream met DONE",
+                        j -> j
+                                .put("component", finalS)
+                                .put("request_id", requestId)
+                );
+                return;
+            }
             try {
                 JsonObject entries = new JsonObject(s);
                 var responseChunk = OpenAIResponseChunk.wrap(entries);
+
+                //Keel.getLogger().fatal("DEBUG responseChunk", responseChunk.cloneAsJsonObject());
+
                 List<OpenAIChatGptResponseChunkChoice> choices = responseChunk.getChoices();
                 if (choices.isEmpty()) return;
                 OpenAIChatGptResponseChunkChoice choiceInChunk = choices.get(0);
@@ -184,6 +132,91 @@ public final class ChatGPTKit {
                 AigcMix.getVerboseLogger().exception(e, "chunk handler exception in ChatGPTKit.chatStream", j -> j.put("request_id", requestId));
             }
         };
+    }
+
+    public Future<Void> chatStream(
+            AzureOpenAIServiceMeta serviceMeta,
+            Handler<OpenAIChatGptRequest> handler,
+            @NotNull Handler<OpenAIResponseChunk> chunkHandler,
+            String requestId
+    ) {
+        OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
+        handler.handle(request);
+        return chatStream(serviceMeta, request, chunkHandler, requestId);
+    }
+
+    public Future<Void> chatStream(
+            AzureOpenAIServiceMeta serviceMeta,
+            JsonObject parameters,
+            @NotNull Handler<String> chunkHandler,
+            String requestId
+    ) {
+        parameters.put("stream", true);
+        Promise<Void> promise = Promise.promise();
+
+        Cutter<String> cutter = new CutterOnString();
+        cutter.setComponentHandler(s -> {
+//            final String finalS = s;
+//            AigcMix.getVerboseLogger().info(
+//                    "Component Handler in ChatGPTKit.chatStream",
+//                    j -> j
+//                            .put("component", finalS)
+//                            .put("request_id", requestId)
+//            );
+//
+//            s = s.replaceFirst("^data:\\s*", "");
+//            if (s.startsWith("[DONE]")) {
+//                promise.complete();
+//            } else {
+//                chunkHandler.handle(s);
+//            }
+            chunkHandler.handle(s);
+        });
+
+        String api = "/chat/completions";
+
+        serviceMeta.requestSSE(api, parameters, promise, cutter, requestId);
+
+        return promise.future();
+    }
+
+    public Future<OpenAIChatGptResponseChoice> chatStream(
+            AzureOpenAIServiceMeta serviceMeta,
+            Handler<OpenAIChatGptRequest> handler,
+            String requestId
+    ) {
+        OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
+        handler.handle(request);
+        return chatStream(serviceMeta, request, requestId);
+    }
+
+    public Future<Void> chatStream(
+            AzureOpenAIServiceMeta serviceMeta,
+            OpenAIChatGptRequest parameters,
+            @NotNull Handler<OpenAIResponseChunk> chunkHandler,
+            String requestId
+    ) {
+        return this.chatStream(
+                serviceMeta,
+                parameters.toJsonObject(),
+                s -> {
+                    final String finalS = s;
+                    AigcMix.getVerboseLogger().info(
+                            "Component Handler in ChatGPTKit.chatStream",
+                            j -> j
+                                    .put("component", finalS)
+                                    .put("request_id", requestId)
+                    );
+
+                    s = s.replaceFirst("^data:\\s*", "");
+                    if (!s.startsWith("[DONE]")) {
+                        JsonObject entries = new JsonObject(s);
+                        var responseChunk = OpenAIResponseChunk.wrap(entries);
+                        chunkHandler.handle(responseChunk);
+                    }
+                },
+                requestId
+        );
     }
 
     public Future<OpenAIChatGptResponseChoice> chatStream(

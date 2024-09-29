@@ -207,6 +207,8 @@ public class AnyLLMKit {
     }
 
     /**
+     * @param request         请求
+     * @param fragmentHandler 针对一个已经格式化好的SSE Chunk的JSON对象字符串表达的处理器
      * @since 1.1.3
      */
     public Future<Void> request(AnyLLMRequest request, Handler<String> fragmentHandler) {
@@ -215,28 +217,33 @@ public class AnyLLMKit {
                 case ChatGPT -> new ChatGPTKit()
                         .chatStream(
                                 (AzureOpenAIServiceMeta) serviceMeta,
-                                request.toChatGptRequest().toJsonObject(),
-                                fragmentHandler,
+                                request.toChatGptRequest(),
+                                chunk -> {
+                                    fragmentHandler.handle(chunk.cloneAsJsonObject().toString());
+                                },
                                 request.getRequestId()
                         );
                 case Qwen -> new QwenKit()
-                        .chatStreamWithStringHandler(
+                        .chatStreamWithChunkHandler(
                                 (DashscopeServiceMeta) serviceMeta,
                                 request.toQwenRequest()
                                         .setModel(model.asQwenModel())
                                         .handleParameters(p -> p
                                                 .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
                                                 .setIncrementalOutput(true)
-                                        )
-                                        .toJsonObject(),
-                                fragmentHandler,
+                                        ),
+                                chunk -> {
+                                    fragmentHandler.handle(chunk.cloneAsJsonObject().toString());
+                                },
                                 request.getRequestId()
                         );
                 case Volces -> new VolcesKit()
-                        .chatStreamWithStringHandler(
+                        .chatStreamWithChunkHandler(
                                 (VolcesServiceMeta) serviceMeta,
-                                request.toVolcesChatRequest().toJsonObject(),
-                                fragmentHandler,
+                                request.toVolcesChatRequest(),
+                                chunk -> {
+                                    fragmentHandler.handle(chunk.cloneAsJsonObject().toString());
+                                },
                                 request.getRequestId()
                         );
             };
@@ -322,7 +329,10 @@ public class AnyLLMKit {
                             this.mirageService,
                             true,
                             request.toMirageRequestEntity(),
-                            fragmentHandler
+                            s -> {
+                                // Keel.getLogger().fatal("Mirage Chunk | " + s);
+                                fragmentHandler.handle(s);
+                            }
                     )
                     .compose(fin -> {
                         return Future.succeededFuture(buffer.toAnyLLMResponse());
