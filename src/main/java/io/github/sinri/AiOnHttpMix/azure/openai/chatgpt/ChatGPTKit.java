@@ -126,6 +126,66 @@ public final class ChatGPTKit {
         return chatStream(serviceMeta, request, requestId);
     }
 
+    /**
+     * @param tempAssistantMessage
+     * @param requestId
+     * @return
+     * @since 1.1.5
+     */
+    public static Handler<String> getStreamBufferFragmentHandler(
+            OpenAIChatGptStreamBuffer tempAssistantMessage,
+            String requestId
+    ) {
+        return s -> {
+            try {
+                JsonObject entries = new JsonObject(s);
+                var responseChunk = OpenAIResponseChunk.wrap(entries);
+                List<OpenAIChatGptResponseChunkChoice> choices = responseChunk.getChoices();
+                if (choices.isEmpty()) return;
+                OpenAIChatGptResponseChunkChoice choiceInChunk = choices.get(0);
+                String finishReason = choiceInChunk.getFinishReason();
+                OpenAIChatGptResponseChunkChoiceDelta delta = choiceInChunk.getDelta();
+                if (delta == null) return;
+
+                String contentAsText = delta.getContentAsText();
+                if (contentAsText != null) {
+                    tempAssistantMessage.acceptContentFragment(contentAsText);
+                }
+
+                ChatGptRole role = delta.getRole();
+                if (role != null) {
+                    tempAssistantMessage.acceptRole(role);
+                }
+
+                List<OpenAIChatGptResponseToolCall> toolCalls = delta.getToolCalls();
+                if (toolCalls != null && !toolCalls.isEmpty()) {
+                    toolCalls.forEach(toolCall -> {
+                        String type = toolCall.getType();
+                        if (type != null) {
+                            // first time met!
+                            tempAssistantMessage.acceptToolCall(toolCall);
+                        } else {
+                            Integer index = toolCall.getIndex();
+                            OpenAIChatGptStreamBuffer.TempToolCall tempToolCall = tempAssistantMessage.getTempToolCall(index);
+                            if (tempToolCall != null) {
+                                OpenAIChatGptResponseFunctionCall function = toolCall.getFunction();
+                                if (function != null) {
+                                    OpenAIChatGptStreamBuffer.TempFunctionCall tempFunctionCall = tempToolCall.getFunction();
+                                    String arguments = function.getArguments();
+                                    if (arguments != null) {
+                                        tempFunctionCall.acceptArgumentFragment(arguments);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (Throwable e) {
+                AigcMix.getVerboseLogger().exception(e, "chunk handler exception in ChatGPTKit.chatStream", j -> j.put("request_id", requestId));
+            }
+        };
+    }
+
     public Future<OpenAIChatGptResponseChoice> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
             OpenAIChatGptRequest parameters,
@@ -135,54 +195,7 @@ public final class ChatGPTKit {
         return this.chatStream(
                         serviceMeta,
                         parameters.toJsonObject(),
-                        s -> {
-                            try {
-                                JsonObject entries = new JsonObject(s);
-                                var responseChunk = OpenAIResponseChunk.wrap(entries);
-                                List<OpenAIChatGptResponseChunkChoice> choices = responseChunk.getChoices();
-                                if (choices.isEmpty()) return;
-                                OpenAIChatGptResponseChunkChoice choiceInChunk = choices.get(0);
-                                String finishReason = choiceInChunk.getFinishReason();
-                                OpenAIChatGptResponseChunkChoiceDelta delta = choiceInChunk.getDelta();
-                                if (delta == null) return;
-
-                                String contentAsText = delta.getContentAsText();
-                                if (contentAsText != null) {
-                                    tempAssistantMessage.acceptContentFragment(contentAsText);
-                                }
-
-                                ChatGptRole role = delta.getRole();
-                                if (role != null) {
-                                    tempAssistantMessage.acceptRole(role);
-                                }
-
-                                List<OpenAIChatGptResponseToolCall> toolCalls = delta.getToolCalls();
-                                if (toolCalls != null && !toolCalls.isEmpty()) {
-                                    toolCalls.forEach(toolCall -> {
-                                        String type = toolCall.getType();
-                                        if (type != null) {
-                                            // first time met!
-                                            tempAssistantMessage.acceptToolCall(toolCall);
-                                        } else {
-                                            Integer index = toolCall.getIndex();
-                                            OpenAIChatGptStreamBuffer.TempToolCall tempToolCall = tempAssistantMessage.getTempToolCall(index);
-                                            if (tempToolCall != null) {
-                                                OpenAIChatGptResponseFunctionCall function = toolCall.getFunction();
-                                                if (function != null) {
-                                                    OpenAIChatGptStreamBuffer.TempFunctionCall tempFunctionCall = tempToolCall.getFunction();
-                                                    String arguments = function.getArguments();
-                                                    if (arguments != null) {
-                                                        tempFunctionCall.acceptArgumentFragment(arguments);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            } catch (Throwable e) {
-                                AigcMix.getVerboseLogger().exception(e, "chunk handler exception in ChatGPTKit.chatStream", j -> j.put("request_id", requestId));
-                            }
-                        },
+                        getStreamBufferFragmentHandler(tempAssistantMessage, requestId),
                         requestId
                 )
                 .compose(v -> {

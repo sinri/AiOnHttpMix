@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.mix;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
+import io.github.sinri.AiOnHttpMix.mirage.MirageRequestEntity;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.vertx.core.Handler;
 
@@ -46,13 +47,31 @@ public interface AnyLLMRequest {
 
     AnyLLMRequest addFunctionToolDefinition(AnyLLMFunctionToolDefinition functionToolDefinition);
 
-    AnyLLMRequest addSystemMessage(String systemMessage);
+    default AnyLLMRequest addSystemMessage(String systemMessage) {
+        return this.addRoleMessage(AnyLLMRole.system, systemMessage);
+    }
 
-    AnyLLMRequest addUserMessage(String userMessage);
+    default AnyLLMRequest addUserMessage(String userMessage) {
+        return this.addRoleMessage(AnyLLMRole.user, userMessage);
+    }
+
+    /**
+     * @param role
+     * @param roleMessage
+     * @return
+     * @since 1.1.5
+     */
+    AnyLLMRequest addRoleMessage(AnyLLMRole role, String roleMessage);
 
     OpenAIChatGptRequest toChatGptRequest();
 
     QwenRequest toQwenRequest();
 
     VolcesChatRequest toVolcesChatRequest();
+
+    /**
+     * @return
+     * @since 1.1.5
+     */
+    MirageRequestEntity toMirageRequestEntity();
 }

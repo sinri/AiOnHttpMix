@@ -1,6 +1,8 @@
 package io.github.sinri.AiOnHttpMix.mirage;
 
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
+import io.github.sinri.AiOnHttpMix.mix.AnyLLMSimpleRoleMessagePair;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentDefinition;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentType;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
@@ -29,15 +31,18 @@ public class MirageRequestEntity implements JsonifiableEntity<MirageRequestEntit
         return new MirageRequestEntity(new JsonObject(Keel.stringHelper().decodeFromNyaCode(nyacode)));
     }
 
+    @Deprecated(since = "1.1.5")
     public String getSystemPrompt() {
         return readString("system_prompt");
     }
 
+    @Deprecated(since = "1.1.5")
     public MirageRequestEntity setSystemPrompt(String systemPrompt) {
         this.jsonObject.put("system_prompt", systemPrompt);
         return this;
     }
 
+    @Deprecated(since = "1.1.5")
     public MirageRequestEntity addUserPrompt(String userPrompt) {
         JsonArray array = this.jsonObject.getJsonArray("user_prompt_array");
         if (array == null) {
@@ -48,8 +53,43 @@ public class MirageRequestEntity implements JsonifiableEntity<MirageRequestEntit
         return this;
     }
 
+    @Deprecated(since = "1.1.5")
     public List<String> getUserPromptList() {
         return readStringArray("user_prompt_array");
+    }
+
+    /**
+     * @return
+     * @since 1.1.5
+     */
+    public List<AnyLLMSimpleRoleMessagePair> getPrompt() {
+        var array = readJsonObjectArray("prompt");
+        if (array == null) {
+            return null;
+        }
+        List<AnyLLMSimpleRoleMessagePair> list = new ArrayList<>();
+        array.forEach(item -> {
+            AnyLLMRole role = AnyLLMRole.valueOf(item.getString("role"));
+            String message = item.getString("message");
+            var pair = new AnyLLMSimpleRoleMessagePair(role, message);
+            list.add(pair);
+        });
+        return list;
+    }
+
+    /**
+     * @param pair
+     * @return
+     * @since 1.1.5
+     */
+    public MirageRequestEntity addToPrompt(AnyLLMSimpleRoleMessagePair pair) {
+        var x = this.jsonObject.getJsonArray("prompt");
+        if (x == null) {
+            x = new JsonArray();
+            this.jsonObject.put("prompt", x);
+        }
+        x.add(pair);
+        return this;
     }
 
     public MirageRequestEntity addFunctionDefinition(
@@ -64,13 +104,15 @@ public class MirageRequestEntity implements JsonifiableEntity<MirageRequestEntit
         }
 
         JsonArray argumentsArray = new JsonArray();
-        arguments.forEach(d -> {
-            var j = new JsonObject()
-                    .put("type", d.argumentType().name())
-                    .put("name", d.name())
-                    .put("description", d.desc());
-            argumentsArray.add(j);
-        });
+        if (arguments != null) {
+            arguments.forEach(d -> {
+                var j = new JsonObject()
+                        .put("type", d.argumentType().name())
+                        .put("name", d.name())
+                        .put("description", d.desc());
+                argumentsArray.add(j);
+            });
+        }
 
         array.add(new JsonObject()
                 .put("function_name", functionName)

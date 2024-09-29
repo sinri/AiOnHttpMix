@@ -393,4 +393,16 @@ public final class QwenKit {
         }
     }
 
+    public static Handler<String> getStreamBufferFragmentHandler(QwenStreamBuffer qwenStreamBuffer, String requestId) {
+        return s -> {
+            try {
+                QwenResponseFragment chatResponseChunk = QwenResponseFragment.parse(s);
+                String dataAsString = chatResponseChunk.getDataAsString();
+                QwenResponseChunk chatMessageResponseInChunk = QwenResponseChunk.parse(dataAsString);
+                qwenStreamBuffer.acceptChunkData(chatMessageResponseInChunk);
+            } catch (Throwable e) {
+                AigcMix.getVerboseLogger().exception(e, "chunk handler exception in QwenKit.getStreamBufferFragmentHandler", j -> j.put("request_id", requestId));
+            }
+        };
+    }
 }

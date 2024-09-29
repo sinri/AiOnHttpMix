@@ -4,12 +4,14 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenRole;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.QwenResponseBase;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.message.QwenMessage;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.response.QwenResponseInMessageFormat;
+import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 
-public class QwenStreamBuffer {
+public class QwenStreamBuffer implements LLMStreamBuffer {
     private final TempChoice tempChoice;
     private QwenResponseBase.Usage usage;
 
@@ -87,5 +89,14 @@ public class QwenStreamBuffer {
             entries.put("content", this.content.toString());
             return entries;
         }
+    }
+
+    /**
+     * @return
+     * @since 1.1.5
+     */
+    @Override
+    public AnyLLMResponse toAnyLLMResponse() {
+        return AnyLLMResponse.from(this.toChatMessageResponse());
     }
 }

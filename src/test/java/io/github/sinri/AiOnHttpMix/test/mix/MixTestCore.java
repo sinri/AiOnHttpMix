@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.test.mix;
 
+import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseChoice;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseToolFunctionCall;
@@ -18,6 +19,7 @@ import java.util.List;
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class MixTestCore extends KeelTest {
+    private MirageSDK mirageSDK;
     protected AnyLLMKit anyLLMKit;
 
     protected AnyLLMKit getAnyLLMKit() {
@@ -30,8 +32,19 @@ public class MixTestCore extends KeelTest {
                 .compose(v -> {
                     Keel.getConfiguration().loadPropertiesFile("config.properties");
                     getLogger().setVisibleLevel(KeelLogLevel.DEBUG);
+
+                    var domain = Keel.config("mirage.domain");
+                    var clientCode = Keel.config("mirage.client_code");
+                    var clientSecret = Keel.config("mirage.client_secret");
+
+                    mirageSDK = new MirageSDK(domain, clientCode, clientSecret);
+
                     return Future.succeededFuture();
                 });
+    }
+
+    protected MirageSDK getMirageSDK() {
+        return mirageSDK;
     }
 
     @TestUnit

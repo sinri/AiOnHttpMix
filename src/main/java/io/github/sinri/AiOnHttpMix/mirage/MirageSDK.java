@@ -50,6 +50,11 @@ public class MirageSDK {
         return body;
     }
 
+    /**
+     * @since 1.1.5
+     */
+    private long maxStreamTime = 180_000L;
+
     public Future<AnyLLMResponse> requestSync(
             String model,
             String service,
@@ -68,12 +73,25 @@ public class MirageSDK {
                             return Future.failedFuture(new Exception("Status Code:" + bufferHttpResponse.statusCode() + "; " + bufferHttpResponse.bodyAsString()));
                         }
                         var resp = bufferHttpResponse.bodyAsJsonObject();
-                        // Keel.getLogger().fatal("RESULT", bufferHttpResponse.bodyAsJsonObject());
+//                         Keel.getLogger().fatal("RESULT", bufferHttpResponse.bodyAsJsonObject());
                         MirageSyncResponse mirageSyncResponse = new MirageSyncResponse(resp);
                         AnyLLMResponse anyLLMResponse = mirageSyncResponse.toAnyLLMResponse();
                         return Future.succeededFuture(anyLLMResponse);
                     });
         });
+    }
+
+    /**
+     * @since 1.1.5
+     */
+    public Future<Void> requestStream(
+            String model,
+            String service,
+            boolean useNyaCode,
+            MirageRequestEntity llmRequestBody,
+            Handler<String> fragmentHandler
+    ) {
+        return requestStream(model, service, useNyaCode, llmRequestBody, getMaxStreamTime(), fragmentHandler);
     }
 
     public Future<Void> requestStream(
@@ -82,7 +100,7 @@ public class MirageSDK {
             boolean useNyaCode,
             MirageRequestEntity llmRequestBody,
             long maxStreamTime,
-            Handler<String> fragementHandler
+            Handler<String> fragmentHandler
     ) {
         var body = buildRequestBody(model, service, useNyaCode, llmRequestBody);
 
@@ -96,14 +114,14 @@ public class MirageSDK {
         HttpClient client = Keel.getVertx().createHttpClient(options);
 
         Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(fragementHandler);
+        cutter.setComponentHandler(fragmentHandler);
 
         client.request(HttpMethod.POST, "/mirage/aigc/llm/stream")
                 .compose(httpClientRequest -> {
                     httpClientRequest.putHeader("Content-Type", "application/json");
                     return httpClientRequest.send(body.toString())
                             .compose(httpClientResponse -> {
-                                long timer = Keel.getVertx().setTimer(maxStreamTime, timeout -> {
+                                long timer = Keel.getVertx().setTimer(maxStreamTime, y -> {
                                     client.close();
                                     promise.tryFail("TIMEOUT FOR REQUEST");
                                 });
@@ -136,5 +154,20 @@ public class MirageSDK {
         });
 
         return promise.future();
+    }
+
+    /**
+     * @since 1.1.5
+     */
+    public long getMaxStreamTime() {
+        return maxStreamTime;
+    }
+
+    /**
+     * @since 1.1.5
+     */
+    public MirageSDK setMaxStreamTime(long maxStreamTime) {
+        this.maxStreamTime = maxStreamTime;
+        return this;
     }
 }

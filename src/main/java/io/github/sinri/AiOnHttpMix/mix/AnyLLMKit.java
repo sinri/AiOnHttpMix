@@ -1,14 +1,19 @@
 package io.github.sinri.AiOnHttpMix.mix;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
+import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptStreamBuffer;
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
 import io.github.sinri.AiOnHttpMix.dashscope.core.DashscopeServiceMeta;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
+import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
+import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit;
+import io.github.sinri.AiOnHttpMix.volces.v3.chunk.VolcesChatStreamBuffer;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
@@ -17,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @since 1.1.0
@@ -29,6 +35,9 @@ public class AnyLLMKit {
 
     private SupportedModel model;
     private ServiceMeta serviceMeta;
+    private MirageSDK mirageSDK;
+    private String mirageModel;
+    private String mirageService;
 
     public AnyLLMKit useChatGPT(AzureOpenAIServiceMeta azureOpenAIServiceMeta) {
         this.model = SupportedModel.ChatGPT;
@@ -63,6 +72,35 @@ public class AnyLLMKit {
     public AnyLLMKit useVolces(VolcesServiceMeta volcesServiceMeta) {
         this.model = SupportedModel.Volces;
         this.serviceMeta = volcesServiceMeta;
+        return this;
+    }
+
+    /**
+     * @since 1.1.5
+     */
+    public AnyLLMKit throughMirage(MirageSDK mirageSDK) {
+        Objects.requireNonNull(this.model);
+        this.mirageSDK = mirageSDK;
+        switch (model) {
+            case ChatGPT:
+                this.mirageModel = "ChatGPT";
+                this.mirageService = "gpt-4-o";
+                break;
+            case QwenPlus:
+                this.mirageModel = "QwenPlus";
+                this.mirageService = null;
+                break;
+            case QwenMax:
+                this.mirageModel = "QwenMax";
+                this.mirageService = null;
+                break;
+            case Volces:
+                this.mirageModel = "Volces";
+                this.mirageService = "doubao-pro-128k";
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown model");
+        }
         return this;
     }
 
@@ -124,74 +162,93 @@ public class AnyLLMKit {
     }
 
     public Future<AnyLLMResponse> request(AnyLLMRequest request) {
-        return switch (model.getSeries()) {
-            case ChatGPT -> new ChatGPTKit()
-                    .chat(
-                            (AzureOpenAIServiceMeta) serviceMeta,
-                            request.toChatGptRequest(),
-                            request.getRequestId()
-                    )
-                    .compose(resp -> {
-                        AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
-                        return Future.succeededFuture(anyLLMResponse);
-                    });
-            case Qwen -> new QwenKit()
-                    .chatForMessageResponse(
-                            (DashscopeServiceMeta) serviceMeta,
-                            request.toQwenRequest()
-                                    .setModel(model.asQwenModel()),
-                            request.getRequestId()
-                    )
-                    .compose(resp -> {
-                        AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
-                        return Future.succeededFuture(anyLLMResponse);
-                    });
-            case Volces -> new VolcesKit()
-                    .chat(
-                            (VolcesServiceMeta) serviceMeta,
-                            request.toVolcesChatRequest(),
-                            request.getRequestId()
-                    )
-                    .compose(resp -> {
-                        AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
-                        return Future.succeededFuture(anyLLMResponse);
-                    });
-        };
+        if (this.mirageSDK == null) {
+            return switch (model.getSeries()) {
+                case ChatGPT -> new ChatGPTKit()
+                        .chat(
+                                (AzureOpenAIServiceMeta) serviceMeta,
+                                request.toChatGptRequest(),
+                                request.getRequestId()
+                        )
+                        .compose(resp -> {
+                            AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                            return Future.succeededFuture(anyLLMResponse);
+                        });
+                case Qwen -> new QwenKit()
+                        .chatForMessageResponse(
+                                (DashscopeServiceMeta) serviceMeta,
+                                request.toQwenRequest()
+                                        .setModel(model.asQwenModel()),
+                                request.getRequestId()
+                        )
+                        .compose(resp -> {
+                            AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                            return Future.succeededFuture(anyLLMResponse);
+                        });
+                case Volces -> new VolcesKit()
+                        .chat(
+                                (VolcesServiceMeta) serviceMeta,
+                                request.toVolcesChatRequest(),
+                                request.getRequestId()
+                        )
+                        .compose(resp -> {
+                            AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                            return Future.succeededFuture(anyLLMResponse);
+                        });
+            };
+        } else {
+            return this.mirageSDK.requestSync(
+                    this.mirageModel,
+                    this.mirageService,
+                    true,
+                    request.toMirageRequestEntity()
+            );
+        }
     }
 
     /**
      * @since 1.1.3
      */
     public Future<Void> request(AnyLLMRequest request, Handler<String> fragmentHandler) {
-        return switch (model.getSeries()) {
-            case ChatGPT -> new ChatGPTKit()
-                    .chatStream(
-                            (AzureOpenAIServiceMeta) serviceMeta,
-                            request.toChatGptRequest().toJsonObject(),
-                            fragmentHandler,
-                            request.getRequestId()
-                    );
-            case Qwen -> new QwenKit()
-                    .chatStreamWithStringHandler(
-                            (DashscopeServiceMeta) serviceMeta,
-                            request.toQwenRequest()
-                                    .setModel(model.asQwenModel())
-                                    .handleParameters(p -> p
-                                            .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
-                                            .setIncrementalOutput(true)
-                                    )
-                                    .toJsonObject(),
-                            fragmentHandler,
-                            request.getRequestId()
-                    );
-            case Volces -> new VolcesKit()
-                    .chatStreamWithStringHandler(
-                            (VolcesServiceMeta) serviceMeta,
-                            request.toVolcesChatRequest().toJsonObject(),
-                            fragmentHandler,
-                            request.getRequestId()
-                    );
-        };
+        if (mirageSDK == null) {
+            return switch (model.getSeries()) {
+                case ChatGPT -> new ChatGPTKit()
+                        .chatStream(
+                                (AzureOpenAIServiceMeta) serviceMeta,
+                                request.toChatGptRequest().toJsonObject(),
+                                fragmentHandler,
+                                request.getRequestId()
+                        );
+                case Qwen -> new QwenKit()
+                        .chatStreamWithStringHandler(
+                                (DashscopeServiceMeta) serviceMeta,
+                                request.toQwenRequest()
+                                        .setModel(model.asQwenModel())
+                                        .handleParameters(p -> p
+                                                .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
+                                                .setIncrementalOutput(true)
+                                        )
+                                        .toJsonObject(),
+                                fragmentHandler,
+                                request.getRequestId()
+                        );
+                case Volces -> new VolcesKit()
+                        .chatStreamWithStringHandler(
+                                (VolcesServiceMeta) serviceMeta,
+                                request.toVolcesChatRequest().toJsonObject(),
+                                fragmentHandler,
+                                request.getRequestId()
+                        );
+            };
+        } else {
+            return this.mirageSDK.requestStream(
+                    this.mirageModel,
+                    this.mirageService,
+                    true,
+                    request.toMirageRequestEntity(),
+                    fragmentHandler
+            );
+        }
     }
 
     public Future<AnyLLMResponse> requestWithStreamBuffer(Handler<AnyLLMRequest> requestHandler) {
@@ -201,42 +258,75 @@ public class AnyLLMKit {
     }
 
     public Future<AnyLLMResponse> requestWithStreamBuffer(AnyLLMRequest request) {
-        return switch (model.getSeries()) {
-            case ChatGPT -> new ChatGPTKit()
-                    .chatStream(
-                            (AzureOpenAIServiceMeta) serviceMeta,
-                            request.toChatGptRequest(),
-                            request.getRequestId()
+        if (mirageSDK == null) {
+            return switch (model.getSeries()) {
+                case ChatGPT -> new ChatGPTKit()
+                        .chatStream(
+                                (AzureOpenAIServiceMeta) serviceMeta,
+                                request.toChatGptRequest(),
+                                request.getRequestId()
+                        )
+                        .compose(resp -> {
+                            AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                            return Future.succeededFuture(anyLLMResponse);
+                        });
+                case Qwen -> new QwenKit()
+                        .chatStreamWithBuffer(
+                                (DashscopeServiceMeta) serviceMeta,
+                                request.toQwenRequest()
+                                        .setModel(model.asQwenModel())
+                                        .handleParameters(p -> p
+                                                .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
+                                                .setIncrementalOutput(true)
+                                        ),
+                                request.getRequestId()
+                        )
+                        .compose(resp -> {
+                            AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                            return Future.succeededFuture(anyLLMResponse);
+                        });
+                case Volces -> new VolcesKit()
+                        .chatStreamWithBuffer(
+                                (VolcesServiceMeta) serviceMeta,
+                                request.toVolcesChatRequest(),
+                                request.getRequestId()
+                        )
+                        .compose(resp -> {
+                            AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                            return Future.succeededFuture(anyLLMResponse);
+                        });
+            };
+        } else {
+            Handler<String> fragmentHandler;
+            LLMStreamBuffer buffer;
+
+            switch (model.getSeries()) {
+                case ChatGPT:
+                    buffer = new OpenAIChatGptStreamBuffer();
+                    fragmentHandler = ChatGPTKit.getStreamBufferFragmentHandler((OpenAIChatGptStreamBuffer) buffer, request.getRequestId());
+                    break;
+                case Qwen:
+                    buffer = new QwenStreamBuffer();
+                    fragmentHandler = QwenKit.getStreamBufferFragmentHandler((QwenStreamBuffer) buffer, request.getRequestId());
+                    break;
+                case Volces:
+                    buffer = new VolcesChatStreamBuffer();
+                    fragmentHandler = VolcesKit.getStreamBufferFragmentHandler((VolcesChatStreamBuffer) buffer, request.getRequestId());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown series " + model.getSeries());
+            }
+
+            return this.mirageSDK.requestStream(
+                            this.mirageModel,
+                            this.mirageService,
+                            true,
+                            request.toMirageRequestEntity(),
+                            fragmentHandler
                     )
-                    .compose(resp -> {
-                        AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
-                        return Future.succeededFuture(anyLLMResponse);
+                    .compose(fin -> {
+                        return Future.succeededFuture(buffer.toAnyLLMResponse());
                     });
-            case Qwen -> new QwenKit()
-                    .chatStreamWithBuffer(
-                            (DashscopeServiceMeta) serviceMeta,
-                            request.toQwenRequest()
-                                    .setModel(model.asQwenModel())
-                                    .handleParameters(p -> p
-                                            .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
-                                            .setIncrementalOutput(true)
-                                    ),
-                            request.getRequestId()
-                    )
-                    .compose(resp -> {
-                        AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
-                        return Future.succeededFuture(anyLLMResponse);
-                    });
-            case Volces -> new VolcesKit()
-                    .chatStreamWithBuffer(
-                            (VolcesServiceMeta) serviceMeta,
-                            request.toVolcesChatRequest(),
-                            request.getRequestId()
-                    )
-                    .compose(resp -> {
-                        AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
-                        return Future.succeededFuture(anyLLMResponse);
-                    });
-        };
+        }
     }
 }

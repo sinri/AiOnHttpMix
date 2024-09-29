@@ -5,13 +5,15 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.AssistantMessage
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseChoice;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseFunctionCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
+import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-public class OpenAIChatGptStreamBuffer {
+public class OpenAIChatGptStreamBuffer implements LLMStreamBuffer {
     private String finishReason;
     private ChatGptRole role;
     private StringBuilder content;
@@ -149,5 +151,14 @@ public class OpenAIChatGptStreamBuffer {
                 .put("finish_reason", finishReason)
                 .put("message", messageJsonObject)
         );
+    }
+
+    /**
+     * @return
+     * @since 1.1.5
+     */
+    @Override
+    public AnyLLMResponse toAnyLLMResponse() {
+        return AnyLLMResponse.from(this.toResponseChoice());
     }
 }

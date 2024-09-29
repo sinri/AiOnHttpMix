@@ -140,4 +140,32 @@ public final class VolcesKit {
                     return Future.succeededFuture(chatCompletionsResponse);
                 });
     }
+
+    /**
+     * @param tempVolcesChatCompletionsResponse
+     * @param requestId
+     * @return
+     * @since 1.1.5
+     */
+    public static Handler<String> getStreamBufferFragmentHandler(
+            VolcesChatStreamBuffer tempVolcesChatCompletionsResponse,
+            String requestId
+    ) {
+        return s -> {
+            try {
+                var nakami = s.replaceFirst("^data:\\s*", "");
+                if (!Objects.equals("[DONE]", nakami)) {
+                    JsonObject data = new JsonObject(nakami);
+                    VolcesChatResponseChunk chunk = VolcesChatResponseChunk.wrap(data);
+                    tempVolcesChatCompletionsResponse.accept(chunk);
+                }
+            } catch (Throwable e) {
+                AigcMix.getVerboseLogger().exception(
+                        e,
+                        "chunk handler exception in VolcesKit.chatStreamWithChunkHandler",
+                        j -> j.put("request_id", requestId)
+                );
+            }
+        };
+    }
 }

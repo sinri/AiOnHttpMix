@@ -19,13 +19,16 @@ public class MixQwenTest extends MixTestCore {
                     String dashscopeApiKey = Keel.config("dashscope.api_key");
 
                     var serviceMeta = new DashscopeServiceMeta(dashscopeApiKey);
-                    anyLLMKit = new AnyLLMKit().useQwen(serviceMeta, SupportedModel.QwenPlus);
+                    anyLLMKit = new AnyLLMKit()
+                            .useQwen(serviceMeta, SupportedModel.QwenPlus)
+                            .throughMirage(getMirageSDK())
+                    ;
 
                     return Future.succeededFuture();
                 });
     }
 
-    @TestUnit(skip = false)
+    @TestUnit(skip = true)
     @Override
     public Future<Void> pureStream() {
         return super.pureStream();
@@ -43,7 +46,7 @@ public class MixQwenTest extends MixTestCore {
         return super.fcNonStream();
     }
 
-    @TestUnit(skip = true)
+    @TestUnit(skip = false)
     @Override
     public Future<Void> fcStream() {
         return super.fcStream();
@@ -55,7 +58,7 @@ public class MixQwenTest extends MixTestCore {
         return super.mixFcNonStream();
     }
 
-    @TestUnit(skip = false)
+    @TestUnit(skip = true)
     public Future<Void> mixFcNonStream2() {
         return getAnyLLMKit()
                 .request(anyLLMRequest -> {

@@ -1,5 +1,7 @@
 package io.github.sinri.AiOnHttpMix.volces.v3.chunk;
 
+import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.*;
 import io.vertx.core.json.JsonArray;
@@ -10,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class VolcesChatStreamBuffer {
+public class VolcesChatStreamBuffer implements LLMStreamBuffer {
     private String id;
     private String model;
     private Integer created;
@@ -198,5 +200,14 @@ public class VolcesChatStreamBuffer {
                 this.arguments.append(arguments);
             }
         }
+    }
+
+    /**
+     * @return
+     * @since 1.1.5
+     */
+    @Override
+    public AnyLLMResponse toAnyLLMResponse() {
+        return AnyLLMResponse.from(this.toChatCompletionsResponse());
     }
 }
