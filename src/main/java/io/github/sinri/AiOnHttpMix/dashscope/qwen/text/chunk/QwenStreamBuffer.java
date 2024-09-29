@@ -32,14 +32,16 @@ public class QwenStreamBuffer implements LLMStreamBuffer {
     }
 
     public QwenResponseInMessageFormat toChatMessageResponse() {
-        return QwenResponseInMessageFormat.wrap(200, new JsonObject()
-                .put("usage", usage.cloneAsJsonObject())
-                .put("output", new JsonObject()
-                        .put("choices", new JsonArray()
-                                .add(tempChoice.toJsonObject())
-                        )
+        var j = new JsonObject();
+        if (usage != null) {
+            j.put("usage", usage.cloneAsJsonObject());
+        }
+        j.put("output", new JsonObject()
+                .put("choices", new JsonArray()
+                        .add(tempChoice.toJsonObject())
                 )
         );
+        return QwenResponseInMessageFormat.wrap(200, j);
     }
 
     public static class TempChoice {
