@@ -11,6 +11,7 @@ import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
+import io.github.sinri.AiOnHttpMix.utils.SupportedModelSeries;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit;
 import io.github.sinri.AiOnHttpMix.volces.v3.chunk.VolcesChatStreamBuffer;
@@ -350,16 +351,25 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
 
     @Override
     public AnyLLMKit useChatGPT(MirageSDK mirageSDK, SupportedModel model) {
+        if (model.getSeries() != SupportedModelSeries.ChatGPT) {
+            throw new IllegalArgumentException("Only ChatGPT supported");
+        }
         return throughMirage(mirageSDK, model);
     }
 
     @Override
     public AnyLLMKit useQwen(MirageSDK mirageSDK, SupportedModel model) {
+        if (model.getSeries() != SupportedModelSeries.Qwen) {
+            throw new IllegalArgumentException("Only Qwen supported");
+        }
         return throughMirage(mirageSDK, model);
     }
 
     @Override
-    public AnyLLMKit useVolces(MirageSDK mirageSDK) {
+    public AnyLLMKit useVolces(MirageSDK mirageSDK, SupportedModel model) {
+        if (model.getSeries() != SupportedModelSeries.Volces) {
+            throw new IllegalArgumentException("Only Volces supported");
+        }
         return throughMirage(mirageSDK, model);
     }
 }

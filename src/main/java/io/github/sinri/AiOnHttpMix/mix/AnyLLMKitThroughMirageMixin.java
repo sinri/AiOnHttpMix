@@ -17,5 +17,9 @@ public interface AnyLLMKitThroughMirageMixin<S> extends SelfInterface<S> {
         return useQwen(mirageSDK, SupportedModel.QwenPlus);
     }
 
-    S useVolces(MirageSDK mirageSDK);
+    S useVolces(MirageSDK mirageSDK, SupportedModel model);
+
+    default S useVolces(MirageSDK mirageSDK) {
+        return useVolces(mirageSDK, SupportedModel.Volces);
+    }
 }
