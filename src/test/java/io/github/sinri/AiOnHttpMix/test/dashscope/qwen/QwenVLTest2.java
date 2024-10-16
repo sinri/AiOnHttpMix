@@ -1,7 +1,8 @@
-package io.github.sinri.AiOnHttpMix.test.dashscope;
+package io.github.sinri.AiOnHttpMix.test.dashscope.qwen;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.*;
+import io.github.sinri.AiOnHttpMix.test.dashscope.DashscopeTestCore;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class QwenVLTest1 extends DashscopeTestCore {
+public class QwenVLTest2 extends DashscopeTestCore {
     private QwenKit qwenKit;
     private QwenVLRequest chatRequest;
 
@@ -30,7 +31,10 @@ public class QwenVLTest1 extends DashscopeTestCore {
                                             .addContentItem(QwenVLMessageContentItem.create()
                                                     .setText("图片中的人是谁")
                                             )
-                                    ));
+                                    ))
+                            .setParameters(QwenVLRequest.Parameters.create()
+                                    .setIncrementalOutput(true)
+                            );
                     return Future.succeededFuture();
                 });
     }
@@ -39,42 +43,75 @@ public class QwenVLTest1 extends DashscopeTestCore {
     public Future<Void> test1() {
         getLogger().info("REQ", chatRequest.toJsonObject());
         String requestId = UUID.randomUUID().toString();
-        return qwenKit.chatVL(
+        return qwenKit.chatVLStreamWithStringHandler(
                         getServiceMeta(),
                         chatRequest.toJsonObject(),
+                        s -> {
+                            getLogger().info("S | " + s);
+                        },
                         requestId
                 )
                 .compose(resp -> {
-                    getLogger().info("resp", resp);
+                    getLogger().info("fin");
                     return Future.succeededFuture();
                 });
     }
 
-    @TestUnit
+    @TestUnit(skip = false)
     public Future<Void> test2() {
         getLogger().info("REQ", chatRequest.toJsonObject());
         String requestId = UUID.randomUUID().toString();
-        return qwenKit.chatVL(
+        return qwenKit.chatVLStreamWithChunkHandler(
+                        getServiceMeta(),
+                        chatRequest,
+                        chatMessageResponseInChunk -> {
+                            QwenVLResponse.Output output = chatMessageResponseInChunk.getOutput();
+                            List<QwenVLResponse.Choice> choices = output.getChoices();
+                            QwenVLResponse.Choice choice = choices.get(0);
+                            String finishReason = choice.getFinishReason();
+                            QwenVLOutputMessage message = choice.getMessage();
+                            QwenVLRole role = message.getRole();
+                            List<QwenVLMessageContentItem> content = message.getContent();
+                            getLogger().info("Role: " + role + " | Finish reason: " + finishReason);
+                            content.forEach(item -> {
+                                getLogger().info("content item", new JsonObject()
+                                        .put("text", item.getText())
+                                        .put("image", item.getImage())
+                                );
+                            });
+                        },
+                        requestId
+                )
+                .compose(resp -> {
+                    getLogger().info("fin");
+                    return Future.succeededFuture();
+                });
+    }
+
+    @TestUnit(skip = false)
+    public Future<Void> test3() {
+        getLogger().info("REQ", chatRequest.toJsonObject());
+        String requestId = UUID.randomUUID().toString();
+        return qwenKit.chatVLStreamWithBuffer(
                         getServiceMeta(),
                         chatRequest,
                         requestId
                 )
-                .compose(resp -> {
-                    getLogger().info("resp");
-                    List<QwenVLResponse.Choice> choices = resp.getOutput().getChoices();
+                .compose(chatMessageResponseInChunk -> {
+                    QwenVLResponse.Output output = chatMessageResponseInChunk.getOutput();
+                    List<QwenVLResponse.Choice> choices = output.getChoices();
                     QwenVLResponse.Choice choice = choices.get(0);
+                    String finishReason = choice.getFinishReason();
                     QwenVLOutputMessage message = choice.getMessage();
                     QwenVLRole role = message.getRole();
-                    String finishReason = choice.getFinishReason();
-                    getLogger().info("Role: " + role + " | Finish Reason: " + finishReason);
                     List<QwenVLMessageContentItem> content = message.getContent();
+                    getLogger().info("Role: " + role + " | Finish reason: " + finishReason);
                     content.forEach(item -> {
-                        getLogger().info("Content Item", new JsonObject()
+                        getLogger().info("content item", new JsonObject()
                                 .put("text", item.getText())
                                 .put("image", item.getImage())
                         );
                     });
-
                     return Future.succeededFuture();
                 });
     }

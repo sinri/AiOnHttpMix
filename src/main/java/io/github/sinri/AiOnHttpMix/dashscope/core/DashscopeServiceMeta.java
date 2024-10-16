@@ -14,6 +14,8 @@ import io.vertx.ext.web.client.WebClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class DashscopeServiceMeta implements ServiceMeta {
@@ -26,6 +28,9 @@ public class DashscopeServiceMeta implements ServiceMeta {
 
     private final static String pathOfDashscopeQwenMultiModalGenerate = "/api/v1/services/aigc/multimodal-generation/generation";
     private final static String endpointOfDashscopeQwenMultiModalGenerate = "https://" + hostOfDashscope + pathOfDashscopeQwenMultiModalGenerate;
+
+    private final static String endpointOfDashscopeWanxiangImageSynthesis = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text2image/image-synthesis";
+    private final static String endpointOfDashscopeAsyncTaskQuery = "https://dashscope.aliyuncs.com/api/v1/tasks/";//{task_id}
 
     private final String apiKey;
 
@@ -74,9 +79,39 @@ public class DashscopeServiceMeta implements ServiceMeta {
         return promise.future();
     }
 
+    /**
+     * @since 1.1.6
+     */
+    public Future<JsonObject> callWanxiangImageSynthesis(JsonObject requestBody, String requestId) {
+        return request(
+                endpointOfDashscopeWanxiangImageSynthesis,
+                Map.of("X-DashScope-Async", "enable"),
+                requestBody,
+                requestId
+        );
+    }
+
+    public Future<JsonObject> callAsyncTaskQuery(String taskId, String requestId) {
+        return Keel.useWebClient(webClient -> {
+                    return webClient.getAbs(endpointOfDashscopeAsyncTaskQuery + taskId)
+                            .putHeader("Authorization", "Bearer " + apiKey)
+                            .send();
+                })
+                .compose(resp -> {
+                    var r = resp.bodyAsJsonObject();
+                    return Future.succeededFuture(r);
+                });
+    }
 
     @Override
     public final Future<JsonObject> request(String api, JsonObject requestBody, String requestId) {
+        return this.request(api, Map.of(), requestBody, requestId);
+    }
+
+    /**
+     * @since 1.1.6
+     */
+    public final Future<JsonObject> request(String api, Map<String, String> headers, JsonObject requestBody, String requestId) {
         AigcMix.getVerboseLogger().info(
                 "Start DashscopeServiceMeta.request",
                 j -> j
@@ -90,6 +125,9 @@ public class DashscopeServiceMeta implements ServiceMeta {
                 .postAbs(api)
                 .putHeader("Content-Type", "application/json")
                 .putHeader("Authorization", "Bearer " + apiKey);
+
+        headers.forEach(req::putHeader);
+
         return req
                 .sendJsonObject(requestBody)
                 .compose(bufferHttpResponse -> {

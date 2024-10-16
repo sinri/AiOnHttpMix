@@ -22,29 +22,37 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @since 1.1.0
  */
-public class AnyLLMKit {
+public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKitThroughMirageMixin<AnyLLMKit> {
     /**
      * @since 1.1.2
      */
     private final Map<String, FunctionCallAdapter> fcMap = new HashMap<>();
-
+    /**
+     * Used by both SDK or Mirage.
+     */
     private SupportedModel model;
+    /**
+     * Used by SDK only.
+     */
     private ServiceMeta serviceMeta;
+    /**
+     * Used by Mirage only.
+     */
     private MirageSDK mirageSDK;
+    /**
+     * Used by Mirage only.
+     */
     private String mirageModel;
+    /**
+     * Used by Mirage only.
+     */
     private String mirageService;
 
-    public AnyLLMKit useChatGPT(AzureOpenAIServiceMeta azureOpenAIServiceMeta) {
-        this.model = SupportedModel.ChatGPT;
-        this.serviceMeta = azureOpenAIServiceMeta;
-        return this;
-    }
-
+    @Override
     public AnyLLMKit useChatGPT(AzureOpenAIServiceMeta azureOpenAIServiceMeta, SupportedModel model) {
         if (model.getSeries() != azureOpenAIServiceMeta.getSupportedModelSeries()) {
             throw new IllegalArgumentException("model is not belong to this series");
@@ -54,12 +62,7 @@ public class AnyLLMKit {
         return this;
     }
 
-    public AnyLLMKit useQwen(DashscopeServiceMeta dashscopeServiceMeta) {
-        this.model = SupportedModel.QwenPlus;
-        this.serviceMeta = dashscopeServiceMeta;
-        return this;
-    }
-
+    @Override
     public AnyLLMKit useQwen(DashscopeServiceMeta dashscopeServiceMeta, SupportedModel model) {
         if (model.getSeries() != dashscopeServiceMeta.getSupportedModelSeries()) {
             throw new IllegalArgumentException("model is not belong to this series");
@@ -69,6 +72,7 @@ public class AnyLLMKit {
         return this;
     }
 
+    @Override
     public AnyLLMKit useVolces(VolcesServiceMeta volcesServiceMeta) {
         this.model = SupportedModel.Volces;
         this.serviceMeta = volcesServiceMeta;
@@ -78,9 +82,9 @@ public class AnyLLMKit {
     /**
      * @since 1.1.5
      */
-    public AnyLLMKit throughMirage(MirageSDK mirageSDK) {
-        Objects.requireNonNull(this.model);
+    private AnyLLMKit throughMirage(@NotNull MirageSDK mirageSDK, @NotNull SupportedModel model) {
         this.mirageSDK = mirageSDK;
+        this.model = model;
         switch (model) {
             case ChatGPT:
                 this.mirageModel = "ChatGPT";
@@ -337,5 +341,25 @@ public class AnyLLMKit {
                         return Future.succeededFuture(buffer.toAnyLLMResponse());
                     });
         }
+    }
+
+    @Override
+    public @NotNull AnyLLMKit getImplementation() {
+        return this;
+    }
+
+    @Override
+    public AnyLLMKit useChatGPT(MirageSDK mirageSDK, SupportedModel model) {
+        return throughMirage(mirageSDK, model);
+    }
+
+    @Override
+    public AnyLLMKit useQwen(MirageSDK mirageSDK, SupportedModel model) {
+        return throughMirage(mirageSDK, model);
+    }
+
+    @Override
+    public AnyLLMKit useVolces(MirageSDK mirageSDK) {
+        return throughMirage(mirageSDK, model);
     }
 }

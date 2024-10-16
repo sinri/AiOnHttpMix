@@ -1,8 +1,9 @@
-package io.github.sinri.AiOnHttpMix.test.dashscope;
+package io.github.sinri.AiOnHttpMix.test.dashscope.qwen;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateResponseOutput;
+import io.github.sinri.AiOnHttpMix.test.dashscope.DashscopeTestCore;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
