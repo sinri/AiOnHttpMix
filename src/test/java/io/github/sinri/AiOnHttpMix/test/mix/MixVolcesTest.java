@@ -1,42 +1,73 @@
 package io.github.sinri.AiOnHttpMix.test.mix;
 
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
-import io.github.sinri.keel.tesuto.TestUnit;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
-import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
+import org.junit.Test;
 
 public class MixVolcesTest extends MixTestCore {
     @Override
-    protected @NotNull Future<Void> starting() {
-        return super.starting()
-                .compose(v -> {
-                    anyLLMKit = new AnyLLMKit().useVolces(getMirageSDK());
-                    return Future.succeededFuture();
-                });
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+
+        anyLLMKit = new AnyLLMKit().useVolces(getMirageSDK());
     }
 
-    @Override
-    @TestUnit(skip = true)
-    public Future<Void> pureNonStream() {
-        return super.pureNonStream();
+    @Test
+    public void testPureStream() {
+        KeelAsyncKit.pseudoAwait(promise -> {
+            pureStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 
-    @Override
-    @TestUnit(skip = true)
-    public Future<Void> pureStream() {
-        return super.pureStream();
+    @Test
+    public void testPureNonStream() {
+        KeelAsyncKit.pseudoAwait(promise -> {
+            pureNonStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 
-    @Override
-    @TestUnit(skip = false)
-    public Future<Void> fcNonStream() {
-        return super.fcNonStream();
+    @Test
+    public void testFcNonStream() {
+        KeelAsyncKit.pseudoAwait(promise -> {
+            fcNonStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 
-    @Override
-    @TestUnit(skip = true)
-    public Future<Void> fcStream() {
-        // NOTE: Volces now does not support FC in Stream.
-        return super.fcStream();
+    @Test
+    public void testFcStream() {
+        // not supported
+        KeelAsyncKit.pseudoAwait(promise -> {
+            fcStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
+    }
+
+    @Test
+    public void testMixFcNonStream() {
+        KeelAsyncKit.pseudoAwait(promise -> {
+            mixFcNonStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 }

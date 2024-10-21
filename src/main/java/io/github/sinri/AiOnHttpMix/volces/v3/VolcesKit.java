@@ -16,6 +16,32 @@ import io.vertx.core.json.JsonObject;
 import java.util.Objects;
 
 public final class VolcesKit {
+    /**
+     * @since 1.1.5
+     */
+    public static Handler<String> getStreamBufferFragmentHandler(
+            VolcesChatStreamBuffer tempVolcesChatCompletionsResponse,
+            String requestId
+    ) {
+        return s -> {
+            AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit.getStreamBufferFragmentHandler::component | " + s);
+            try {
+                var nakami = s.replaceFirst("^data:\\s*", "");
+                if (!Objects.equals("[DONE]", nakami)) {
+                    JsonObject data = new JsonObject(nakami);
+                    VolcesChatResponseChunk chunk = VolcesChatResponseChunk.wrap(data);
+                    tempVolcesChatCompletionsResponse.accept(chunk);
+                }
+            } catch (Throwable e) {
+                AigcMix.getVerboseLogger().exception(
+                        e,
+                        "chunk handler exception in VolcesKit.chatStreamWithChunkHandler",
+                        j -> j.put("request_id", requestId)
+                );
+            }
+        };
+    }
+
     public Future<JsonObject> chat(VolcesServiceMeta serviceMeta, JsonObject requestBody, String requestId) {
         requestBody.put("model", serviceMeta.getModel());
         return serviceMeta.request(
@@ -139,33 +165,5 @@ public final class VolcesKit {
                     VolcesChatResponse chatCompletionsResponse = tempVolcesChatCompletionsResponse.toChatCompletionsResponse();
                     return Future.succeededFuture(chatCompletionsResponse);
                 });
-    }
-
-    /**
-     * @param tempVolcesChatCompletionsResponse
-     * @param requestId
-     * @return
-     * @since 1.1.5
-     */
-    public static Handler<String> getStreamBufferFragmentHandler(
-            VolcesChatStreamBuffer tempVolcesChatCompletionsResponse,
-            String requestId
-    ) {
-        return s -> {
-            try {
-                var nakami = s.replaceFirst("^data:\\s*", "");
-                if (!Objects.equals("[DONE]", nakami)) {
-                    JsonObject data = new JsonObject(nakami);
-                    VolcesChatResponseChunk chunk = VolcesChatResponseChunk.wrap(data);
-                    tempVolcesChatCompletionsResponse.accept(chunk);
-                }
-            } catch (Throwable e) {
-                AigcMix.getVerboseLogger().exception(
-                        e,
-                        "chunk handler exception in VolcesKit.chatStreamWithChunkHandler",
-                        j -> j.put("request_id", requestId)
-                );
-            }
-        };
     }
 }

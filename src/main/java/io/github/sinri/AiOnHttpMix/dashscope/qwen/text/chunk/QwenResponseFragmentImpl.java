@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +23,12 @@ class QwenResponseFragmentImpl implements QwenResponseFragment {
                 dataString = s.replaceAll("^data:\\s*", "");
             }
         }
+        AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenResponseFragmentImpl.QwenResponseFragmentImpl", j -> j
+                .put("id", id)
+                .put("event", event)
+                .put("httpStatus", httpStatus)
+                .put("dataString", dataString)
+        );
     }
 
     @Override

@@ -7,13 +7,26 @@ public interface QwenToolCall extends UnmodifiableJsonifiableEntity {
     static QwenToolCall wrap(JsonObject jsonObject) {
         return new QwenToolCallImpl(jsonObject);
     }
+
     default String getType() {
         return readString("type");
     }
 
     FunctionCall getFunction();
 
+    default Integer getIndex() {
+        return readInteger("index");
+    }
+
+    default String getId() {
+        return readString("id");
+    }
+
     interface FunctionCall extends UnmodifiableJsonifiableEntity {
+        static FunctionCall wrap(JsonObject jsonObject) {
+            return new QwenToolCallImpl.FunctionCallImpl(jsonObject);
+        }
+
         default String getName() {
             return readString("name");
         }
@@ -21,14 +34,6 @@ public interface QwenToolCall extends UnmodifiableJsonifiableEntity {
         default String getArguments() {
             return readString("arguments");
         }
-    }
-
-    default Integer getIndex(){
-        return readInteger("index");
-    }
-
-    default String getId(){
-        return readString("id");
     }
 
 

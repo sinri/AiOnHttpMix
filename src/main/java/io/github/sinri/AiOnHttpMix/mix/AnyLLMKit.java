@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.mix;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptStreamBuffer;
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
@@ -335,6 +336,10 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             true,
                             request.toMirageRequestEntity(),
                             s -> {
+                                AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mix.AnyLLMKit.requestWithStreamBuffer::component | " + s);
+                                /*
+                                {"output":{"choices":[{"message":{"content":"筑","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":58,"input_tokens":54,"output_tokens":4},"request_id":"ab856b62-68aa-928d-ade3-ae7f9312d5ee"}
+                                 */
                                 fragmentHandler.handle(s);
                             }
                     )

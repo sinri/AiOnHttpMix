@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.mirage;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMRequest;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
@@ -20,6 +21,10 @@ public class MirageSDK {
     private final String mirageDomain;
     private final String clientCode;
     private final String clientSecret;
+    /**
+     * @since 1.1.5
+     */
+    private long maxStreamTime = 180_000L;
 
     public MirageSDK(String mirageDomain, String clientCode, String clientSecret) {
         this.mirageDomain = mirageDomain;
@@ -52,11 +57,6 @@ public class MirageSDK {
         return body;
     }
 
-    /**
-     * @since 1.1.5
-     */
-    private long maxStreamTime = 180_000L;
-
     public Future<AnyLLMResponse> requestSync(
             String model,
             String service,
@@ -72,6 +72,9 @@ public class MirageSDK {
                         if (bufferHttpResponse.statusCode() != 200) {
                             return Future.failedFuture(new Exception("Status Code:" + bufferHttpResponse.statusCode() + "; " + bufferHttpResponse.bodyAsString()));
                         }
+
+                        AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestSync::bufferHttpResponse | " + bufferHttpResponse.bodyAsString());
+
                         var resp = bufferHttpResponse.bodyAsJsonObject();
                         MirageSyncResponse mirageSyncResponse = new MirageSyncResponse(resp);
                         AnyLLMResponse anyLLMResponse = mirageSyncResponse.toAnyLLMResponse();
@@ -119,11 +122,15 @@ public class MirageSDK {
 
         Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
+            AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestStream::component | " + s);
+
             //Keel.getLogger().fatal("MirageSDK.requestStream cut off: " + s);
             var lines = s.split("[\r\n]+");
             for (var line : lines) {
                 if (line.startsWith("data:")) {
                     line = line.replaceAll("^data:\\s*", "");
+                    AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestStream::line | " + line);
+
                     fragmentHandler.handle(line);
                     break;
                 }
@@ -165,6 +172,7 @@ public class MirageSDK {
 
         promise.future().andThen(ar -> {
             client.close();
+            AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestStream::promise | client closed");
         });
 
         return promise.future();

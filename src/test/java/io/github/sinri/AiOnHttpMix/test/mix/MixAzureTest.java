@@ -1,50 +1,74 @@
 package io.github.sinri.AiOnHttpMix.test.mix;
 
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
-import io.github.sinri.keel.tesuto.TestUnit;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
-import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
+import org.junit.Test;
 
 public class MixAzureTest extends MixTestCore {
 
+    @Before
     @Override
-    protected @NotNull Future<Void> starting() {
-        return super.starting()
-                .compose(v -> {
-                    anyLLMKit = new AnyLLMKit().useChatGPT(getMirageSDK());
-                    return Future.succeededFuture();
-                });
+    public void setUp() throws Exception {
+        super.setUp();
 
+        anyLLMKit = new AnyLLMKit().useChatGPT(getMirageSDK());
     }
 
-    @TestUnit(skip = false)
-    @Override
-    public Future<Void> pureStream() {
-        return super.pureStream();
+    @Test
+    public void testPureStream() {
+        KeelAsyncKit.pseudoAwait(promise -> {
+            pureStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 
-    @TestUnit(skip = false)
-    @Override
-    public Future<Void> pureNonStream() {
-        return super.pureNonStream();
+    @Test
+    public void testPureNonStream() {
+        KeelAsyncKit.pseudoAwait(promise -> {
+            pureNonStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 
-    @TestUnit(skip = false)
-    @Override
-    public Future<Void> fcNonStream() {
-        return super.fcNonStream();
+    @Test
+    public void testFcNonStream() {
+        KeelAsyncKit.pseudoAwait(promise -> {
+            fcNonStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 
-    @TestUnit(skip = false)
-    @Override
-    public Future<Void> fcStream() {
-        return super.fcStream();
+    @Test
+    public void testFcStream() {
+        KeelAsyncKit.pseudoAwait(promise -> {
+            fcStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 
-    @TestUnit(skip = false)
-    @Override
-    public Future<Void> mixFcNonStream() {
-        return super.mixFcNonStream();
+    @Test
+    public void testMixFcNonStream() {
+        KeelAsyncKit.pseudoAwait(promise -> {
+            mixFcNonStream()
+                    .compose(v -> {
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 
 }

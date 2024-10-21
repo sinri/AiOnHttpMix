@@ -6,7 +6,7 @@
 
     <groupId>io.github.sinri</groupId>
     <artifactId>AiOnHttpMix</artifactId>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
 
     <name>AiOnHttpMix</name>
     <description>
@@ -52,6 +52,18 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>24.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-unit</artifactId>
+            <version>4.5.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

@@ -1,55 +1,49 @@
 package io.github.sinri.AiOnHttpMix.test.mix;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseChoice;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseToolFunctionCall;
 import io.github.sinri.AiOnHttpMix.mix.FunctionCallAdapter;
+import io.github.sinri.AiOnHttpMix.test.BaseUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentDefinition;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentType;
-import io.github.sinri.keel.logger.KeelLogLevel;
-import io.github.sinri.keel.tesuto.KeelTest;
-import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
+import org.junit.Before;
 
 import java.util.List;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-public class MixTestCore extends KeelTest {
-    private MirageSDK mirageSDK;
+public class MixTestCore extends BaseUnitTest {
     protected AnyLLMKit anyLLMKit;
+    private MirageSDK mirageSDK;
 
     protected AnyLLMKit getAnyLLMKit() {
         return anyLLMKit;
     }
 
+    @Before
     @Override
-    protected @NotNull Future<Void> starting() {
-        return super.starting()
-                .compose(v -> {
-                    Keel.getConfiguration().loadPropertiesFile("config.properties");
-                    getLogger().setVisibleLevel(KeelLogLevel.DEBUG);
+    public void setUp() throws Exception {
+        super.setUp();
+        AigcMix.enableVerboseLogger(getLogger());
 
-                    //AigcMix.enableVerboseLogger(getLogger());
+        var domain = Keel.config("mirage.domain");
+        var clientCode = Keel.config("mirage.client_code");
+        var clientSecret = Keel.config("mirage.client_secret");
 
-                    var domain = Keel.config("mirage.domain");
-                    var clientCode = Keel.config("mirage.client_code");
-                    var clientSecret = Keel.config("mirage.client_secret");
-
-                    mirageSDK = new MirageSDK(domain, clientCode, clientSecret);
-
-                    return Future.succeededFuture();
-                });
+        mirageSDK = new MirageSDK(domain, clientCode, clientSecret);
     }
 
     protected MirageSDK getMirageSDK() {
         return mirageSDK;
     }
 
-    @TestUnit
     public Future<Void> pureNonStream() {
         return getAnyLLMKit()
                 .request(
@@ -60,16 +54,17 @@ public class MixTestCore extends KeelTest {
                 .compose(anyLLMResponse -> {
                     List<AnyLLMResponseChoice> choices = anyLLMResponse.getChoices();
                     getLogger().info("choices count: " + choices.size());
+                    Assert.assertEquals(1, choices.size());
                     for (AnyLLMResponseChoice choice : choices) {
                         String finishReason = choice.getFinishReason();
                         String content = choice.getContent();
                         getLogger().info("Response Choice | " + content + " | " + finishReason);
+                        Assert.assertNotNull(content);
                     }
                     return Future.succeededFuture();
                 });
     }
 
-    @TestUnit
     public Future<Void> fcNonStream() {
         return getAnyLLMKit()
                 .request(
@@ -85,11 +80,13 @@ public class MixTestCore extends KeelTest {
                 .compose(anyLLMResponse -> {
                     List<AnyLLMResponseChoice> choices = anyLLMResponse.getChoices();
                     getLogger().info("choices count: " + choices.size());
+                    Assert.assertEquals(1, choices.size());
                     for (AnyLLMResponseChoice choice : choices) {
                         String finishReason = choice.getFinishReason();
                         String content = choice.getContent();
                         getLogger().info("Response Choice | " + content + " | " + finishReason);
                         List<AnyLLMResponseToolFunctionCall> functionCalls = choice.getFunctionCalls();
+                        Assert.assertNotNull(functionCalls);
                         functionCalls.forEach(functionCall -> {
                             getLogger().info("Function Call | " + functionCall.getFunctionName() + " | " + functionCall.getFunctionArguments());
                         });
@@ -98,7 +95,6 @@ public class MixTestCore extends KeelTest {
                 });
     }
 
-    @TestUnit
     public Future<Void> pureStream() {
         return getAnyLLMKit()
                 .requestWithStreamBuffer(
@@ -109,6 +105,7 @@ public class MixTestCore extends KeelTest {
                 .compose(anyLLMResponse -> {
                     List<AnyLLMResponseChoice> choices = anyLLMResponse.getChoices();
                     getLogger().info("choices count: " + choices.size());
+                    Assert.assertEquals(1, choices.size());
                     for (AnyLLMResponseChoice choice : choices) {
                         String finishReason = choice.getFinishReason();
                         String content = choice.getContent();
@@ -118,7 +115,6 @@ public class MixTestCore extends KeelTest {
                 });
     }
 
-    @TestUnit
     public Future<Void> fcStream() {
         return getAnyLLMKit()
                 .requestWithStreamBuffer(
@@ -134,6 +130,7 @@ public class MixTestCore extends KeelTest {
                 .compose(anyLLMResponse -> {
                     List<AnyLLMResponseChoice> choices = anyLLMResponse.getChoices();
                     getLogger().info("choices count: " + choices.size());
+                    Assert.assertEquals(1, choices.size());
                     for (AnyLLMResponseChoice choice : choices) {
                         String finishReason = choice.getFinishReason();
                         String content = choice.getContent();
@@ -147,7 +144,6 @@ public class MixTestCore extends KeelTest {
                 });
     }
 
-    @TestUnit
     public Future<Void> mixFcNonStream() {
         var f = new FunctionToCheckPrice();
         return getAnyLLMKit()

@@ -4,10 +4,11 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateResponseOutput;
 import io.github.sinri.AiOnHttpMix.test.dashscope.DashscopeTestCore;
-import io.github.sinri.keel.tesuto.TestUnit;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,48 +18,53 @@ public class TextEmbeddingTest extends DashscopeTestCore {
     private DashscopeTextEmbeddingGenerateRequest textEmbeddingGenerateRequest;
 
     @Override
-    protected @NotNull Future<Void> starting() {
-        return super.starting()
-                .compose(v -> {
-                    qwenKit = new QwenKit();
-                    textEmbeddingGenerateRequest = DashscopeTextEmbeddingGenerateRequest.create()
-                            .setModel(QwenKit.TextEmbeddingModel.TEXT_EMBEDDING_V2)
-                            .setInputTexts(List.of("电子商务时代已经到来", "零售业逐渐步入下一个十年"));
-                    return Future.succeededFuture();
-                });
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+
+        qwenKit = new QwenKit();
+        textEmbeddingGenerateRequest = DashscopeTextEmbeddingGenerateRequest.create()
+                .setModel(QwenKit.TextEmbeddingModel.TEXT_EMBEDDING_V2)
+                .setInputTexts(List.of("电子商务时代已经到来", "零售业逐渐步入下一个十年"));
     }
 
-    @TestUnit
-    public Future<Void> test1() {
+    @Test
+    public void test1() {
         String requestId = UUID.randomUUID().toString();
-        return qwenKit.generateTextEmbedding(
-                        getServiceMeta(),
-                        textEmbeddingGenerateRequest.toJsonObject(),
-                        requestId
-                )
-                .compose(resp -> {
-                    getLogger().info("resp", resp);
-                    return Future.succeededFuture();
-                });
+        KeelAsyncKit.pseudoAwait(promise -> {
+            qwenKit.generateTextEmbedding(
+                            getServiceMeta(),
+                            textEmbeddingGenerateRequest.toJsonObject(),
+                            requestId
+                    )
+                    .compose(resp -> {
+                        getLogger().info("resp", resp);
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 
-    @TestUnit
-    public Future<Void> test2() {
+    @Test
+    public void test2() {
         String requestId = UUID.randomUUID().toString();
-        return qwenKit.generateTextEmbedding(
-                        getServiceMeta(),
-                        textEmbeddingGenerateRequest,
-                        requestId
-                )
-                .compose(resp -> {
-                    List<DashscopeTextEmbeddingGenerateResponseOutput.Embedding> embeddings = resp.getOutput().getEmbeddings();
-                    embeddings.forEach(e -> {
-                        getLogger().info("Embedding #" + e.getTextIndex(), new JsonObject()
-                                .put("array", e.getTensor().toJsonArray())
-                        );
+        KeelAsyncKit.pseudoAwait(promise -> {
+            qwenKit.generateTextEmbedding(
+                            getServiceMeta(),
+                            textEmbeddingGenerateRequest,
+                            requestId
+                    )
+                    .compose(resp -> {
+                        List<DashscopeTextEmbeddingGenerateResponseOutput.Embedding> embeddings = resp.getOutput().getEmbeddings();
+                        embeddings.forEach(e -> {
+                            getLogger().info("Embedding #" + e.getTextIndex(), new JsonObject()
+                                    .put("array", e.getTensor().toJsonArray())
+                            );
 
-                    });
-                    return Future.succeededFuture();
-                });
+                        });
+                        return Future.succeededFuture();
+                    })
+                    .onComplete(promise);
+        });
     }
 }

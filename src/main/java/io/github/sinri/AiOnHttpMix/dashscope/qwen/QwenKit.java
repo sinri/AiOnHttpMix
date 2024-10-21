@@ -23,6 +23,17 @@ import io.vertx.core.json.JsonObject;
 
 public final class QwenKit {
 
+    public static Handler<String> getStreamBufferFragmentHandler(QwenStreamBuffer qwenStreamBuffer, String requestId) {
+        return s -> {
+            try {
+                QwenResponseChunk chatMessageResponseInChunk = QwenResponseChunk.parse(s);
+                qwenStreamBuffer.acceptChunkData(chatMessageResponseInChunk);
+            } catch (Throwable e) {
+                AigcMix.getVerboseLogger().exception(e, "chunk handler exception in QwenKit.getStreamBufferFragmentHandler", j -> j.put("request_id", requestId));
+            }
+        };
+    }
+
     public Future<JsonObject> chat(
             DashscopeServiceMeta serviceMeta,
             JsonObject chatRequest,
@@ -154,7 +165,12 @@ public final class QwenKit {
         return chatStreamWithChunkHandler(
                 serviceMeta,
                 chatRequest,
-                qwenStreamBuffer::acceptChunkData,
+                responseChunk -> {
+                    AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit.chatStreamWithBuffer::responseChunk", j -> j
+                            .put("raw", responseChunk.cloneAsJsonObject())
+                    );
+                    qwenStreamBuffer.acceptChunkData(responseChunk);
+                },
                 requestId
         )
                 .compose(v -> {
@@ -391,18 +407,5 @@ public final class QwenKit {
         public String getModelCode() {
             return modelCode;
         }
-    }
-
-    public static Handler<String> getStreamBufferFragmentHandler(QwenStreamBuffer qwenStreamBuffer, String requestId) {
-        return s -> {
-            try {
-                QwenResponseFragment chatResponseChunk = QwenResponseFragment.parse(s);
-                String dataAsString = chatResponseChunk.getDataAsString();
-                QwenResponseChunk chatMessageResponseInChunk = QwenResponseChunk.parse(dataAsString);
-                qwenStreamBuffer.acceptChunkData(chatMessageResponseInChunk);
-            } catch (Throwable e) {
-                AigcMix.getVerboseLogger().exception(e, "chunk handler exception in QwenKit.getStreamBufferFragmentHandler", j -> j.put("request_id", requestId));
-            }
-        };
     }
 }
