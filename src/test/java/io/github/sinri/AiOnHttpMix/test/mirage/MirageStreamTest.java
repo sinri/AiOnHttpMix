@@ -21,19 +21,23 @@ public class MirageStreamTest extends MirageTestBase {
     }
 
     private MirageRequestEntity buildMirageRequestEntity() {
-        return new MirageRequestEntity()
+        var x = new MirageRequestEntity()
                 .addToPrompt(new AnyLLMSimpleRoleMessagePair(AnyLLMRole.system, "你是一个专业的程序员。"))
                 .addToPrompt(new AnyLLMSimpleRoleMessagePair(AnyLLMRole.user, "请帮我执行一行python计算代码 `35/5.0-1`，给我结果。"));
+        getLogger().info("x: " + x);
+//        throw new RuntimeException("!");
+        return x;
     }
 
     @Test
     public void test1() {
+        MirageRequestEntity mirageRequestEntity = buildMirageRequestEntity();
         KeelAsyncKit.pseudoAwait(promise -> {
             getMirageSDK().requestStream(
                             "QwenPlus",
                             null,
                             true,
-                            buildMirageRequestEntity(),
+                            mirageRequestEntity,
                             180_000L,
                             s -> {
                                 getLogger().info("CHUNK | " + s);
