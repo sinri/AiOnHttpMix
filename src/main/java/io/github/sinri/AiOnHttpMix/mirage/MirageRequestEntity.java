@@ -59,7 +59,6 @@ public class MirageRequestEntity implements JsonifiableEntity<MirageRequestEntit
     }
 
     /**
-     * @return
      * @since 1.1.5
      */
     public List<AnyLLMSimpleRoleMessagePair> getPrompt() {
@@ -78,9 +77,8 @@ public class MirageRequestEntity implements JsonifiableEntity<MirageRequestEntit
     }
 
     /**
-     * @param pair
-     * @return
      * @since 1.1.5
+     * @since 1.1.11 save JsonObject expression of AnyLLMSimpleRoleMessagePair into `prompt`.
      */
     public MirageRequestEntity addToPrompt(AnyLLMSimpleRoleMessagePair pair) {
         var x = this.jsonObject.getJsonArray("prompt");
@@ -88,7 +86,7 @@ public class MirageRequestEntity implements JsonifiableEntity<MirageRequestEntit
             x = new JsonArray();
             this.jsonObject.put("prompt", x);
         }
-        x.add(pair);
+        x.add(pair.toJsonObject());
         return this;
     }
 
