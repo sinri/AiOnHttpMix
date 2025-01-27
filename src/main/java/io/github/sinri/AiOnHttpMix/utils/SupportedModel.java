@@ -1,6 +1,7 @@
 package io.github.sinri.AiOnHttpMix.utils;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
+import io.github.sinri.AiOnHttpMix.deepseek.core.DeepseekModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,6 +10,8 @@ public enum SupportedModel {
     QwenPlus(SupportedModelSeries.Qwen, QwenKit.QwenModel.QWEN_PLUS.getModelCode()),
     QwenMax(SupportedModelSeries.Qwen, QwenKit.QwenModel.QWEN_MAX.getModelCode()),
     Volces(SupportedModelSeries.Volces),
+    DeepSeekChat(SupportedModelSeries.DeepSeek, DeepseekModel.ChatModel.getCode()),
+    DeepSeekReasoner(SupportedModelSeries.DeepSeek, DeepseekModel.ReasonerModel.getCode()),
     ;
     private final @NotNull SupportedModelSeries series;
     private final @Nullable String mappedModelCode;
@@ -38,6 +41,17 @@ public enum SupportedModel {
                 throw new IllegalArgumentException();
             }
             return QwenKit.QwenModel.fromModelCode(mappedModelCode);
+        }
+        throw new IllegalArgumentException();
+    }
+
+    @NotNull
+    public DeepseekModel getDeepseekModel() {
+        if (series == SupportedModelSeries.DeepSeek) {
+            if (mappedModelCode == null) {
+                throw new IllegalArgumentException();
+            }
+            return DeepseekModel.fromCode(mappedModelCode);
         }
         throw new IllegalArgumentException();
     }

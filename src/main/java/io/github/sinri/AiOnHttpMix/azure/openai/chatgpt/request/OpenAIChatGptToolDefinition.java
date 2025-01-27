@@ -22,7 +22,7 @@ public interface OpenAIChatGptToolDefinition extends JsonifiableEntity<OpenAICha
 
         @Override
         public OpenAIChatGptToolDefinition build() {
-            return new OpenAIChatGptToolDefinitionImpl(toJsonObject());
+            return OpenAIChatGptToolDefinition.wrap(toJsonObject());
         }
 
         @Override
