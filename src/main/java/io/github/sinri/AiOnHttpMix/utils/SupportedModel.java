@@ -5,29 +5,36 @@ import io.github.sinri.AiOnHttpMix.deepseek.core.DeepseekModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @since 1.1.12 changed definitions.
+ */
 public enum SupportedModel {
-    ChatGPT(SupportedModelSeries.ChatGPT),
-    QwenPlus(SupportedModelSeries.Qwen, QwenKit.QwenModel.QWEN_PLUS.getModelCode()),
-    QwenMax(SupportedModelSeries.Qwen, QwenKit.QwenModel.QWEN_MAX.getModelCode()),
-    Volces(SupportedModelSeries.Volces),
-    DeepSeekChat(SupportedModelSeries.DeepSeek, DeepseekModel.ChatModel.getCode()),
-    DeepSeekReasoner(SupportedModelSeries.DeepSeek, DeepseekModel.ReasonerModel.getCode()),
+    ChatGPT(SupportedProvider.AzureOpenAI),
+    QwenPlus(SupportedProvider.DataScope, QwenKit.QwenModel.QWEN_PLUS.getModelCode()),
+    QwenMax(SupportedProvider.DataScope, QwenKit.QwenModel.QWEN_MAX.getModelCode()),
+    /**
+     * Once named as `Volces`
+     */
+    Doubao(SupportedProvider.Volces),
+    DeepSeekReasonerOnVolces(SupportedProvider.Volces)
+    // DeepSeekChat(SupportedProvider.DeepSeek, DeepseekModel.ChatModel.getCode()),
+    // DeepSeekReasoner(SupportedProvider.DeepSeek, DeepseekModel.ReasonerModel.getCode()),
     ;
-    private final @NotNull SupportedModelSeries series;
+    private final @NotNull SupportedProvider provider;
     private final @Nullable String mappedModelCode;
 
-    SupportedModel(@NotNull SupportedModelSeries series) {
-        this.series = series;
+    SupportedModel(@NotNull SupportedProvider provider) {
+        this.provider = provider;
         this.mappedModelCode = null;
     }
 
-    SupportedModel(@NotNull SupportedModelSeries series, @NotNull String mappedModelCode) {
-        this.series = series;
+    SupportedModel(@NotNull SupportedProvider provider, @NotNull String mappedModelCode) {
+        this.provider = provider;
         this.mappedModelCode = mappedModelCode;
     }
 
-    public @NotNull SupportedModelSeries getSeries() {
-        return series;
+    public @NotNull SupportedProvider getProvider() {
+        return provider;
     }
 
     public @Nullable String getMappedModelCode() {
@@ -36,7 +43,7 @@ public enum SupportedModel {
 
     @NotNull
     public QwenKit.QwenModel asQwenModel() {
-        if (series == SupportedModelSeries.Qwen) {
+        if (provider == SupportedProvider.DataScope) {
             if (mappedModelCode == null) {
                 throw new IllegalArgumentException();
             }
@@ -47,7 +54,7 @@ public enum SupportedModel {
 
     @NotNull
     public DeepseekModel getDeepseekModel() {
-        if (series == SupportedModelSeries.DeepSeek) {
+        if (provider == SupportedProvider.DeepSeek) {
             if (mappedModelCode == null) {
                 throw new IllegalArgumentException();
             }

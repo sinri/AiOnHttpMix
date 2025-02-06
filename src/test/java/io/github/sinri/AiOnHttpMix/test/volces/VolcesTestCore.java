@@ -13,14 +13,22 @@ public class VolcesTestCore extends BaseUnitTest {
         return serviceMeta;
     }
 
+    protected String getServiceName() {
+        return "doubao-pro-128k";
+    }
+
+    protected VolcesServiceMeta buildServiceMeta() {
+        String serviceName = getServiceName();
+        String apiKey = Keel.config("volces." + serviceName + ".apiKey");
+        String model = Keel.config("volces." + serviceName + ".model");
+
+        return new VolcesServiceMeta(apiKey, model);
+    }
+
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-
-        String apiKey = Keel.config("volces.doubao-pro-128k.apiKey");
-        String model = Keel.config("volces.doubao-pro-128k.model");
-
-        serviceMeta = new VolcesServiceMeta(apiKey, model);
+        serviceMeta = buildServiceMeta();
     }
 }

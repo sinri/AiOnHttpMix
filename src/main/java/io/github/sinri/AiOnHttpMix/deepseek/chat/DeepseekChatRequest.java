@@ -26,12 +26,20 @@ public interface DeepseekChatRequest extends JsonifiableEntity<DeepseekChatReque
             jsonArray = new JsonArray();
             toJsonObject().put("messages", jsonArray);
         }
-        jsonArray.add(message);
+        jsonArray.add(message.toJsonObject());
         return this;
     }
 
     default DeepseekChatRequest setModel(DeepseekModel model) {
         toJsonObject().put("model", model.getCode());
+        return this;
+    }
+
+    /**
+     * @param modelDeployment 在火山引擎等平台部署的情况下，model需要用平台部署的名称。
+     */
+    default DeepseekChatRequest setModel(String modelDeployment) {
+        toJsonObject().put("model", modelDeployment);
         return this;
     }
 

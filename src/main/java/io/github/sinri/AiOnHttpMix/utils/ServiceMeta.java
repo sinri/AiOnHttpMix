@@ -22,7 +22,7 @@ public interface ServiceMeta {
             String requestId
     );
 
-    SupportedModelSeries getSupportedModelSeries();
+    SupportedProvider getSupportedProvider();
 
     class AbnormalResponse extends Exception {
         private final int statusCode;

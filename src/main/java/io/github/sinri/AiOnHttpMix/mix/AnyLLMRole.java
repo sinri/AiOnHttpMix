@@ -2,10 +2,12 @@ package io.github.sinri.AiOnHttpMix.mix;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGptRole;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenRole;
+import io.github.sinri.AiOnHttpMix.deepseek.chat.message.DeepseekRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
 
 /**
  * @since 1.1.0
+ * @since 1.1.12 add DeepSeek
  */
 public enum AnyLLMRole {
     system,
@@ -40,7 +42,6 @@ public enum AnyLLMRole {
     }
 
     /**
-     * @return
      * @since 1.1.5
      */
     public VolcesChatRole toVolcesChatRole() {
@@ -49,6 +50,15 @@ public enum AnyLLMRole {
             case user -> VolcesChatRole.user;
             case assistant -> VolcesChatRole.assistant;
             case tool -> VolcesChatRole.tool;
+        };
+    }
+
+    public DeepseekRole toDeepseekRole() {
+        return switch (this) {
+            case system -> DeepseekRole.system;
+            case user -> DeepseekRole.user;
+            case assistant -> DeepseekRole.assistant;
+            case tool -> DeepseekRole.tool;
         };
     }
 }

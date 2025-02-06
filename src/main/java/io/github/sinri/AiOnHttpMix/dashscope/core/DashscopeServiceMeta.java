@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.dashscope.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
-import io.github.sinri.AiOnHttpMix.utils.SupportedModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -251,8 +251,8 @@ public class DashscopeServiceMeta implements ServiceMeta {
     private long streamTimeout = 180_000L;
 
     @Override
-    public SupportedModelSeries getSupportedModelSeries() {
-        return SupportedModelSeries.Qwen;
+    public SupportedProvider getSupportedProvider() {
+        return SupportedProvider.DataScope;
     }
 
     @Override

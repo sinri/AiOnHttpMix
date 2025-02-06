@@ -8,6 +8,8 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptRe
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.message.QwenMessage;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.response.QwenResponseInMessageFormat;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.tool.QwenToolCall;
+import io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatResponse;
+import io.github.sinri.AiOnHttpMix.deepseek.chat.message.DeepseekMessageInResponse;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatFunctionCallForRequest;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatMessageToolCallForResponse;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponse;
@@ -147,8 +149,44 @@ public interface AnyLLMResponse {
     }
 
     /**
-     * @param jsonObject
-     * @return
+     * @since 1.1.12
+     */
+    static AnyLLMResponse from(DeepseekChatResponse volcesChatResponse) {
+        List<DeepseekChatResponse.Choice> choices = volcesChatResponse.getChoices();
+        if (choices == null || choices.isEmpty()) {
+            return null;
+        }
+
+        List<AnyLLMResponseChoice> anyLLMResponseChoices = new ArrayList<>();
+        choices.forEach(choice -> {
+            String finishReason = choice.getFinishReason();
+            DeepseekMessageInResponse message = choice.getMessage();
+            String content = message.getContent();
+
+            List<AnyLLMResponseToolFunctionCall> functionCalls = new ArrayList<>();
+
+            // todo FC of DeepSeek is not tested
+//            List<VolcesChatMessageToolCallForResponse> toolCalls = message.getToolCalls();
+//            if (toolCalls != null && !toolCalls.isEmpty()) {
+//                for (VolcesChatMessageToolCallForResponse toolCall : toolCalls) {
+//                    VolcesChatFunctionCallForRequest function = toolCall.getFunction();
+//                    if (function != null) {
+//                        String name = function.getName();
+//                        String arguments = function.getArguments();
+//                        AnyLLMResponseToolFunctionCall functionCall = AnyLLMResponseToolFunctionCall.build(name, arguments);
+//                        functionCalls.add(functionCall);
+//                    }
+//                }
+//            }
+
+            AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(finishReason, content, functionCalls);
+            anyLLMResponseChoices.add(anyLLMResponseChoice);
+        });
+
+        return new AnyLLMResponseImpl(anyLLMResponseChoices);
+    }
+
+    /**
      * @since 1.1.4
      */
     static AnyLLMResponse wrap(JsonObject jsonObject) {

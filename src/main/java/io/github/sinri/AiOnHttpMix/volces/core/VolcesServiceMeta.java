@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.volces.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
-import io.github.sinri.AiOnHttpMix.utils.SupportedModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -154,8 +154,8 @@ public class VolcesServiceMeta implements ServiceMeta {
     }
 
     @Override
-    public SupportedModelSeries getSupportedModelSeries() {
-        return SupportedModelSeries.Volces;
+    public SupportedProvider getSupportedProvider() {
+        return SupportedProvider.Volces;
     }
 
     private long streamTimeout = 180_000L;

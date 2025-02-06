@@ -13,7 +13,7 @@ public class MixAzureTest extends MixTestCore {
     public void setUp() throws Exception {
         super.setUp();
 
-        anyLLMKit = new AnyLLMKit().useChatGPT(getMirageSDK());
+        anyLLMKit = new AnyLLMKit().useAzure(getMirageSDK());
     }
 
     @Test

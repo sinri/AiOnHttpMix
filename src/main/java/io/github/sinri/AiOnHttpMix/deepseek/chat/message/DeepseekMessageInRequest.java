@@ -18,10 +18,4 @@ public interface DeepseekMessageInRequest
     }
 
 
-    enum Role {
-        system,
-        user,
-        assistant,
-        tool,
-    }
 }

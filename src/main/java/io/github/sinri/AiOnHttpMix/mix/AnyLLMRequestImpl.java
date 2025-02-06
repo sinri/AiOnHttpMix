@@ -4,6 +4,8 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptReq
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptToolDefinition;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.tool.QwenToolDefinition;
+import io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatRequest;
+import io.github.sinri.AiOnHttpMix.deepseek.chat.message.DeepseekMessageInRequest;
 import io.github.sinri.AiOnHttpMix.mirage.MirageRequestEntity;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
@@ -106,7 +108,24 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
     }
 
     /**
-     * @return
+     * @since 1.1.12
+     */
+    @Override
+    public DeepseekChatRequest toDeepseekChatRequest() {
+        DeepseekChatRequest chatRequest = DeepseekChatRequest.create();
+        this.messageItems.forEach(messageItem -> {
+            chatRequest.addMessage(DeepseekMessageInRequest.create()
+                    .setRole(messageItem.role().toDeepseekRole())
+                    .setContent(messageItem.message())
+            );
+        });
+        this.functionToolDefinitions.forEach(functionToolDefinition -> {
+            chatRequest.addTool(DeepseekChatRequest.ToolDefinition.wrap(functionToolDefinition.toJsonObject()));
+        });
+        return chatRequest;
+    }
+
+    /**
      * @since 1.1.5
      */
     @Override

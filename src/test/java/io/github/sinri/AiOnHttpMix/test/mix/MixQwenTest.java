@@ -14,7 +14,7 @@ public class MixQwenTest extends MixTestCore {
     public void setUp() throws Exception {
         super.setUp();
 
-        anyLLMKit = new AnyLLMKit().useQwen(getMirageSDK());
+        anyLLMKit = new AnyLLMKit().useDataScope(getMirageSDK());
     }
 
     @Test

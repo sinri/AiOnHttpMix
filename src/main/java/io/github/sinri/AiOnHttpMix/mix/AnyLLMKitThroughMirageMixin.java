@@ -5,21 +5,33 @@ import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.keel.core.SelfInterface;
 
 public interface AnyLLMKitThroughMirageMixin<S> extends SelfInterface<S> {
-    S useChatGPT(MirageSDK mirageSDK, SupportedModel model);
+    /**
+     * Once named as `useChatGPT`.
+     */
+    S useAzure(MirageSDK mirageSDK, SupportedModel model);
 
-    default S useChatGPT(MirageSDK mirageSDK) {
-        return useChatGPT(mirageSDK, SupportedModel.ChatGPT);
+    /**
+     * Once named as `useChatGPT`.
+     */
+    default S useAzure(MirageSDK mirageSDK) {
+        return useAzure(mirageSDK, SupportedModel.ChatGPT);
     }
 
-    S useQwen(MirageSDK mirageSDK, SupportedModel model);
+    /**
+     * Once named as `useQwen`.
+     */
+    S useDataScope(MirageSDK mirageSDK, SupportedModel model);
 
-    default S useQwen(MirageSDK mirageSDK) {
-        return useQwen(mirageSDK, SupportedModel.QwenPlus);
+    /**
+     * Once named as `useQwen`.
+     */
+    default S useDataScope(MirageSDK mirageSDK) {
+        return useDataScope(mirageSDK, SupportedModel.QwenPlus);
     }
 
     S useVolces(MirageSDK mirageSDK, SupportedModel model);
 
     default S useVolces(MirageSDK mirageSDK) {
-        return useVolces(mirageSDK, SupportedModel.Volces);
+        return useVolces(mirageSDK, SupportedModel.Doubao);
     }
 }

@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.deepseek.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
-import io.github.sinri.AiOnHttpMix.utils.SupportedModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -54,8 +54,8 @@ public class DeepseekServiceMeta implements ServiceMeta {
     }
 
     @Override
-    public SupportedModelSeries getSupportedModelSeries() {
-        return SupportedModelSeries.DeepSeek;
+    public SupportedProvider getSupportedProvider() {
+        return SupportedProvider.DeepSeek;
     }
 
     @Override
