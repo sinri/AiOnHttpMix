@@ -29,7 +29,9 @@ public final class QwenKit {
                 QwenResponseChunk chatMessageResponseInChunk = QwenResponseChunk.parse(s);
                 qwenStreamBuffer.acceptChunkData(chatMessageResponseInChunk);
             } catch (Throwable e) {
-                AigcMix.getVerboseLogger().exception(e, "chunk handler exception in QwenKit.getStreamBufferFragmentHandler", j -> j.put("request_id", requestId));
+                AigcMix.getVerboseLogger().exception(e, x -> x
+                        .message("chunk handler exception in QwenKit.getStreamBufferFragmentHandler")
+                        .context(j -> j.put("request_id", requestId)));
             }
         };
     }
@@ -86,11 +88,11 @@ public final class QwenKit {
         Promise<Void> promise = Promise.promise();
         Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
-            AigcMix.getVerboseLogger().debug(
-                    "Component Handler in QwenKit.chatStreamWithStringHandler",
-                    j -> j
+            AigcMix.getVerboseLogger().debug(x -> x
+                    .message("Component Handler in QwenKit.chatStreamWithStringHandler")
+                    .context(j -> j
                             .put("component", s)
-                            .put("request_id", requestId)
+                            .put("request_id", requestId))
             );
             handler.handle(s);
         });
@@ -166,8 +168,10 @@ public final class QwenKit {
                 serviceMeta,
                 chatRequest,
                 responseChunk -> {
-                    AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit.chatStreamWithBuffer::responseChunk", j -> j
-                            .put("raw", responseChunk.cloneAsJsonObject())
+                    AigcMix.getVerboseLogger().debug(x -> x
+                            .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit.chatStreamWithBuffer::responseChunk")
+                            .context(j -> j
+                                    .put("raw", responseChunk.cloneAsJsonObject()))
                     );
                     qwenStreamBuffer.acceptChunkData(responseChunk);
                 },
@@ -244,11 +248,12 @@ public final class QwenKit {
         Promise<Void> promise = Promise.promise();
         Cutter<String> cutterOnString = new CutterOnString();
         cutterOnString.setComponentHandler(s -> {
-            AigcMix.getVerboseLogger().debug(
-                    "Component Handler in QwenKit.chatVLStreamWithStringHandler",
-                    j -> j
+            AigcMix.getVerboseLogger().debug(x -> x
+                    .message("Component Handler in QwenKit.chatVLStreamWithStringHandler")
+                    .context(j -> j
                             .put("component", s)
                             .put("request_id", requestId)
+                    )
             );
             handler.handle(s);
         });

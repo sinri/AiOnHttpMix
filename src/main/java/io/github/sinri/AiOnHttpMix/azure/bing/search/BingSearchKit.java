@@ -20,11 +20,13 @@ public class BingSearchKit {
     }
 
     public Future<BingSearchResponse> callBingSearch(JsonObject parameters, String requestId) {
-        AigcMix.getVerboseLogger().info(
-                "Start BingSearchKit.callBingSearch",
-                j -> j
-                        .put("input", parameters)
-                        .put("request_id", requestId)
+        AigcMix.getVerboseLogger().info(x -> x
+                .message("Start BingSearchKit.callBingSearch")
+                .context(
+                        j -> j
+                                .put("input", parameters)
+                                .put("request_id", requestId)
+                )
         );
 
         WebClient webClient = WebClient.create(Keel.getVertx());
@@ -48,11 +50,12 @@ public class BingSearchKit {
                             body
                     );
 
-                    AigcMix.getVerboseLogger().info(
-                            "bufferHttpResponse in BingSearchKit.callBingSearch",
-                            j -> j
+                    AigcMix.getVerboseLogger().info(e -> e
+                            .message("bufferHttpResponse in BingSearchKit.callBingSearch")
+                            .context(j -> j
                                     .put("output", bingSearchResponse.cloneAsJsonObject())
                                     .put("request_id", requestId)
+                            )
                     );
 
                     return Future.succeededFuture(bingSearchResponse);

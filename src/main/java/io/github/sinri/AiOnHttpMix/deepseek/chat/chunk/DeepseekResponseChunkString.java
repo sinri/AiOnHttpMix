@@ -16,7 +16,19 @@ public class DeepseekResponseChunkString {
         return Objects.equals(component, "data: [DONE]");
     }
 
+    public boolean isKeepAliveChunk() {
+        return Objects.equals(component, ": keep-alive");
+    }
+
+    /**
+     * Note: check with isDoneChunk and isKeepAliveChunk first to avoid exception.
+     */
     public DeepseekResponseChunk getChunk() {
-        return new DeepseekResponseChunk(new JsonObject(component.substring(6)));
+        try {
+            JsonObject entries = new JsonObject(component.substring(6));
+            return new DeepseekResponseChunk(entries);
+        } catch (Throwable e) {
+            throw new RuntimeException("io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekResponseChunkString.getChunk failed to parse component: " + component, e);
+        }
     }
 }

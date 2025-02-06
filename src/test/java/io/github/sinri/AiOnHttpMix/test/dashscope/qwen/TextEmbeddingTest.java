@@ -4,7 +4,6 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.embedding.DashscopeTextEmbeddingGenerateResponseOutput;
 import io.github.sinri.AiOnHttpMix.test.dashscope.DashscopeTestCore;
-import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import org.junit.Before;
@@ -12,6 +11,8 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.UUID;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class TextEmbeddingTest extends DashscopeTestCore {
     private QwenKit qwenKit;
@@ -31,7 +32,7 @@ public class TextEmbeddingTest extends DashscopeTestCore {
     @Test
     public void test1() {
         String requestId = UUID.randomUUID().toString();
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             qwenKit.generateTextEmbedding(
                             getServiceMeta(),
                             textEmbeddingGenerateRequest.toJsonObject(),
@@ -48,7 +49,7 @@ public class TextEmbeddingTest extends DashscopeTestCore {
     @Test
     public void test2() {
         String requestId = UUID.randomUUID().toString();
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             qwenKit.generateTextEmbedding(
                             getServiceMeta(),
                             textEmbeddingGenerateRequest,

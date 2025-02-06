@@ -15,4 +15,17 @@ class DeepseekChatResponseImpl extends UnmodifiableJsonifiableEntityImpl impleme
             super(jsonObject);
         }
     }
+
+    public static class ToolCallImpl extends UnmodifiableJsonifiableEntityImpl implements DeepseekChatResponse.ToolCall {
+
+        public ToolCallImpl(@NotNull JsonObject jsonObject) {
+            super(jsonObject);
+        }
+    }
+
+    public static class ToolCallFunctionImpl extends UnmodifiableJsonifiableEntityImpl implements DeepseekChatResponse.ToolCallFunction {
+        public ToolCallFunctionImpl(@NotNull JsonObject jsonObject) {
+            super(jsonObject);
+        }
+    }
 }

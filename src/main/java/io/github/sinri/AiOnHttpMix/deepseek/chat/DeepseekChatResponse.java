@@ -3,6 +3,7 @@ package io.github.sinri.AiOnHttpMix.deepseek.chat;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.message.DeepseekMessageInResponse;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -82,6 +83,56 @@ public interface DeepseekChatResponse extends UnmodifiableJsonifiableEntity {
             return DeepseekMessageInResponse.wrap(message);
         }
 
+        @Nullable
+        default List<ToolCall> getToolCalls() {
+            var a = readJsonObjectArray("tool_calls");
+            if (a == null) {
+                return null;
+            }
+            return a.stream().map(ToolCall::wrap).toList();
+        }
+
         // logprobs: 该 choice 的对数概率信息。
+    }
+
+    interface ToolCall extends UnmodifiableJsonifiableEntity {
+        static ToolCall wrap(JsonObject jsonObject) {
+            return new DeepseekChatResponseImpl.ToolCallImpl(jsonObject);
+        }
+
+        default Integer getIndex() {
+            return readInteger("index");
+        }
+
+        default String getId() {
+            return readString("id");
+        }
+
+        default String getType() {
+            return readString("type");
+        }
+
+        @Nullable
+        default ToolCallFunction getFunction() {
+            JsonObject entries = readJsonObject("function");
+            if (entries == null) {
+                return null;
+            }
+            return ToolCallFunction.wrap(entries);
+        }
+    }
+
+    interface ToolCallFunction extends UnmodifiableJsonifiableEntity {
+        static ToolCallFunction wrap(JsonObject jsonObject) {
+            return new DeepseekChatResponseImpl.ToolCallFunctionImpl(jsonObject);
+        }
+
+        default String getName() {
+            return readString("name");
+        }
+
+        default String getArguments() {
+            return readString("arguments");
+        }
     }
 }

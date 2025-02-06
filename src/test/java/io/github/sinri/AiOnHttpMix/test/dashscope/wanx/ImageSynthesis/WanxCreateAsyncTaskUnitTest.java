@@ -4,16 +4,17 @@ import io.github.sinri.AiOnHttpMix.dashscope.wanx.DashscopeWanxKit;
 import io.github.sinri.AiOnHttpMix.dashscope.wanx.ImageSynthesis.request.WanxImageSynthesisParameters;
 import io.github.sinri.AiOnHttpMix.dashscope.wanx.ImageSynthesis.request.WanxImageSynthesisRequest;
 import io.github.sinri.AiOnHttpMix.test.dashscope.DashscopeTestCore;
-import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import org.junit.Test;
 
 import java.util.UUID;
 
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
+
 public class WanxCreateAsyncTaskUnitTest extends DashscopeTestCore {
     @Test
     public void test1() {
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             new DashscopeWanxKit().createImageSynthesisTask(
                             getServiceMeta(),
                             WanxImageSynthesisRequest.create()

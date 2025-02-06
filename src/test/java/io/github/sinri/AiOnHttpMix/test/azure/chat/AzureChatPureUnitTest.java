@@ -6,7 +6,6 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptRespo
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.chunk.OpenAIChatGptResponseChunkChoiceDelta;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseChoice;
-import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +13,8 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.UUID;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class AzureChatPureUnitTest extends AzureChatUnitTestCore {
     private OpenAIChatGptRequest parameters;
@@ -32,7 +33,7 @@ public class AzureChatPureUnitTest extends AzureChatUnitTestCore {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", parameters.toJsonObject());
 
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             new ChatGPTKit()
                     .chat(getServiceMeta(), parameters.toJsonObject(), requestId)
                     .compose(resp -> {
@@ -48,7 +49,7 @@ public class AzureChatPureUnitTest extends AzureChatUnitTestCore {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", parameters.toJsonObject());
 
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             new ChatGPTKit().chatStream(
                             getServiceMeta(),
                             parameters.toJsonObject(),
@@ -69,7 +70,7 @@ public class AzureChatPureUnitTest extends AzureChatUnitTestCore {
     public void testSync() {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", parameters.toJsonObject());
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             new ChatGPTKit()
                     .chat(getServiceMeta(), parameters, requestId)
                     .compose(resp -> {
@@ -96,7 +97,7 @@ public class AzureChatPureUnitTest extends AzureChatUnitTestCore {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", parameters.toJsonObject());
 
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             new ChatGPTKit()
                     .chatStream(
                             getServiceMeta(),

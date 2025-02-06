@@ -3,12 +3,13 @@ package io.github.sinri.AiOnHttpMix.test.dashscope.qwen;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.test.dashscope.DashscopeTestCore;
-import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.UUID;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class QwenSearchUnitTest extends DashscopeTestCore {
     private QwenKit qwenKit;
@@ -41,7 +42,7 @@ public class QwenSearchUnitTest extends DashscopeTestCore {
     public void test1() {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", chatRequest.toJsonObject());
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             qwenKit.chat(
                             getServiceMeta(),
                             chatRequest.toJsonObject(),

@@ -7,7 +7,6 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.message.QwenMessage;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.response.QwenResponseInMessageFormat;
 import io.github.sinri.AiOnHttpMix.test.dashscope.DashscopeTestCore;
-import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +14,8 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.UUID;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class QwenPureUnitTest extends DashscopeTestCore {
     private QwenKit qwenKit;
@@ -40,7 +41,7 @@ public class QwenPureUnitTest extends DashscopeTestCore {
     public void test1() throws Exception {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", chatRequest.toJsonObject());
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             qwenKit.chat(
                             getServiceMeta(),
                             chatRequest.toJsonObject(),
@@ -59,7 +60,7 @@ public class QwenPureUnitTest extends DashscopeTestCore {
     public void test2() {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", chatRequest.toJsonObject());
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             qwenKit.chatForMessageResponse(
                             getServiceMeta(),
                             chatRequest,
@@ -87,7 +88,7 @@ public class QwenPureUnitTest extends DashscopeTestCore {
     public void test3() {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", chatRequest.toJsonObject());
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             qwenKit.chatStreamWithStringHandler(
                             getServiceMeta(),
                             chatRequest.toJsonObject(),
@@ -108,7 +109,7 @@ public class QwenPureUnitTest extends DashscopeTestCore {
     public void test4() {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", chatRequest.toJsonObject());
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             qwenKit.chatStreamWithChunkHandler(
                             getServiceMeta(),
                             chatRequest,
@@ -138,7 +139,7 @@ public class QwenPureUnitTest extends DashscopeTestCore {
     public void test5() {
         String requestId = UUID.randomUUID().toString();
         getLogger().info("REQ", chatRequest.toJsonObject());
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             qwenKit.chatStreamWithBuffer(
                             getServiceMeta(),
                             chatRequest,

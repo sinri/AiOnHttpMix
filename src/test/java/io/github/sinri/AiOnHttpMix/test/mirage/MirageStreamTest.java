@@ -5,12 +5,13 @@ import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMSimpleRoleMessagePair;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentDefinition;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentType;
-import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class MirageStreamTest extends MirageTestBase {
 
@@ -32,7 +33,7 @@ public class MirageStreamTest extends MirageTestBase {
     @Test
     public void test1() {
         MirageRequestEntity mirageRequestEntity = buildMirageRequestEntity();
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             getMirageSDK().requestStream(
                             "QwenPlus",
                             null,
@@ -66,7 +67,7 @@ public class MirageStreamTest extends MirageTestBase {
                         )
                 );
         getLogger().info("REQ:", req.toJsonObject());
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             getMirageSDK().requestStream(
                             "QwenPlus",
                             null,

@@ -33,6 +33,7 @@ public class DashscopeServiceMeta implements ServiceMeta {
     private final static String endpointOfDashscopeAsyncTaskQuery = "https://dashscope.aliyuncs.com/api/v1/tasks/";//{task_id}
 
     private final String apiKey;
+    private long streamTimeout = 180_000L;
 
     public DashscopeServiceMeta(String apiKey) {
         this.apiKey = apiKey;
@@ -112,12 +113,13 @@ public class DashscopeServiceMeta implements ServiceMeta {
      * @since 1.1.6
      */
     public final Future<JsonObject> request(String api, Map<String, String> headers, JsonObject requestBody, String requestId) {
-        AigcMix.getVerboseLogger().info(
-                "Start DashscopeServiceMeta.request",
-                j -> j
+        AigcMix.getVerboseLogger().info(x -> x
+                .message("Start DashscopeServiceMeta.request")
+                .context(j -> j
                         .put("api", api)
                         .put("requestId", requestId)
                         .put("input", requestBody)
+                )
         );
 
         WebClient webClient = WebClient.create(Keel.getVertx());
@@ -133,12 +135,14 @@ public class DashscopeServiceMeta implements ServiceMeta {
                 .compose(bufferHttpResponse -> {
                     int statusCode = bufferHttpResponse.statusCode();
                     if (statusCode != 200) {
-                        AigcMix.getVerboseLogger().error(
-                                "Unexpected bufferHttpResponse in DashscopeServiceMeta.request",
-                                j -> j
-                                        .put("requestId", requestId)
-                                        .put("status_code", statusCode)
-                                        .put("detail", bufferHttpResponse.bodyAsString())
+                        AigcMix.getVerboseLogger().error(x -> x
+                                .message("Unexpected bufferHttpResponse in DashscopeServiceMeta.request")
+                                .context(
+                                        j -> j
+                                                .put("requestId", requestId)
+                                                .put("status_code", statusCode)
+                                                .put("detail", bufferHttpResponse.bodyAsString())
+                                )
                         );
 
                         return Future.failedFuture(new AbnormalResponse(
@@ -147,11 +151,11 @@ public class DashscopeServiceMeta implements ServiceMeta {
                     } else {
                         JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
 
-                        AigcMix.getVerboseLogger().info(
-                                "bufferHttpResponse in DashscopeServiceMeta.request",
-                                j -> j
+                        AigcMix.getVerboseLogger().info(x -> x
+                                .message("bufferHttpResponse in DashscopeServiceMeta.request")
+                                .context(j -> j
                                         .put("requestId", requestId)
-                                        .put("output", entries)
+                                        .put("output", entries))
                         );
 
                         return Future.succeededFuture(entries);
@@ -164,12 +168,12 @@ public class DashscopeServiceMeta implements ServiceMeta {
 
     @Override
     public final void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, Cutter<String> cutter, String requestId) {
-        AigcMix.getVerboseLogger().info(
-                "Start DashscopeServiceMeta.requestSSE",
-                j -> j
+        AigcMix.getVerboseLogger().info(x -> x
+                .message("Start DashscopeServiceMeta.requestSSE")
+                .context(j -> j
                         .put("api", api)
                         .put("requestId", requestId)
-                        .put("input", parameters)
+                        .put("input", parameters))
         );
 
         HttpClientOptions options = new HttpClientOptions()
@@ -190,10 +194,11 @@ public class DashscopeServiceMeta implements ServiceMeta {
                                 long timer = Keel.getVertx().setTimer(getStreamTimeout(), timeout -> {
                                     client.close();
                                     promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
-                                    AigcMix.getVerboseLogger().warning(
-                                            "Timeout in DashscopeServiceMeta.requestSSE",
-                                            j -> j
+                                    AigcMix.getVerboseLogger().warning(x -> x
+                                            .message("Timeout in DashscopeServiceMeta.requestSSE")
+                                            .context(j -> j
                                                     .put("requestId", requestId)
+                                            )
                                     );
                                 });
                                 httpClientResponse
@@ -203,10 +208,10 @@ public class DashscopeServiceMeta implements ServiceMeta {
                                                     .onSuccess(cutterEnded -> {
                                                         Keel.getVertx().cancelTimer(timer);
                                                         promise.complete();
-                                                        AigcMix.getVerboseLogger().info(
-                                                                "End Success in DashscopeServiceMeta.requestSSE",
-                                                                j -> j
-                                                                        .put("requestId", requestId)
+                                                        AigcMix.getVerboseLogger().info(x -> x
+                                                                .message("End Success in DashscopeServiceMeta.requestSSE")
+                                                                .context(j -> j
+                                                                        .put("requestId", requestId))
                                                         );
                                                     })
                                                     .onFailure(throwable -> {
@@ -214,9 +219,9 @@ public class DashscopeServiceMeta implements ServiceMeta {
                                                         promise.fail(throwable);
                                                         AigcMix.getVerboseLogger().exception(
                                                                 throwable,
-                                                                "End Failure in DashscopeServiceMeta.requestSSE",
-                                                                j -> j
-                                                                        .put("requestId", requestId)
+                                                                x -> x.message("End Failure in DashscopeServiceMeta.requestSSE")
+                                                                        .context(j -> j
+                                                                                .put("requestId", requestId))
                                                         );
                                                     });
                                         })
@@ -225,9 +230,9 @@ public class DashscopeServiceMeta implements ServiceMeta {
                                             Keel.getVertx().cancelTimer(timer);
                                             AigcMix.getVerboseLogger().exception(
                                                     throwable,
-                                                    "Response Failure in DashscopeServiceMeta.requestSSE",
-                                                    j -> j
-                                                            .put("requestId", requestId)
+                                                    x -> x.message("Response Failure in DashscopeServiceMeta.requestSSE")
+                                                            .context(j -> j
+                                                                    .put("requestId", requestId))
                                             );
                                         });
                                 return Future.succeededFuture();
@@ -237,9 +242,9 @@ public class DashscopeServiceMeta implements ServiceMeta {
                     promise.fail(new RuntimeException("HttpClient request exception for request: " + requestId, throwable));
                     AigcMix.getVerboseLogger().exception(
                             throwable,
-                            "HttpClient Failure in DashscopeServiceMeta.requestSSE",
-                            j -> j
-                                    .put("requestId", requestId)
+                            x -> x.message("HttpClient Failure in DashscopeServiceMeta.requestSSE")
+                                    .context(j -> j
+                                            .put("requestId", requestId))
                     );
                 });
 
@@ -247,8 +252,6 @@ public class DashscopeServiceMeta implements ServiceMeta {
             client.close();
         });
     }
-
-    private long streamTimeout = 180_000L;
 
     @Override
     public SupportedProvider getSupportedProvider() {

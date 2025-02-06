@@ -35,8 +35,9 @@ public final class VolcesKit {
             } catch (Throwable e) {
                 AigcMix.getVerboseLogger().exception(
                         e,
-                        "chunk handler exception in VolcesKit.chatStreamWithChunkHandler",
-                        j -> j.put("request_id", requestId)
+                        x -> x
+                                .message("chunk handler exception in VolcesKit.chatStreamWithChunkHandler")
+                                .context(j -> j.put("request_id", requestId))
                 );
             }
         };
@@ -79,11 +80,13 @@ public final class VolcesKit {
         Promise<Void> promise = Promise.promise();
         Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
-            AigcMix.getVerboseLogger().debug(
-                    "Component Handler in VolcesKit.chatStreamWithStringHandler",
-                    j -> j
-                            .put("component", s)
-                            .put("request_id", requestId)
+            AigcMix.getVerboseLogger().debug(x -> x
+                    .message("Component Handler in VolcesKit.chatStreamWithStringHandler")
+                    .context(
+                            j -> j
+                                    .put("component", s)
+                                    .put("request_id", requestId)
+                    )
             );
             handler.handle(s);
         });
@@ -130,8 +133,8 @@ public final class VolcesKit {
                     } catch (Throwable e) {
                         AigcMix.getVerboseLogger().exception(
                                 e,
-                                "chunk handler exception in VolcesKit.chatStreamWithChunkHandler",
-                                j -> j.put("request_id", requestId)
+                                x -> x.message("chunk handler exception in VolcesKit.chatStreamWithChunkHandler")
+                                        .context(j -> j.put("request_id", requestId))
                         );
                     }
                 },

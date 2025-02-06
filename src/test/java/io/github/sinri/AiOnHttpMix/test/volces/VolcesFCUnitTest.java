@@ -8,13 +8,14 @@ import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatToolDefinition;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponseChoice;
 import io.github.sinri.AiOnHttpMix.volces.v3.tool.VolcesChatFunctionDefinition;
-import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.UUID;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class VolcesFCUnitTest extends VolcesTestCore {
     private VolcesKit volcesKit;
@@ -48,7 +49,7 @@ public class VolcesFCUnitTest extends VolcesTestCore {
     @Test
     public void test1() {
         String requestId = UUID.randomUUID().toString();
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             volcesKit.chat(
                             getServiceMeta(),
                             chatCompletionsRequest.toJsonObject(),
@@ -65,7 +66,7 @@ public class VolcesFCUnitTest extends VolcesTestCore {
     @Test
     public void test2() {
         String requestId = UUID.randomUUID().toString();
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             volcesKit.chat(
                             getServiceMeta(),
                             chatCompletionsRequest,
@@ -100,7 +101,7 @@ public class VolcesFCUnitTest extends VolcesTestCore {
     @Test
     public void test3() {
         String requestId = UUID.randomUUID().toString();
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
 
 
             volcesKit.chatStreamWithStringHandler(
@@ -122,7 +123,7 @@ public class VolcesFCUnitTest extends VolcesTestCore {
     @Test
     public void test4() {
         String requestId = UUID.randomUUID().toString();
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
 
 
             volcesKit.chatStreamWithChunkHandler(
@@ -165,7 +166,7 @@ public class VolcesFCUnitTest extends VolcesTestCore {
     @Test
     public void test5() {
         String requestId = UUID.randomUUID().toString();
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             volcesKit.chatStreamWithBuffer(
                             getServiceMeta(),
                             chatCompletionsRequest,

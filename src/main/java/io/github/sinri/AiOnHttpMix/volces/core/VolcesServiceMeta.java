@@ -16,29 +16,31 @@ import org.jetbrains.annotations.NotNull;
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class VolcesServiceMeta implements ServiceMeta {
-    private static final String hostOfV3ChatCompletions = "ark.cn-beijing.volces.com";
     public static final String pathOfV3ChatCompletions = "/api/v3/chat/completions";
+    private static final String hostOfV3ChatCompletions = "ark.cn-beijing.volces.com";
     //private static final String endpointOfV3ChatCompletions = "https://" + hostOfV3ChatCompletions + pathOfV3ChatCompletions;
     private final @NotNull String apiKey;
     private final @NotNull String model;
-
-    public @NotNull String getModel() {
-        return model;
-    }
+    private long streamTimeout = 180_000L;
 
     public VolcesServiceMeta(@NotNull String apiKey, @NotNull String model) {
         this.apiKey = apiKey;
         this.model = model;
     }
 
+    public @NotNull String getModel() {
+        return model;
+    }
+
     @Override
     public Future<JsonObject> request(String api, JsonObject requestBody, String requestId) {
-        AigcMix.getVerboseLogger().info(
-                "Start VolcesServiceMeta.request",
-                j -> j
+        AigcMix.getVerboseLogger().info(x -> x
+                .message("Start VolcesServiceMeta.request")
+                .context(j -> j
                         .put("api", api)
                         .put("requestId", requestId)
                         .put("input", requestBody)
+                )
         );
 
         WebClient webClient = WebClient.create(Keel.getVertx());
@@ -48,21 +50,21 @@ public class VolcesServiceMeta implements ServiceMeta {
                 .sendJsonObject(requestBody)
                 .compose(bufferHttpResponse -> {
                     if (bufferHttpResponse.statusCode() != 200) {
-                        AigcMix.getVerboseLogger().error(
-                                "Unexpected bufferHttpResponse in VolcesServiceMeta.request",
-                                j -> j
+                        AigcMix.getVerboseLogger().error(x -> x
+                                .message("Unexpected bufferHttpResponse in VolcesServiceMeta.request")
+                                .context(j -> j
                                         .put("requestId", requestId)
                                         .put("status_code", bufferHttpResponse.statusCode())
-                                        .put("detail", bufferHttpResponse.bodyAsString())
+                                        .put("detail", bufferHttpResponse.bodyAsString()))
                         );
                         return Future.failedFuture(new Exception("Volces API Error: NOT 200. " + bufferHttpResponse.bodyAsString()));
                     } else {
                         JsonObject respAsJsonObject = bufferHttpResponse.bodyAsJsonObject();
-                        AigcMix.getVerboseLogger().info(
-                                "bufferHttpResponse in VolcesServiceMeta.request",
-                                j -> j
+                        AigcMix.getVerboseLogger().info(x -> x
+                                .message("bufferHttpResponse in VolcesServiceMeta.request")
+                                .context(j -> j
                                         .put("requestId", requestId)
-                                        .put("output", respAsJsonObject)
+                                        .put("output", respAsJsonObject))
                         );
                         return Future.succeededFuture(respAsJsonObject);
                     }
@@ -74,12 +76,12 @@ public class VolcesServiceMeta implements ServiceMeta {
 
     @Override
     public void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, Cutter<String> cutter, String requestId) {
-        AigcMix.getVerboseLogger().info(
-                "Start VolcesServiceMeta.requestSSE",
-                j -> j
+        AigcMix.getVerboseLogger().info(x -> x
+                .message("Start VolcesServiceMeta.requestSSE")
+                .context(j -> j
                         .put("api", api)
                         .put("requestId", requestId)
-                        .put("input", parameters)
+                        .put("input", parameters))
         );
 
         HttpClientOptions options = new HttpClientOptions()
@@ -99,10 +101,10 @@ public class VolcesServiceMeta implements ServiceMeta {
                                 long timer = Keel.getVertx().setTimer(getStreamTimeout(), timeout -> {
                                     client.close();
                                     promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
-                                    AigcMix.getVerboseLogger().info(
-                                            "Timeout in VolcesServiceMeta.requestSSE",
-                                            j -> j
-                                                    .put("requestId", requestId)
+                                    AigcMix.getVerboseLogger().info(x -> x
+                                            .message("Timeout in VolcesServiceMeta.requestSSE")
+                                            .context(j -> j
+                                                    .put("requestId", requestId))
                                     );
                                 });
                                 httpClientResponse
@@ -111,19 +113,19 @@ public class VolcesServiceMeta implements ServiceMeta {
                                             cutter.end()
                                                     .onSuccess(cutterEnded -> {
                                                         promise.complete();
-                                                        AigcMix.getVerboseLogger().info(
-                                                                "End Success in VolcesServiceMeta.requestSSE",
-                                                                j -> j
-                                                                        .put("requestId", requestId)
+                                                        AigcMix.getVerboseLogger().info(x -> x
+                                                                .message("End Success in VolcesServiceMeta.requestSSE")
+                                                                .context(j -> j
+                                                                        .put("requestId", requestId))
                                                         );
                                                     })
                                                     .onFailure(throwable -> {
                                                         promise.fail(throwable);
                                                         AigcMix.getVerboseLogger().exception(
                                                                 throwable,
-                                                                "End Failure in VolcesServiceMeta.requestSSE",
-                                                                j -> j
-                                                                        .put("requestId", requestId)
+                                                                x -> x.message("End Failure in VolcesServiceMeta.requestSSE")
+                                                                        .context(j -> j
+                                                                                .put("requestId", requestId))
                                                         );
                                                     });
                                         })
@@ -131,9 +133,9 @@ public class VolcesServiceMeta implements ServiceMeta {
                                             promise.fail(new RuntimeException("httpClientResponse exception", throwable));
                                             AigcMix.getVerboseLogger().exception(
                                                     throwable,
-                                                    "HttpClient Response Failure in VolcesServiceMeta.requestSSE",
-                                                    j -> j
-                                                            .put("requestId", requestId)
+                                                    x -> x.message("HttpClient Response Failure in VolcesServiceMeta.requestSSE")
+                                                            .context(j -> j
+                                                                    .put("requestId", requestId))
                                             );
                                         });
                             });
@@ -142,9 +144,9 @@ public class VolcesServiceMeta implements ServiceMeta {
                     promise.fail(new RuntimeException("httpClient request exception", throwable));
                     AigcMix.getVerboseLogger().exception(
                             throwable,
-                            "HttpClient Failure in VolcesServiceMeta.requestSSE",
-                            j -> j
-                                    .put("requestId", requestId)
+                            x -> x.message("HttpClient Failure in VolcesServiceMeta.requestSSE")
+                                    .context(j -> j
+                                            .put("requestId", requestId))
                     );
                 });
 
@@ -157,8 +159,6 @@ public class VolcesServiceMeta implements ServiceMeta {
     public SupportedProvider getSupportedProvider() {
         return SupportedProvider.Volces;
     }
-
-    private long streamTimeout = 180_000L;
 
     @Override
     public long getStreamTimeout() {

@@ -6,12 +6,13 @@ import io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatResponse;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.message.DeepseekMessageInRequest;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.message.DeepseekMessageInResponse;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.message.DeepseekRole;
-import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.json.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.UUID;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class VolcesDeepSeekReasonerUnitTest extends VolcesTestCore {
 
@@ -42,7 +43,7 @@ public class VolcesDeepSeekReasonerUnitTest extends VolcesTestCore {
 
     @Test
     public void test1() {
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             // chatRequest.setModel(getServiceName());
             String requestId = UUID.randomUUID().toString();
 
@@ -61,7 +62,7 @@ public class VolcesDeepSeekReasonerUnitTest extends VolcesTestCore {
 
     @Test
     public void test2() {
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             // chatRequest.setModel(getServiceName());
             String requestId = UUID.randomUUID().toString();
             deepseekKit.chat(getServiceMeta(), chatRequest, requestId)
@@ -90,7 +91,7 @@ public class VolcesDeepSeekReasonerUnitTest extends VolcesTestCore {
 
     @Test
     public void test3() {
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             // chatRequest.setModel(getServiceName());
             String requestId = UUID.randomUUID().toString();
             deepseekKit.chatStreamWithChunkHandler(
@@ -113,7 +114,7 @@ public class VolcesDeepSeekReasonerUnitTest extends VolcesTestCore {
 
     @Test
     public void test4() {
-        KeelAsyncKit.pseudoAwait(promise -> {
+        Keel.pseudoAwait(promise -> {
             // chatRequest.setModel(getServiceName());
             String requestId = UUID.randomUUID().toString();
             deepseekKit.chatSSEWithBuffer(

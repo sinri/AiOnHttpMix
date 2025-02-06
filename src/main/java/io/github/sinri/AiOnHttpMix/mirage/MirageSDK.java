@@ -15,7 +15,6 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
-import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class MirageSDK {
     private final String mirageDomain;
@@ -39,7 +38,7 @@ public class MirageSDK {
             MirageRequestEntity llmRequestBody
     ) {
         var timestamp = System.currentTimeMillis();
-        String checksum = KeelHelpers.digestHelper().md5(clientCode + "@" + timestamp + "@" + clientSecret);
+        String checksum = Keel.digestHelper().md5(clientCode + "@" + timestamp + "@" + clientSecret);
 
         JsonObject body = new JsonObject()
                 .put("client_code", clientCode)

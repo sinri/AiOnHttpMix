@@ -3,7 +3,6 @@ package io.github.sinri.AiOnHttpMix.test.azure.bing;
 import io.github.sinri.AiOnHttpMix.azure.bing.search.BingSearchKit;
 import io.github.sinri.AiOnHttpMix.azure.bing.search.v7.BingSearchParameters;
 import io.github.sinri.AiOnHttpMix.test.BaseUnitTest;
-import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,7 +27,7 @@ public class BingSearchV7UnitTest extends BaseUnitTest {
     @Test
     public void test() {
         try {
-            KeelAsyncKit.pseudoAwait(promise -> {
+            Keel.pseudoAwait(promise -> {
                 bingSearchInFirstTower.callBingSearch(
                                 BingSearchParameters.create()
                                         .setQ("日本东北地区的大城市")

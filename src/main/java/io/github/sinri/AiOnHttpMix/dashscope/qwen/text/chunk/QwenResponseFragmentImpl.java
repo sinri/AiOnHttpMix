@@ -23,11 +23,14 @@ class QwenResponseFragmentImpl implements QwenResponseFragment {
                 dataString = s.replaceAll("^data:\\s*", "");
             }
         }
-        AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenResponseFragmentImpl.QwenResponseFragmentImpl", j -> j
-                .put("id", id)
-                .put("event", event)
-                .put("httpStatus", httpStatus)
-                .put("dataString", dataString)
+        AigcMix.getVerboseLogger().debug(x -> x
+                .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenResponseFragmentImpl.QwenResponseFragmentImpl")
+                .context(j -> j
+                        .put("id", id)
+                        .put("event", event)
+                        .put("httpStatus", httpStatus)
+                        .put("dataString", dataString)
+                )
         );
     }
 

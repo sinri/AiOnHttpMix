@@ -80,5 +80,50 @@ public class DeepseekResponseChunk extends UnmodifiableJsonifiableEntityImpl {
         public String getRole() {
             return readString("role");
         }
+
+        @Nullable
+        public List<ChoiceChunkDeltaToolCall> getToolCalls() {
+            List<JsonObject> toolCalls = readJsonObjectArray("tool_calls");
+            if (toolCalls == null) {
+                return null;
+            }
+            return toolCalls.stream().map(ChoiceChunkDeltaToolCall::new).toList();
+        }
+    }
+
+    public static class ChoiceChunkDeltaToolCall extends UnmodifiableJsonifiableEntityImpl {
+
+        public ChoiceChunkDeltaToolCall(@NotNull JsonObject jsonObject) {
+            super(jsonObject);
+        }
+
+        public Integer getIndex() {
+            return readInteger("index");
+        }
+
+        @Nullable
+        public ChoiceChunkDeltaToolCallFunction getFunction() {
+            JsonObject function = readJsonObject("function");
+            if (function == null) {
+                return null;
+            }
+            return new ChoiceChunkDeltaToolCallFunction(function);
+        }
+    }
+
+    public static class ChoiceChunkDeltaToolCallFunction extends UnmodifiableJsonifiableEntityImpl {
+
+        public ChoiceChunkDeltaToolCallFunction(@NotNull JsonObject jsonObject) {
+            super(jsonObject);
+        }
+
+        @Nullable
+        public String getName() {
+            return readString("name");
+        }
+
+        public String getArguments() {
+            return readString("arguments");
+        }
     }
 }

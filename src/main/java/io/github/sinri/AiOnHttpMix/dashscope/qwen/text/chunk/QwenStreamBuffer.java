@@ -24,14 +24,18 @@ public class QwenStreamBuffer implements LLMStreamBuffer {
     }
 
     public void acceptChunkData(QwenResponseChunk chatMessageResponseInChunk) {
-        AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer.acceptChunkData::chatMessageResponseInChunk", chatMessageResponseInChunk.cloneAsJsonObject());
+        AigcMix.getVerboseLogger().debug(x -> x
+                .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer.acceptChunkData::chatMessageResponseInChunk")
+                .context(chatMessageResponseInChunk.cloneAsJsonObject()));
         usage = chatMessageResponseInChunk.getUsage();
         QwenResponseChunk.OutputChunkForMessageResponse output = chatMessageResponseInChunk.getOutput();
         if (output != null) {
             List<QwenResponseChunk.OutputChunkForMessageResponse.Choice> choices = output.getChoices();
             if (choices != null && !choices.isEmpty()) {
                 QwenResponseChunk.OutputChunkForMessageResponse.Choice choice = choices.get(0);
-                AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer.acceptChunkData::choice", choice.cloneAsJsonObject());
+                AigcMix.getVerboseLogger().debug(x -> x
+                        .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer.acceptChunkData::choice")
+                        .context(choice.cloneAsJsonObject()));
                 tempChoice.acceptChoice(choice);
             }
         }

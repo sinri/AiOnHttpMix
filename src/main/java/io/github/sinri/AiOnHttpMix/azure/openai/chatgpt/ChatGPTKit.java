@@ -23,36 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public final class ChatGPTKit {
-    public Future<JsonObject> chat(
-            AzureOpenAIServiceMeta serviceMeta,
-            JsonObject parameters,
-            String requestId
-    ) {
-        String api = "/chat/completions";
-        return serviceMeta.request(api, parameters, requestId);
-    }
-
-    public Future<OpenAIChatGptResponse> chat(
-            AzureOpenAIServiceMeta serviceMeta,
-            OpenAIChatGptRequest parameters,
-            String requestId
-    ) {
-        return chat(serviceMeta, parameters.toJsonObject(), requestId)
-                .compose(resp -> {
-                    return Future.succeededFuture(OpenAIChatGptResponse.wrap(resp));
-                });
-    }
-
-    public Future<OpenAIChatGptResponse> chat(
-            AzureOpenAIServiceMeta serviceMeta,
-            Handler<OpenAIChatGptRequest> handler,
-            String requestId
-    ) {
-        OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
-        handler.handle(request);
-        return chat(serviceMeta, request, requestId);
-    }
-
     /**
      * @since 1.1.5
      */
@@ -63,19 +33,22 @@ public final class ChatGPTKit {
         return s -> {
             final String finalS = s;
             AigcMix.getVerboseLogger().info(
-                    "Component Handler in ChatGPTKit.chatStream",
-                    j -> j
-                            .put("component", finalS)
-                            .put("request_id", requestId)
-            );
+                    x -> x
+                            .message("Component Handler in ChatGPTKit.chatStream")
+                            .context(
+                                    j -> j
+                                            .put("component", finalS)
+                                            .put("request_id", requestId)
+                            ));
 
             s = s.replaceFirst("^data:\\s*", "");
             if (s.startsWith("[DONE]")) {
-                AigcMix.getVerboseLogger().info(
-                        "Component Handler in ChatGPTKit.chatStream met DONE",
-                        j -> j
+                AigcMix.getVerboseLogger().info(x -> x
+                        .message("Component Handler in ChatGPTKit.chatStream met DONE")
+                        .context(j -> j
                                 .put("component", finalS)
                                 .put("request_id", requestId)
+                        )
                 );
                 return;
             }
@@ -123,9 +96,43 @@ public final class ChatGPTKit {
                     });
                 }
             } catch (Throwable e) {
-                AigcMix.getVerboseLogger().exception(e, "chunk handler exception in ChatGPTKit.chatStream", j -> j.put("request_id", requestId));
+                AigcMix.getVerboseLogger().exception(
+                        e,
+                        x -> x
+                                .message("chunk handler exception in ChatGPTKit.chatStream")
+                                .context(j -> j.put("request_id", requestId)));
             }
         };
+    }
+
+    public Future<JsonObject> chat(
+            AzureOpenAIServiceMeta serviceMeta,
+            JsonObject parameters,
+            String requestId
+    ) {
+        String api = "/chat/completions";
+        return serviceMeta.request(api, parameters, requestId);
+    }
+
+    public Future<OpenAIChatGptResponse> chat(
+            AzureOpenAIServiceMeta serviceMeta,
+            OpenAIChatGptRequest parameters,
+            String requestId
+    ) {
+        return chat(serviceMeta, parameters.toJsonObject(), requestId)
+                .compose(resp -> {
+                    return Future.succeededFuture(OpenAIChatGptResponse.wrap(resp));
+                });
+    }
+
+    public Future<OpenAIChatGptResponse> chat(
+            AzureOpenAIServiceMeta serviceMeta,
+            Handler<OpenAIChatGptRequest> handler,
+            String requestId
+    ) {
+        OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
+        handler.handle(request);
+        return chat(serviceMeta, request, requestId);
     }
 
     public Future<Void> chatStream(
@@ -181,11 +188,12 @@ public final class ChatGPTKit {
                 parameters.toJsonObject(),
                 s -> {
                     final String finalS = s;
-                    AigcMix.getVerboseLogger().info(
-                            "Component Handler in ChatGPTKit.chatStream",
-                            j -> j
+                    AigcMix.getVerboseLogger().info(x -> x
+                            .message("Component Handler in ChatGPTKit.chatStream")
+                            .context(j -> j
                                     .put("component", finalS)
                                     .put("request_id", requestId)
+                            )
                     );
 
                     s = s.replaceFirst("^data:\\s*", "");

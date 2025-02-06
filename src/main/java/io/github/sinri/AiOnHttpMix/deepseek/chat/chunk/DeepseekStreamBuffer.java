@@ -7,14 +7,26 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class DeepseekStreamBuffer implements LLMStreamBuffer {
     private final JsonObject buffer;
     private final DeepseekChoiceBuffer choiceBuffer;
+    private boolean metDoneFlag = false;
 
     public DeepseekStreamBuffer() {
         buffer = new JsonObject();
         choiceBuffer = new DeepseekChoiceBuffer();
+    }
+
+    public DeepseekStreamBuffer meetDoneFlag() {
+        this.metDoneFlag = true;
+        return this;
+    }
+
+    public boolean isMetDoneFlag() {
+        return metDoneFlag;
     }
 
     public void accept(DeepseekResponseChunk chunk) {
@@ -46,6 +58,7 @@ public class DeepseekStreamBuffer implements LLMStreamBuffer {
         private final StringBuilder reasoningContentBuffer = new StringBuilder();
         private final JsonObject buffer;
         private String role;
+        private final Map<Integer, ToolCallFunctionBuffer> toolCallMap = new TreeMap<>();
 
         public DeepseekChoiceBuffer() {
             buffer = new JsonObject();
@@ -73,16 +86,70 @@ public class DeepseekStreamBuffer implements LLMStreamBuffer {
                 if (content != null) {
                     contentBuffer.append(content);
                 }
+
+                List<DeepseekResponseChunk.ChoiceChunkDeltaToolCall> toolCalls = delta.getToolCalls();
+                if (toolCalls != null && !toolCalls.isEmpty()) {
+                    toolCalls.forEach(deltaToolCall -> {
+                        toolCallMap.computeIfAbsent(deltaToolCall.getIndex(), ToolCallFunctionBuffer::new)
+                                .accept(deltaToolCall);
+                    });
+                }
             }
         }
 
         public DeepseekChatResponse.Choice toChoice() {
-            buffer.put("message", new JsonObject()
+            var message = new JsonObject()
                     .put("role", role)
                     .put("content", contentBuffer.toString())
-                    .put("reasoning_content", reasoningContentBuffer.toString())
-            );
+                    .put("reasoning_content", reasoningContentBuffer.toString());
+
+
+            if (!toolCallMap.isEmpty()) {
+                JsonArray array = new JsonArray();
+                List<Integer> keys = toolCallMap.keySet().stream().sorted().toList();
+                for (Integer key : keys) {
+                    ToolCallFunctionBuffer toolCallFunctionBuffer = toolCallMap.get(key);
+                    array.add(toolCallFunctionBuffer.toJsonObject());
+                }
+                message.put("tool_calls", array);
+            }
+
+            buffer.put("message", message);
+
             return DeepseekChatResponse.Choice.wrap(buffer);
+        }
+    }
+
+    public static class ToolCallFunctionBuffer {
+        private final Integer index;
+        private final StringBuilder functionName = new StringBuilder();
+        private final StringBuilder functionArguments = new StringBuilder();
+
+        public ToolCallFunctionBuffer(Integer index) {
+            this.index = index;
+        }
+
+        public void accept(DeepseekResponseChunk.ChoiceChunkDeltaToolCall choiceChunkDeltaToolCall) {
+            DeepseekResponseChunk.ChoiceChunkDeltaToolCallFunction function = choiceChunkDeltaToolCall.getFunction();
+            if (function != null) {
+                String name = function.getName();
+                if (name != null) {
+                    functionName.append(name);
+                }
+                String arguments = function.getArguments();
+                if (arguments != null) {
+                    functionArguments.append(arguments);
+                }
+            }
+        }
+
+        public JsonObject toJsonObject() {
+            return new JsonObject()
+                    .put("index", index)
+                    .put("function", new JsonObject()
+                            .put("name", functionName)
+                            .put("arguments", functionArguments)
+                    );
         }
     }
 }

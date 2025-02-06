@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.deepseek.chat.message;
 
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -20,10 +21,11 @@ public interface DeepseekMessageInResponse extends DeepseekMessageBase<DeepseekM
     /**
      * @return 模型生成的 tool 调用，例如 function 调用。
      */
+    @Nullable
     default List<DeepseekToolCallInResponse> getToolCalls() {
         var a = readJsonObjectArray("tool_calls");
         if (a == null) {
-            return List.of();
+            return null;
         }
         return a.stream().map(DeepseekToolCallInResponse::wrap).toList();
     }
@@ -31,6 +33,10 @@ public interface DeepseekMessageInResponse extends DeepseekMessageBase<DeepseekM
     interface DeepseekToolCallInResponse extends UnmodifiableJsonifiableEntity {
         static DeepseekToolCallInResponse wrap(JsonObject jsonObject) {
             return new DeepseekToolCallInResponseImpl(jsonObject);
+        }
+
+        default Integer getIndex() {
+            return readInteger("index");
         }
 
         /**
