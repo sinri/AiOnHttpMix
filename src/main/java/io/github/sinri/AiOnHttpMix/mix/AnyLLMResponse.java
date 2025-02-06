@@ -165,19 +165,19 @@ public interface AnyLLMResponse {
 
             List<AnyLLMResponseToolFunctionCall> functionCalls = new ArrayList<>();
 
-            // todo FC of DeepSeek is not tested
-//            List<VolcesChatMessageToolCallForResponse> toolCalls = message.getToolCalls();
-//            if (toolCalls != null && !toolCalls.isEmpty()) {
-//                for (VolcesChatMessageToolCallForResponse toolCall : toolCalls) {
-//                    VolcesChatFunctionCallForRequest function = toolCall.getFunction();
-//                    if (function != null) {
-//                        String name = function.getName();
-//                        String arguments = function.getArguments();
-//                        AnyLLMResponseToolFunctionCall functionCall = AnyLLMResponseToolFunctionCall.build(name, arguments);
-//                        functionCalls.add(functionCall);
-//                    }
-//                }
-//            }
+            // FC of DeepSeek is not tested; R1 is not supported FC.
+            var toolCalls = message.getToolCalls();
+            if (toolCalls != null && !toolCalls.isEmpty()) {
+                for (var toolCall : toolCalls) {
+                    var function = toolCall.getFunction();
+                    if (function != null) {
+                        String name = function.getName();
+                        String arguments = function.getArguments();
+                        AnyLLMResponseToolFunctionCall functionCall = AnyLLMResponseToolFunctionCall.build(name, arguments);
+                        functionCalls.add(functionCall);
+                    }
+                }
+            }
 
             AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(finishReason, content, functionCalls);
             anyLLMResponseChoices.add(anyLLMResponseChoice);

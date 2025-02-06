@@ -100,6 +100,7 @@ public class MixTestCore extends BaseUnitTest {
                         .addUserMessage("请介绍下筑波有什么好玩的地方，尽可能详细，形成一篇2000字以上的文案。")
                 )
                 .compose(anyLLMResponse -> {
+                    getLogger().info("resp raw: " + anyLLMResponse.toJsonObject());
                     List<AnyLLMResponseChoice> choices = anyLLMResponse.getChoices();
                     getLogger().info("choices count: " + choices.size());
                     Assert.assertEquals(1, choices.size());

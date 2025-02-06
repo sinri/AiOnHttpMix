@@ -67,6 +67,14 @@ public class DeepseekServiceMeta implements ServiceMeta {
                                 .putHeader("Authorization", "Bearer " + apiKey)
                                 .send(parameters.toBuffer())
                                 .compose(response -> {
+                                    long timer = Keel.getVertx().setTimer(getStreamTimeout(), timeout -> {
+                                        promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
+                                        AigcMix.getVerboseLogger().info(x -> x
+                                                .message("Timeout in DeepseekServiceMeta.requestSSE")
+                                                .context(j -> j
+                                                        .put("requestId", requestId))
+                                        );
+                                    });
                                     response
                                             .handler(buffer -> {
                                                 System.out.println("> " + buffer.toString());

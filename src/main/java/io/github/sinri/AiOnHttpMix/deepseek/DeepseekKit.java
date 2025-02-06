@@ -32,22 +32,6 @@ public class DeepseekKit {
             JsonObject jsonObject = new JsonObject(s);
             DeepseekResponseChunk chunk = new DeepseekResponseChunk(jsonObject);
             buffer.accept(chunk);
-
-//            AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.deepseek.DeepseekClient.getStreamBufferFragmentHandler::component | " + s);
-//            try {
-//                var nakami = s.replaceFirst("^data:\\s*", "");
-//                if (!Objects.equals("[DONE]", nakami)) {
-//                    JsonObject data = new JsonObject(nakami);
-//                    VolcesChatResponseChunk chunk = VolcesChatResponseChunk.wrap(data);
-//                    tempVolcesChatCompletionsResponse.accept(chunk);
-//                }
-//            } catch (Throwable e) {
-//                AigcMix.getVerboseLogger().exception(
-//                        e,
-//                        "chunk handler exception in VolcesKit.chatStreamWithChunkHandler",
-//                        j -> j.put("request_id", requestId)
-//                );
-//            }
         };
     }
 
@@ -83,7 +67,6 @@ public class DeepseekKit {
 
         Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(component -> {
-//            System.out.println("[COMPONENT] " + component);
             DeepseekResponseChunkString deepseekResponseChunkString = new DeepseekResponseChunkString(component);
             if (!deepseekResponseChunkString.isDoneChunk() && !deepseekResponseChunkString.isKeepAliveChunk()) {
                 DeepseekResponseChunk chunk = deepseekResponseChunkString.getChunk();
@@ -165,7 +148,11 @@ public class DeepseekKit {
                         streamBuffer.accept(chunk);
                     } catch (Throwable throwable) {
                         // ignore it
-                        throwable.printStackTrace();
+                        AigcMix.getVerboseLogger().exception(throwable,
+                                "io.github.sinri.AiOnHttpMix.deepseek.DeepseekKit.chatStreamWithBuffer met error",
+                                context -> context.put("request_id", requestId).put("chunk_string", s)
+                        );
+                        throw new RuntimeException(throwable);
                     }
                 }
             } else {
