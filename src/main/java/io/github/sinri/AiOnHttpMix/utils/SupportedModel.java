@@ -16,7 +16,8 @@ public enum SupportedModel {
      * Once named as `Volces`
      */
     Doubao(SupportedProvider.Volces),
-    DeepSeekReasonerOnVolces(SupportedProvider.Volces)
+    DeepSeekReasonerOnVolces(SupportedProvider.Volces),
+    DeepSeekChatOnVolces(SupportedProvider.Volces),
     // DeepSeekChat(SupportedProvider.DeepSeek, DeepseekModel.ChatModel.getCode()),
     // DeepSeekReasoner(SupportedProvider.DeepSeek, DeepseekModel.ReasonerModel.getCode()),
     ;

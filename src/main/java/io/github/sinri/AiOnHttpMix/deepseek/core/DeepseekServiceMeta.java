@@ -99,9 +99,7 @@ public class DeepseekServiceMeta implements ServiceMeta {
                             cutter.end();
                             promise.fail(throwable);
                         })
-                        .eventually(() -> {
-                            return promise.future();
-                        })
+                                        .eventually(promise::future)
         );
     }
 

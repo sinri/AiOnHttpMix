@@ -24,7 +24,7 @@ public class AzureChatTestCore extends KeelInstantRunner {
 
         this.serviceMeta = new AzureOpenAIServiceMeta(apiKey, resourceName, deployment, apiVersion);
 
-        getLogger().setVisibleLevel(KeelLogLevel.DEBUG);
+        getInstantLogger().setVisibleLevel(KeelLogLevel.DEBUG);
 
         return Future.succeededFuture();
     }

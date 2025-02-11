@@ -96,27 +96,25 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
         this.mirageModel = model.name();
         switch (model) {
             case ChatGPT:
-//                this.mirageModel = "ChatGPT";
                 this.mirageService = "gpt-4-o";
                 break;
             case QwenPlus:
-//                this.mirageModel = "QwenPlus";
                 this.mirageService = null;
                 break;
             case QwenMax:
-//                this.mirageModel = "QwenMax";
                 this.mirageService = null;
                 break;
             case Doubao:
-//                this.mirageModel = "Doubao";
                 this.mirageService = "doubao-pro-128k";
                 break;
             case DeepSeekReasonerOnVolces:
-//                this.mirageModel = "DeepSeekReasonerOnVolces";
                 this.mirageService = "DeepSeek-R1";
                 break;
-            default:
-                throw new IllegalArgumentException("Unknown model");
+            case DeepSeekChatOnVolces:
+                this.mirageService = "DeepSeek-V3";
+                break;
+            //            default:
+            //                throw new IllegalArgumentException("Unknown model");
         }
         return this;
     }
@@ -156,7 +154,8 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
      * @since 1.1.2
      */
     public Future<Object> callRegisterFunction(AnyLLMResponseToolFunctionCall anyLLMResponseToolFunctionCall) {
-        FunctionCallAdapter registeredFunction = this.getRegisteredFunction(anyLLMResponseToolFunctionCall.getFunctionName());
+        FunctionCallAdapter registeredFunction =
+                this.getRegisteredFunction(anyLLMResponseToolFunctionCall.getFunctionName());
         if (registeredFunction == null) {
             return Future.failedFuture(new UnsupportedOperationException("Function not registered"));
         }
@@ -186,7 +185,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                         .chatForMessageResponse(
                                 (DashscopeServiceMeta) serviceMeta,
                                 request.toQwenRequest()
-                                        .setModel(model.asQwenModel()),
+                                       .setModel(model.asQwenModel()),
                                 request.getRequestId()
                         )
                         .compose(resp -> {
@@ -246,11 +245,11 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                         .chatStreamWithChunkHandler(
                                 (DashscopeServiceMeta) serviceMeta,
                                 request.toQwenRequest()
-                                        .setModel(model.asQwenModel())
-                                        .handleParameters(p -> p
-                                                .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
-                                                .setIncrementalOutput(true)
-                                        ),
+                                       .setModel(model.asQwenModel())
+                                       .handleParameters(p -> p
+                                               .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
+                                               .setIncrementalOutput(true)
+                                       ),
                                 chunk -> {
                                     fragmentHandler.handle(chunk.cloneAsJsonObject().toString());
                                 },
@@ -265,7 +264,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                                 },
                                 request.getRequestId()
                         );
-                case DeepSeekReasonerOnVolces -> new DeepseekKit()
+                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> new DeepseekKit()
                         .chatStreamWithChunkHandler(
                                 (VolcesServiceMeta) serviceMeta,
                                 request.toDeepseekChatRequest(),
@@ -274,7 +273,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                                 },
                                 request.getRequestId()
                         );
-                default -> Future.failedFuture(new UnsupportedOperationException("Not supported!"));
+                //default -> Future.failedFuture(new UnsupportedOperationException("Not supported!"));
             };
         } else {
             return this.mirageSDK.requestStream(
@@ -310,11 +309,11 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                         .chatStreamWithBuffer(
                                 (DashscopeServiceMeta) serviceMeta,
                                 request.toQwenRequest()
-                                        .setModel(model.asQwenModel())
-                                        .handleParameters(p -> p
-                                                .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
-                                                .setIncrementalOutput(true)
-                                        ),
+                                       .setModel(model.asQwenModel())
+                                       .handleParameters(p -> p
+                                               .setResultFormat(QwenRequest.Parameters.ResultFormat.message)
+                                               .setIncrementalOutput(true)
+                                       ),
                                 request.getRequestId()
                         )
                         .compose(resp -> {
@@ -331,7 +330,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-                case DeepSeekReasonerOnVolces -> new DeepseekKit()
+                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> new DeepseekKit()
                         .chatSSEWithBuffer(
                                 (VolcesServiceMeta) serviceMeta,
                                 request.toDeepseekChatRequest(),
@@ -341,49 +340,57 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-//                default -> Future.failedFuture(new UnsupportedOperationException("Not supported!"));
+                //                default -> Future.failedFuture(new UnsupportedOperationException("Not supported!"));
             };
         } else {
             Handler<String> fragmentHandler;
             LLMStreamBuffer buffer;
 
-            switch (model) {
-                case ChatGPT:
+            fragmentHandler = switch (model) {
+                case ChatGPT -> {
                     buffer = new OpenAIChatGptStreamBuffer();
-                    fragmentHandler = ChatGPTKit.getStreamBufferFragmentHandler((OpenAIChatGptStreamBuffer) buffer, request.getRequestId());
-                    break;
-                case QwenPlus, QwenMax:
+                    yield ChatGPTKit.getStreamBufferFragmentHandler((OpenAIChatGptStreamBuffer) buffer,
+                            request.getRequestId());
+                }
+                case QwenPlus, QwenMax -> {
                     buffer = new QwenStreamBuffer();
-                    fragmentHandler = QwenKit.getStreamBufferFragmentHandler((QwenStreamBuffer) buffer, request.getRequestId());
-                    break;
-                case Doubao:
+                    yield QwenKit.getStreamBufferFragmentHandler((QwenStreamBuffer) buffer,
+                            request.getRequestId());
+                }
+                case Doubao -> {
                     buffer = new VolcesChatStreamBuffer();
-                    fragmentHandler = VolcesKit.getStreamBufferFragmentHandler((VolcesChatStreamBuffer) buffer, request.getRequestId());
-                    break;
-                case DeepSeekReasonerOnVolces:
+                    yield VolcesKit.getStreamBufferFragmentHandler((VolcesChatStreamBuffer) buffer,
+                            request.getRequestId());
+                }
+                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> {
                     buffer = new DeepseekStreamBuffer();
-                    fragmentHandler = DeepseekKit.getStreamBufferFragmentHandler((DeepseekStreamBuffer) buffer, request.getRequestId());
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Not supported!");
-            }
+                    yield DeepseekKit.getStreamBufferFragmentHandler((DeepseekStreamBuffer) buffer,
+                            request.getRequestId());
+                    //                default:
+                    //                    throw new UnsupportedOperationException("Not supported!");
+                }
+            };
 
             return this.mirageSDK.requestStream(
-                            this.mirageModel,
-                            this.mirageService,
-                            true,
-                            request.toMirageRequestEntity(),
-                            s -> {
-                                AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mix.AnyLLMKit.requestWithStreamBuffer::component | " + s);
+                               this.mirageModel,
+                               this.mirageService,
+                               true,
+                               request.toMirageRequestEntity(),
+                               s -> {
+                                   AigcMix.getVerboseLogger()
+                                          .debug("io.github.sinri.AiOnHttpMix.mix.AnyLLMKit" +
+                                                  ".requestWithStreamBuffer::component | " + s);
                                 /*
-                                {"output":{"choices":[{"message":{"content":"筑","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":58,"input_tokens":54,"output_tokens":4},"request_id":"ab856b62-68aa-928d-ade3-ae7f9312d5ee"}
+                                {"output":{"choices":[{"message":{"content":"筑","role":"assistant"},
+                                "finish_reason":"null"}]},"usage":{"total_tokens":58,"input_tokens":54,
+                                "output_tokens":4},"request_id":"ab856b62-68aa-928d-ade3-ae7f9312d5ee"}
                                  */
-                                fragmentHandler.handle(s);
-                            }
-                    )
-                    .compose(fin -> {
-                        return Future.succeededFuture(buffer.toAnyLLMResponse());
-                    });
+                                   fragmentHandler.handle(s);
+                               }
+                       )
+                                 .compose(fin -> {
+                                     return Future.succeededFuture(buffer.toAnyLLMResponse());
+                                 });
         }
     }
 
