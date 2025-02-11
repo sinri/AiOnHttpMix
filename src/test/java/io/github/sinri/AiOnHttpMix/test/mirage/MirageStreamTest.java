@@ -5,6 +5,7 @@ import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMSimpleRoleMessagePair;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentDefinition;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentType;
+import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.vertx.core.Future;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,13 +31,22 @@ public class MirageStreamTest extends MirageTestBase {
         return x;
     }
 
+
+    private SupportedModel getModelToTest() {
+        return SupportedModel.DeepSeekChatOnVolces;
+    }
+
+    private String getService() {
+        return "DeepSeek-V3";
+    }
+
     @Test
     public void test1() {
         MirageRequestEntity mirageRequestEntity = buildMirageRequestEntity();
         Keel.pseudoAwait(promise -> {
             getMirageSDK().requestStream(
-                            "QwenPlus",
-                            null,
+                                  getModelToTest().name(),
+                                  getService(),
                             true,
                             mirageRequestEntity,
                             180_000L,
@@ -69,8 +79,8 @@ public class MirageStreamTest extends MirageTestBase {
         getLogger().info("REQ:", req.toJsonObject());
         Keel.pseudoAwait(promise -> {
             getMirageSDK().requestStream(
-                            "QwenPlus",
-                            null,
+                                  getModelToTest().name(),
+                                  getService(),
                             true,
                             req,
                             180_000L,
