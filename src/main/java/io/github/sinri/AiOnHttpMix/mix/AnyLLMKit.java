@@ -202,7 +202,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-                case DeepSeekReasonerOnVolces -> new DeepseekKit()
+                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> new DeepseekKit()
                         .chat(
                                 (VolcesServiceMeta) serviceMeta,
                                 request.toDeepseekChatRequest(),
@@ -212,7 +212,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-                default -> Future.failedFuture(new UnsupportedOperationException("Not supported!"));
+                //default -> Future.failedFuture(new UnsupportedOperationException("Not supported!"));
             };
         } else {
             return this.mirageSDK.requestSync(
