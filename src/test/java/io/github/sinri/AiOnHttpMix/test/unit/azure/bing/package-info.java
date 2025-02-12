@@ -1,0 +1,1 @@
+package io.github.sinri.AiOnHttpMix.test.unit.azure.bing;

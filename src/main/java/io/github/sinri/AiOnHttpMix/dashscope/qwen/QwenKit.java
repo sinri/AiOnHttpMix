@@ -13,7 +13,6 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLResponse;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLStreamBuffer;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.github.sinri.keel.core.cutter.CutterOnString;
 import io.vertx.core.Future;
@@ -65,24 +64,27 @@ public final class QwenKit {
             chatRequest.getParameters().setResultFormat(QwenRequest.Parameters.ResultFormat.message);
         }
         return serviceMeta.callQwenTextGenerate(chatRequest.toJsonObject(), requestId)
-                .compose(jsonObject -> {
-                    QwenResponseInMessageFormat chatMessageResponse = QwenResponseInMessageFormat.wrap(200, jsonObject);
-                    return Future.succeededFuture(chatMessageResponse);
-                }, throwable -> {
-                    if (throwable instanceof ServiceMeta.AbnormalResponse abnormalResponse) {
-                        int statusCode = abnormalResponse.getStatusCode();
-                        JsonObject responseBodyAsJson = abnormalResponse.getResponseBodyAsJson();
-                        QwenResponseInMessageFormat chatMessageResponse = QwenResponseInMessageFormat.wrap(statusCode, responseBodyAsJson);
-                        return Future.succeededFuture(chatMessageResponse);
-                    }
-                    return Future.failedFuture(throwable);
-                });
+                          .compose(jsonObject -> {
+                              QwenResponseInMessageFormat chatMessageResponse = QwenResponseInMessageFormat.wrap(200,
+                                      jsonObject);
+                              return Future.succeededFuture(chatMessageResponse);
+                          }, throwable -> {
+                              if (throwable instanceof ServiceMeta.AbnormalResponse abnormalResponse) {
+                                  int statusCode = abnormalResponse.getStatusCode();
+                                  JsonObject responseBodyAsJson = abnormalResponse.getResponseBodyAsJson();
+                                  QwenResponseInMessageFormat chatMessageResponse =
+                                          QwenResponseInMessageFormat.wrap(statusCode, responseBodyAsJson);
+                                  return Future.succeededFuture(chatMessageResponse);
+                              }
+                              return Future.failedFuture(throwable);
+                          });
     }
 
     public Future<Void> chatStreamWithStringHandler(
             DashscopeServiceMeta serviceMeta,
             JsonObject chatRequest,
             Handler<String> handler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         Promise<Void> promise = Promise.promise();
@@ -100,6 +102,7 @@ public final class QwenKit {
                 chatRequest,
                 promise,
                 cutter,
+                maxExecutionSeconds,
                 requestId
         );
     }
@@ -108,11 +111,13 @@ public final class QwenKit {
             DashscopeServiceMeta serviceMeta,
             Handler<QwenRequest> chatRequestHandler,
             Handler<QwenResponseChunk> handler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         QwenRequest chatRequest = QwenRequest.create();
+        chatRequest.handleParameters(p -> p.setIncrementalOutput(true));
         chatRequestHandler.handle(chatRequest);
-        return chatStreamWithChunkHandler(serviceMeta, chatRequest, handler, requestId);
+        return chatStreamWithChunkHandler(serviceMeta, chatRequest, handler, maxExecutionSeconds, requestId);
     }
 
     /**
@@ -122,6 +127,7 @@ public final class QwenKit {
             DashscopeServiceMeta serviceMeta,
             QwenRequest chatRequest,
             Handler<QwenResponseChunk> handler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         if (chatRequest.getParameters() == null) {
@@ -138,6 +144,7 @@ public final class QwenKit {
                     QwenResponseChunk chatMessageResponseInChunk = QwenResponseChunk.parse(dataAsString);
                     handler.handle(chatMessageResponseInChunk);
                 },
+                maxExecutionSeconds,
                 requestId
         );
     }
@@ -145,16 +152,19 @@ public final class QwenKit {
     public Future<QwenResponseInMessageFormat> chatStreamWithBuffer(
             DashscopeServiceMeta serviceMeta,
             Handler<QwenRequest> chatRequestHandler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         QwenRequest qwenRequest = QwenRequest.create();
+        qwenRequest.handleParameters(p -> p.setIncrementalOutput(true));
         chatRequestHandler.handle(qwenRequest);
-        return chatStreamWithBuffer(serviceMeta, qwenRequest, requestId);
+        return chatStreamWithBuffer(serviceMeta, qwenRequest, maxExecutionSeconds, requestId);
     }
 
     public Future<QwenResponseInMessageFormat> chatStreamWithBuffer(
             DashscopeServiceMeta serviceMeta,
             QwenRequest chatRequest,
+            int maxExecutionSeconds,
             String requestId
     ) {
         QwenStreamBuffer qwenStreamBuffer = new QwenStreamBuffer();
@@ -169,12 +179,14 @@ public final class QwenKit {
                 chatRequest,
                 responseChunk -> {
                     AigcMix.getVerboseLogger().debug(x -> x
-                            .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit.chatStreamWithBuffer::responseChunk")
+                            .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit" +
+                                    ".chatStreamWithBuffer::responseChunk")
                             .context(j -> j
                                     .put("raw", responseChunk.cloneAsJsonObject()))
                     );
                     qwenStreamBuffer.acceptChunkData(responseChunk);
                 },
+                maxExecutionSeconds,
                 requestId
         )
                 .compose(v -> {
@@ -206,16 +218,17 @@ public final class QwenKit {
             String requestId
     ) {
         return serviceMeta.callTextEmbeddingGeneration(requestBody.toJsonObject(), requestId)
-                .compose(jsonObject -> {
-                    return Future.succeededFuture(DashscopeTextEmbeddingGenerateResponse.wrap(200, jsonObject));
-                }, throwable -> {
-                    if (throwable instanceof ServiceMeta.AbnormalResponse abnormalResponse) {
-                        int statusCode = abnormalResponse.getStatusCode();
-                        JsonObject responseBodyAsJson = abnormalResponse.getResponseBodyAsJson();
-                        return Future.succeededFuture(DashscopeTextEmbeddingGenerateResponse.wrap(statusCode, responseBodyAsJson));
-                    }
-                    return Future.failedFuture(throwable);
-                });
+                          .compose(jsonObject -> {
+                              return Future.succeededFuture(DashscopeTextEmbeddingGenerateResponse.wrap(200,
+                                      jsonObject));
+                          }, throwable -> {
+                              if (throwable instanceof ServiceMeta.AbnormalResponse abnormalResponse) {
+                                  int statusCode = abnormalResponse.getStatusCode();
+                                  JsonObject responseBodyAsJson = abnormalResponse.getResponseBodyAsJson();
+                                  return Future.succeededFuture(DashscopeTextEmbeddingGenerateResponse.wrap(statusCode, responseBodyAsJson));
+                              }
+                              return Future.failedFuture(throwable);
+                          });
     }
 
     public Future<JsonObject> chatVL(DashscopeServiceMeta serviceMeta, JsonObject jsonObject, String requestId) {
@@ -232,17 +245,19 @@ public final class QwenKit {
         return chatVL(serviceMeta, request, requestId);
     }
 
-    public Future<QwenVLResponse> chatVL(DashscopeServiceMeta serviceMeta, QwenVLRequest chatRequest, String requestId) {
+    public Future<QwenVLResponse> chatVL(DashscopeServiceMeta serviceMeta, QwenVLRequest chatRequest,
+                                         String requestId) {
         return serviceMeta.callQwenMultiModalGenerate(chatRequest.toJsonObject(), requestId)
-                .compose(jsonObject -> {
-                    return Future.succeededFuture(QwenVLResponse.wrap(jsonObject));
-                });
+                          .compose(jsonObject -> {
+                              return Future.succeededFuture(QwenVLResponse.wrap(jsonObject));
+                          });
     }
 
     public Future<Void> chatVLStreamWithStringHandler(
             DashscopeServiceMeta serviceMeta,
             JsonObject jsonObject,
             Handler<String> handler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         Promise<Void> promise = Promise.promise();
@@ -261,6 +276,7 @@ public final class QwenKit {
                 jsonObject,
                 promise,
                 cutterOnString,
+                maxExecutionSeconds,
                 requestId
         );
     }
@@ -269,17 +285,19 @@ public final class QwenKit {
             DashscopeServiceMeta serviceMeta,
             Handler<QwenVLRequest> chatRequestHandler,
             Handler<QwenVLResponse> handler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         QwenVLRequest request = QwenVLRequest.create();
         chatRequestHandler.handle(request);
-        return chatVLStreamWithChunkHandler(serviceMeta, request, handler, requestId);
+        return chatVLStreamWithChunkHandler(serviceMeta, request, handler, maxExecutionSeconds, requestId);
     }
 
     public Future<Void> chatVLStreamWithChunkHandler(
             DashscopeServiceMeta serviceMeta,
             QwenVLRequest chatRequest,
             Handler<QwenVLResponse> handler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         return this.chatVLStreamWithStringHandler(
@@ -291,6 +309,7 @@ public final class QwenKit {
                     QwenVLResponse vlChatResponse = QwenVLResponse.wrap(new JsonObject(dataAsString));
                     handler.handle(vlChatResponse);
                 },
+                maxExecutionSeconds,
                 requestId
         );
     }
@@ -298,16 +317,18 @@ public final class QwenKit {
     public Future<QwenVLResponse> chatVLStreamWithBuffer(
             DashscopeServiceMeta serviceMeta,
             Handler<QwenVLRequest> chatRequestHandler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         QwenVLRequest request = QwenVLRequest.create();
         chatRequestHandler.handle(request);
-        return chatVLStreamWithBuffer(serviceMeta, request, requestId);
+        return chatVLStreamWithBuffer(serviceMeta, request, maxExecutionSeconds, requestId);
     }
 
     public Future<QwenVLResponse> chatVLStreamWithBuffer(
             DashscopeServiceMeta serviceMeta,
             QwenVLRequest chatRequest,
+            int maxExecutionSeconds,
             String requestId
     ) {
         QwenVLStreamBuffer qwenVLStreamBuffer = new QwenVLStreamBuffer();
@@ -321,6 +342,7 @@ public final class QwenKit {
                 serviceMeta,
                 chatRequest,
                 qwenVLStreamBuffer::accept,
+                maxExecutionSeconds,
                 requestId
         )
                 .compose(v -> {
@@ -353,64 +375,4 @@ public final class QwenKit {
         }
     }
 
-    /**
-     * @see <a href="https://help.aliyun.com/zh/dashscope/developer-reference/model-introduction">模型概览</a>
-     */
-    public enum QwenModel {
-        // 通义千问-Max: 通义千问系列效果最好的模型，适合复杂、多步骤的任务。
-        QWEN_MAX("qwen-max"),
-        QWEN_MAX_LONGCONTEXT("qwen-max-longcontext"),
-        // 通义千问-Plus
-        QWEN_PLUS("qwen-plus"),
-        @TechnicalPreview(notice = "Beta阶段，上下文长度131072，最大输入128k")
-        QWEN_PLUS_BETA("qwen-plus-0806"),
-        // 通义千问-Turbo:通义千问系列速度最快、成本很低的模型，适合简单任务。
-        QWEN_TURBO("qwen-turbo"),
-        ;
-        private final String modelCode;
-
-        QwenModel(String modelCode) {
-            this.modelCode = modelCode;
-        }
-
-        public static QwenModel fromModelCode(String modelCode) {
-            return switch (modelCode) {
-                case "qwen-max" -> QwenModel.QWEN_MAX;
-                case "qwen-max-longcontext" -> QwenModel.QWEN_MAX_LONGCONTEXT;
-                case "qwen-plus" -> QwenModel.QWEN_PLUS;
-                case "qwen-plus-0806" -> QwenModel.QWEN_PLUS_BETA;
-                case "qwen-turbo" -> QwenModel.QWEN_TURBO;
-                default -> throw new IllegalArgumentException("Unknown modelCode: " + modelCode);
-            };
-        }
-
-        public String getModelCode() {
-            return modelCode;
-        }
-
-    }
-
-    public enum QwenVLModel {
-        QWEN_VL_PLUS("qwen-vl-plus"),
-        QWEN_VL_MAX("qwen-vl-max"),
-        ;
-
-        private final String modelCode;
-
-        QwenVLModel(String modelCode) {
-            this.modelCode = modelCode;
-        }
-
-        public static QwenVLModel fromModelCode(String modelCode) {
-            return switch (modelCode) {
-                case "qwen-vl-plus" -> QWEN_VL_PLUS;
-                case "qwen-vl-max" -> QWEN_VL_MAX;
-                default -> throw new IllegalArgumentException(modelCode);
-            };
-        }
-
-        public String getModelCode() {
-            return modelCode;
-        }
-    }
 }

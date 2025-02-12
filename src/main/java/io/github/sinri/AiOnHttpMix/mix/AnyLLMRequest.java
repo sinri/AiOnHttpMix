@@ -76,4 +76,14 @@ public interface AnyLLMRequest {
      * @since 1.1.5
      */
     MirageRequestEntity toMirageRequestEntity();
+
+    /**
+     * @since 1.2.2
+     */
+    int getMaxExecutionSeconds();
+
+    /**
+     * @since 1.2.2
+     */
+    AnyLLMRequest setMaxExecutionSeconds(int maxExecutionSeconds);
 }

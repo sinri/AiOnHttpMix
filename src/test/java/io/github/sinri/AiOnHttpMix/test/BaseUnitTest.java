@@ -1,9 +1,7 @@
 package io.github.sinri.AiOnHttpMix.test;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
-import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.VertxOptions;
 import org.junit.After;
 import org.junit.Before;
@@ -15,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
+@Deprecated(forRemoval = true)
 public class BaseUnitTest {
     @Rule
     public TestName testName = new TestName();
@@ -25,12 +24,11 @@ public class BaseUnitTest {
         Keel.initializeVertxStandalone(getVertxOptions());
         Keel.getConfiguration().loadPropertiesFile("config.properties");
 
-        logger = KeelIssueRecordCenter.outputCenter().generateEventLogger(testName.getMethodName());
+        //        logger = KeelIssueRecordCenter.outputCenter().generateEventLogger(testName.getMethodName());
+        //        getLogger().setVisibleLevel(KeelLogLevel.DEBUG);
+        //        getLogger().debug("io.github.sinri.AiOnHttpMix.test.BaseUnitTest.setUp");
 
-        getLogger().setVisibleLevel(KeelLogLevel.DEBUG);
-        getLogger().debug("io.github.sinri.AiOnHttpMix.test.BaseUnitTest.setUp");
-
-        AigcMix.enableVerboseLogger(getLogger());
+        AigcMix.enableVerboseLogger();
     }
 
     protected VertxOptions getVertxOptions() {

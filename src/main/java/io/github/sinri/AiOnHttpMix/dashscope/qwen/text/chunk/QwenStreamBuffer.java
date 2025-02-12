@@ -8,6 +8,7 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.response.QwenResponseInMe
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.tool.QwenToolCall;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
+import io.github.sinri.keel.core.TechnicalPreview;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -25,7 +26,8 @@ public class QwenStreamBuffer implements LLMStreamBuffer {
 
     public void acceptChunkData(QwenResponseChunk chatMessageResponseInChunk) {
         AigcMix.getVerboseLogger().debug(x -> x
-                .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer.acceptChunkData::chatMessageResponseInChunk")
+                .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer" +
+                        ".acceptChunkData::chatMessageResponseInChunk")
                 .context(chatMessageResponseInChunk.cloneAsJsonObject()));
         usage = chatMessageResponseInChunk.getUsage();
         QwenResponseChunk.OutputChunkForMessageResponse output = chatMessageResponseInChunk.getOutput();
@@ -34,7 +36,8 @@ public class QwenStreamBuffer implements LLMStreamBuffer {
             if (choices != null && !choices.isEmpty()) {
                 QwenResponseChunk.OutputChunkForMessageResponse.Choice choice = choices.get(0);
                 AigcMix.getVerboseLogger().debug(x -> x
-                        .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer.acceptChunkData::choice")
+                        .message("io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer" +
+                                ".acceptChunkData::choice")
                         .context(choice.cloneAsJsonObject()));
                 tempChoice.acceptChoice(choice);
             }
@@ -55,7 +58,6 @@ public class QwenStreamBuffer implements LLMStreamBuffer {
     }
 
     /**
-     * @return
      * @since 1.1.5
      */
     @Override
@@ -87,11 +89,17 @@ public class QwenStreamBuffer implements LLMStreamBuffer {
 
     public static class TempMessage {
         private final StringBuilder content;
+        /**
+         * For DeepSeek on Bailian Platform of Aliyun
+         */
+        @TechnicalPreview(since = "1.2.2")
+        private final StringBuilder reasoningReason;
         private final TempToolCalls toolCalls;
         private QwenRole role;
 
         public TempMessage() {
             content = new StringBuilder();
+            reasoningReason = new StringBuilder();
             toolCalls = new TempToolCalls();
         }
 
@@ -101,6 +109,9 @@ public class QwenStreamBuffer implements LLMStreamBuffer {
             }
             if (message.getContent() != null) {
                 this.content.append(message.getContent());
+            }
+            if (message.getReasoningContent() != null) {
+                this.reasoningReason.append(message.getReasoningContent());
             }
             if (message.getToolCalls() != null) {
                 List<QwenToolCall> toolCallList = message.getToolCalls();
@@ -114,6 +125,8 @@ public class QwenStreamBuffer implements LLMStreamBuffer {
                 entries.put("role", this.role.name());
             }
             entries.put("content", this.content.toString());
+            // todo if needed for all?
+            entries.put("reasoning_reason", this.reasoningReason.toString());
             List<QwenToolCall.FunctionCall> tcList = this.toolCalls.toToolCalls();
             if (!tcList.isEmpty()) {
                 JsonArray tcArray = new JsonArray();

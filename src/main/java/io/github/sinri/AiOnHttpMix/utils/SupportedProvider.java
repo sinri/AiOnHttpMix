@@ -13,7 +13,7 @@ public enum SupportedProvider {
     /**
      * Once named as `Qwen`
      */
-    DataScope,
+    DashScope,
     Volces,
     DeepSeek,
     Kimi,

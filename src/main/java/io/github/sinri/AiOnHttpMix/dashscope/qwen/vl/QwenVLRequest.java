@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen.vl;
 
-import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenVLModel;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -12,16 +12,25 @@ public interface QwenVLRequest extends JsonifiableEntity<QwenVLRequest> {
         return new QwenVLRequestImpl();
     }
 
-    default QwenVLRequest setModel(QwenKit.QwenVLModel model) {
+    @Nullable
+    default QwenVLModel getModel() {
+        String model = readString("model");
+        if (model == null) return null;
+        return QwenVLModel.fromModelCode(model);
+    }
+
+    @Deprecated(since = "1.2.2")
+    default QwenVLRequest setModel(QwenVLModel model) {
         toJsonObject().put("model", model.getModelCode());
         return this;
     }
 
-    @Nullable
-    default QwenKit.QwenVLModel getModel() {
-        String model = readString("model");
-        if (model == null) return null;
-        return QwenKit.QwenVLModel.fromModelCode(model);
+    /**
+     * @since 1.2.2
+     */
+    default QwenVLRequest setModel(String model) {
+        toJsonObject().put("model", model);
+        return this;
     }
 
     default QwenVLRequest setInput(Input input) {
@@ -90,9 +99,8 @@ public interface QwenVLRequest extends JsonifiableEntity<QwenVLRequest> {
         }
 
         /**
-         * 例如，取值为0.8时，仅保留累计概率之和大于等于0.8的概率分布中的token，作为随机采样的候选集。
-         * 取值范围为(0,1.0)，取值越大，生成的随机性越高；取值越低，生成的随机性越低。
-         * 默认值 0.8。注意，取值不要大于等于1
+         * 例如，取值为0.8时，仅保留累计概率之和大于等于0.8的概率分布中的token，作为随机采样的候选集。 取值范围为(0,1.0)，取值越大，生成的随机性越高；取值越低，生成的随机性越低。 默认值
+         * 0.8。注意，取值不要大于等于1
          *
          * @param top_p 生成时，核采样方法的概率阈值。
          */
@@ -102,9 +110,7 @@ public interface QwenVLRequest extends JsonifiableEntity<QwenVLRequest> {
         }
 
         /**
-         * 例如，取值为50时，仅将单次生成中得分最高的50个token组成随机采样的候选集。
-         * 取值越大，生成的随机性越高；取值越小，生成的确定性越高。
-         * 注意：如果top_k的值大于100，top_k将取值100。
+         * 例如，取值为50时，仅将单次生成中得分最高的50个token组成随机采样的候选集。 取值越大，生成的随机性越高；取值越小，生成的确定性越高。 注意：如果top_k的值大于100，top_k将取值100。
          *
          * @param top_k 生成时，采样候选集的大小。
          */
@@ -124,8 +130,7 @@ public interface QwenVLRequest extends JsonifiableEntity<QwenVLRequest> {
         }
 
         /**
-         * 如果使用相同的种子，每次运行生成的结果都将相同；当需要复现模型的生成结果时，可以使用相同的种子。
-         * seed参数支持无符号64位整数类型。
+         * 如果使用相同的种子，每次运行生成的结果都将相同；当需要复现模型的生成结果时，可以使用相同的种子。 seed参数支持无符号64位整数类型。
          *
          * @param seed 生成时，随机数的种子，用于控制模型生成的随机性。
          */

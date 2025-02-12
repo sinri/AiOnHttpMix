@@ -22,6 +22,10 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
     private final String requestId;
     private final List<AnyLLMSimpleRoleMessagePair> messageItems = new ArrayList<>();
     private final List<AnyLLMFunctionToolDefinition> functionToolDefinitions = new ArrayList<>();
+    /**
+     * @since 1.2.2
+     */
+    private int maxExecutionSeconds;
 
     public AnyLLMRequestImpl() {
         this.requestId = UUID.randomUUID().toString();
@@ -115,8 +119,8 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
         DeepseekChatRequest chatRequest = DeepseekChatRequest.create();
         this.messageItems.forEach(messageItem -> {
             chatRequest.addMessage(DeepseekMessageInRequest.create()
-                    .setRole(messageItem.role().toDeepseekRole())
-                    .setContent(messageItem.message())
+                                                           .setRole(messageItem.role().toDeepseekRole())
+                                                           .setContent(messageItem.message())
             );
         });
         this.functionToolDefinitions.forEach(functionToolDefinition -> {
@@ -133,12 +137,12 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
         MirageRequestEntity mirageRequestEntity = new MirageRequestEntity();
         this.messageItems.forEach(mirageRequestEntity::addToPrompt);
         this.functionToolDefinitions.forEach(x -> {
-//            Keel.getLogger().fatal("x", x.toJsonObject());
-//            Keel.getLogger().fatal("x.fn: " + x.getFunctionName());
-//            Keel.getLogger().fatal("x.fd: " + x.getFunctionDescription());
-//            x.getFunctionArgumentDefinitions().forEach(item -> {
-//                Keel.getLogger().fatal("x.a[]: " + item.name() + " as " + item.argumentType() + " // " + item.desc());
-//            });
+            //            Keel.getLogger().fatal("x", x.toJsonObject());
+            //            Keel.getLogger().fatal("x.fn: " + x.getFunctionName());
+            //            Keel.getLogger().fatal("x.fd: " + x.getFunctionDescription());
+            //            x.getFunctionArgumentDefinitions().forEach(item -> {
+            //                Keel.getLogger().fatal("x.a[]: " + item.name() + " as " + item.argumentType() + " // " + item.desc());
+            //            });
 
             mirageRequestEntity.addFunctionDefinition(
                     x.getFunctionName(),
@@ -147,5 +151,22 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
             );
         });
         return mirageRequestEntity;
+    }
+
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public AnyLLMRequest setMaxExecutionSeconds(int maxExecutionSeconds) {
+        this.maxExecutionSeconds = maxExecutionSeconds;
+        return this;
+    }
+
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public int getMaxExecutionSeconds() {
+        return maxExecutionSeconds;
     }
 }

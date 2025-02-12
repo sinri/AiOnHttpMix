@@ -18,8 +18,7 @@ import io.vertx.core.json.JsonObject;
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
- * DeepSeek的模型，目前并没有非常稳定，树大招风。
- * 按照20250205的情报，官方API已被攻陷，火山引擎的不支持FC。
+ * DeepSeek的模型，目前并没有非常稳定，树大招风。 按照20250205的情报，官方API已被攻陷，火山引擎的不支持FC。
  */
 public class DeepseekKit {
     public static Handler<String> getStreamBufferFragmentHandler(DeepseekStreamBuffer buffer, String requestId) {
@@ -35,6 +34,7 @@ public class DeepseekKit {
         };
     }
 
+    @Deprecated(since = "1.2.2", forRemoval = true)
     public Future<JsonObject> chat(
             VolcesServiceMeta serviceMeta,
             JsonObject requestBody,
@@ -44,6 +44,7 @@ public class DeepseekKit {
         return serviceMeta.request(VolcesServiceMeta.pathOfV3ChatCompletions, requestBody, requestId);
     }
 
+    @Deprecated(since = "1.2.2", forRemoval = true)
     public Future<DeepseekChatResponse> chat(
             VolcesServiceMeta serviceMeta,
             DeepseekChatRequest request,
@@ -51,14 +52,16 @@ public class DeepseekKit {
     ) {
         request.setModel(serviceMeta.getModel());
         return serviceMeta.request(VolcesServiceMeta.pathOfV3ChatCompletions, request.toJsonObject(), requestId)
-                .compose(resp -> {
-                    return Future.succeededFuture(DeepseekChatResponse.wrap(resp));
-                });
+                          .compose(resp -> {
+                              return Future.succeededFuture(DeepseekChatResponse.wrap(resp));
+                          });
     }
 
+    @Deprecated(since = "1.2.2", forRemoval = true)
     public Future<Void> chatStreamWithChunkHandler(VolcesServiceMeta serviceMeta,
                                                    DeepseekChatRequest request,
                                                    Handler<DeepseekResponseChunk> chunkHandler,
+                                                   int maxExecutionSeconds,
                                                    String requestId
     ) {
         request.setModel(serviceMeta.getModel());
@@ -75,16 +78,18 @@ public class DeepseekKit {
                 }
             }
         });
-        serviceMeta.requestSSE(VolcesServiceMeta.pathOfV3ChatCompletions, request.toJsonObject(), promise, cutter, requestId);
+        serviceMeta.requestSSE(VolcesServiceMeta.pathOfV3ChatCompletions, request.toJsonObject(), promise, cutter, maxExecutionSeconds, requestId);
         return promise.future();
     }
 
+    @Deprecated(since = "1.2.2", forRemoval = true)
     public Future<DeepseekChatResponse> chatSSEWithBuffer(VolcesServiceMeta serviceMeta,
                                                           DeepseekChatRequest request,
+                                                          int maxExecutionSeconds,
                                                           String requestId
     ) {
         DeepseekStreamBuffer streamBuffer = new DeepseekStreamBuffer();
-        return chatStreamWithChunkHandler(serviceMeta, request, streamBuffer::accept, requestId)
+        return chatStreamWithChunkHandler(serviceMeta, request, streamBuffer::accept, maxExecutionSeconds, requestId)
                 .compose(v -> {
                     return Future.succeededFuture(streamBuffer.toResponse());
                 });
@@ -104,16 +109,17 @@ public class DeepseekKit {
             String requestId
     ) {
         return serviceMeta.request("/chat/completions", request.toJsonObject(), requestId)
-                .compose(resp -> {
-                    // System.out.println("io.github.sinri.AiOnHttpMix.deepseek.DeepseekKit.chat(io.github.sinri.AiOnHttpMix.deepseek.core.DeepseekServiceMeta, io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatRequest, java.lang.String):\n"+resp.toString());
-                    return Future.succeededFuture(DeepseekChatResponse.wrap(resp));
-                });
+                          .compose(resp -> {
+                              // System.out.println("io.github.sinri.AiOnHttpMix.deepseek.DeepseekKit.chat(io.github.sinri.AiOnHttpMix.deepseek.core.DeepseekServiceMeta, io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatRequest, java.lang.String):\n"+resp.toString());
+                              return Future.succeededFuture(DeepseekChatResponse.wrap(resp));
+                          });
     }
 
     public Future<Void> chatStreamWithStreamHandler(
             DeepseekServiceMeta serviceMeta,
             JsonObject requestBody,
             Handler<String> streamHandler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         requestBody.put("stream", true);
@@ -128,6 +134,41 @@ public class DeepseekKit {
                 requestBody,
                 promise,
                 cutter,
+                maxExecutionSeconds,
+                requestId
+        );
+        return promise.future();
+    }
+
+    /**
+     * @since 1.2.2
+     */
+    public Future<Void> chatStreamWithChunkHandler(
+            DeepseekServiceMeta serviceMeta,
+            DeepseekChatRequest request,
+            Handler<DeepseekResponseChunk> chunkHandler,
+            int maxExecutionSeconds,
+            String requestId
+    ) {
+        request.setStream(true);
+
+        Promise<Void> promise = Promise.promise();
+
+        Cutter<String> cutter = new CutterOnString();
+        cutter.setComponentHandler(s -> {
+            DeepseekResponseChunkString deepseekResponseChunkString = new DeepseekResponseChunkString(s);
+            if (!deepseekResponseChunkString.isDoneChunk() && !deepseekResponseChunkString.isKeepAliveChunk()) {
+                DeepseekResponseChunk chunk = deepseekResponseChunkString.getChunk();
+                chunkHandler.handle(chunk);
+            }
+        });
+
+        serviceMeta.requestSSE(
+                "/chat/completions",
+                request.toJsonObject(),
+                promise,
+                cutter,
+                maxExecutionSeconds,
                 requestId
         );
         return promise.future();
@@ -136,6 +177,7 @@ public class DeepseekKit {
     public Future<DeepseekChatResponse> chatStreamWithBuffer(
             DeepseekServiceMeta serviceMeta,
             DeepseekChatRequest request,
+            int maxExecutionSeconds,
             String requestId
     ) {
         DeepseekStreamBuffer streamBuffer = new DeepseekStreamBuffer();
@@ -159,20 +201,21 @@ public class DeepseekKit {
                 streamBuffer.meetDoneFlag();
             }
         };
-        return this.chatStreamWithStreamHandler(serviceMeta, request.toJsonObject(), streamHandler, requestId)
-                .compose(v -> {
-                    if (!streamBuffer.isMetDoneFlag()) {
-                        return Keel.asyncSleep(500L);
-                    }
-                    return Future.succeededFuture();
-                })
-                .compose(v -> {
-                    if (streamBuffer.isMetDoneFlag()) {
-                        DeepseekChatResponse response = streamBuffer.toResponse();
-                        return Future.succeededFuture(response);
-                    } else {
-                        return Future.failedFuture("Stream buffer did not met DONE flag. The cached buffer is " + streamBuffer.toResponse().toString());
-                    }
-                });
+        return this.chatStreamWithStreamHandler(serviceMeta, request.toJsonObject(), streamHandler, maxExecutionSeconds, requestId)
+                   .compose(v -> {
+                       if (!streamBuffer.isMetDoneFlag()) {
+                           return Keel.asyncSleep(500L);
+                       }
+                       return Future.succeededFuture();
+                   })
+                   .compose(v -> {
+                       if (streamBuffer.isMetDoneFlag()) {
+                           DeepseekChatResponse response = streamBuffer.toResponse();
+                           return Future.succeededFuture(response);
+                       } else {
+                           return Future.failedFuture("Stream buffer did not met DONE flag. The cached buffer is " + streamBuffer.toResponse()
+                                                                                                                                 .toString());
+                       }
+                   });
     }
 }

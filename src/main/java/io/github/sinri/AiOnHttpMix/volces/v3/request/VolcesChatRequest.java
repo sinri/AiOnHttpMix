@@ -17,7 +17,7 @@ public interface VolcesChatRequest extends JsonifiableEntity<VolcesChatRequest> 
     }
 
     /**
-     * @param model 以 endpoint_id 索引对应的模型接入点。
+     * @param model 以 endpoint_id 索引对应的模型接入点，长得像 {@code ep-*}.
      */
     default VolcesChatRequest setModel(String model) {
         this.toJsonObject().put("model", model);

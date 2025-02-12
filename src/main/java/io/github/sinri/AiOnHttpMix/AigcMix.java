@@ -1,60 +1,61 @@
 package io.github.sinri.AiOnHttpMix;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 
 import javax.annotation.Nonnull;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class AigcMix {
+    private static final KeelIssueRecorder<KeelEventLog> silentVerboseLogger;
     @Nonnull
-    private static KeelEventLogger verboseLogger = KeelIssueRecordCenter.silentCenter().generateEventLogger("");
+    private static final AtomicReference<KeelIssueRecorder<KeelEventLog>> verboseLoggerRef;
 
+    static {
+        silentVerboseLogger = KeelIssueRecorder.buildSilentIssueRecorder();
+        verboseLoggerRef = new AtomicReference<>(silentVerboseLogger);
+    }
 
     /**
      * 设定logger为按照给定的日志记录最低级别的对StdOut进行输出的日志记录器。
      *
-     * @param level 日志记录最低级别
      * @since 1.0.2
      */
-    public static void enableVerboseLogger(@Nonnull KeelLogLevel level) {
-        verboseLogger = createLogger(level);
+    public static void enableVerboseLogger() {
+        enableVerboseLogger(KeelIssueRecordCenter.outputCenter(), KeelLogLevel.DEBUG);
     }
 
     /**
-     * 设定logger为给定的日志记录器。
-     *
-     * @param logger 一个指定的日志记录器
-     * @since 1.0.2
+     * @since 1.2.2
      */
-    public static void enableVerboseLogger(@Nonnull KeelEventLogger logger) {
-        verboseLogger = logger;
+    public static void enableVerboseLogger(@Nonnull KeelIssueRecordCenter center, @Nonnull KeelLogLevel level) {
+        if (level == KeelLogLevel.SILENT) {
+            disableVerboseLogger();
+        } else {
+            synchronized (verboseLoggerRef) {
+                var logger = center.generateIssueRecorder("AigcMix", KeelEventLog::new);
+                logger.setVisibleLevel(level);
+                verboseLoggerRef.set(logger);
+            }
+        }
     }
 
     /**
      * @since 1.0.2
      */
     public static void disableVerboseLogger() {
-        verboseLogger = createLogger(KeelLogLevel.SILENT);
+        //verboseLogger = createLogger(KeelLogLevel.SILENT);
+        synchronized (verboseLoggerRef) {
+            verboseLoggerRef.set(silentVerboseLogger);
+        }
     }
 
     /**
      * @since 1.0.2
      */
-    public static @Nonnull KeelEventLogger getVerboseLogger() {
-        return verboseLogger;
-    }
-
-    /**
-     * @since 1.0.3
-     */
-    private static @Nonnull KeelEventLogger createLogger(@Nonnull KeelLogLevel level) {
-        if (level == KeelLogLevel.SILENT) {
-            return KeelIssueRecordCenter.silentCenter().generateEventLogger("AigcMix");
-        } else {
-            var logger = KeelIssueRecordCenter.outputCenter().generateEventLogger("AigcMix");
-            logger.setVisibleLevel(level);
-            return logger;
-        }
+    public static @Nonnull KeelIssueRecorder<KeelEventLog> getVerboseLogger() {
+        return verboseLoggerRef.get();
     }
 }

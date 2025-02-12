@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.dashscope.qwen.text.message;
 
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenRole;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.tool.QwenToolCall;
+import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.Nullable;
@@ -17,21 +18,6 @@ public interface QwenMessage extends JsonifiableEntity<QwenMessage> {
         return new QwenMessageImpl(jsonObject);
     }
 
-    default QwenMessage setContent(String content) {
-        this.toJsonObject().put("content", content);
-        return this;
-    }
-
-    /**
-     * role为tool表示当前message为function_call的调用结果，
-     * name是工具函数名，需要和上轮response中的tool_calls[i].function.name参数保持一致，
-     * content为工具函数的输出。
-     */
-    default QwenMessage setName(String name) {
-        this.toJsonObject().put("name", name);
-        return this;
-    }
-
     default QwenRole getRole() {
         return QwenRole.valueOf(readString("role"));
     }
@@ -45,11 +31,35 @@ public interface QwenMessage extends JsonifiableEntity<QwenMessage> {
         return readString("content");
     }
 
+    default QwenMessage setContent(String content) {
+        this.toJsonObject().put("content", content);
+        return this;
+    }
+
     @Nullable
     default String getName() {
         return readString("name");
     }
 
+    /**
+     * role为tool表示当前message为function_call的调用结果， name是工具函数名，需要和上轮response中的tool_calls[i].function.name参数保持一致，
+     * content为工具函数的输出。
+     */
+    default QwenMessage setName(String name) {
+        this.toJsonObject().put("name", name);
+        return this;
+    }
+
     @Nullable
     List<QwenToolCall> getToolCalls();
+
+
+    /**
+     * @since 1.2.2 For DeepSeek on Bailian Platform of Aliyun
+     */
+    @TechnicalPreview(since = "1.2.2")
+    @Nullable
+    default String getReasoningContent() {
+        return readString("reasoning_content");
+    }
 }

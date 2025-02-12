@@ -19,7 +19,7 @@ public class DeepseekServiceMeta implements ServiceMeta {
     public static final int ENDPOINT_PORT = 443;
 
     private final String apiKey;
-    private long streamTimeout = 180_000L;
+    private final long streamTimeout = 180_000L;
 
     public DeepseekServiceMeta(String apiKey) {
         this.apiKey = apiKey;
@@ -35,20 +35,24 @@ public class DeepseekServiceMeta implements ServiceMeta {
                         .put("input", requestBody))
         );
         return Keel.useWebClient(webClient -> {
-                    return webClient.postAbs(ENDPOINT_SCHEMA + "://" + ENDPOINT_HOST + api)
-                            .bearerTokenAuthentication(apiKey)
-                            .sendJsonObject(requestBody);
-                })
-                .compose(bufferHttpResponse -> {
-                    if (bufferHttpResponse.statusCode() != 200) {
-                        return Future.failedFuture(new Exception("Status code: " + bufferHttpResponse.statusCode() + "; Body: " + bufferHttpResponse.bodyAsString()));
-                    }
-                    return Future.succeededFuture(bufferHttpResponse.bodyAsJsonObject());
-                });
+                       return webClient.postAbs(ENDPOINT_SCHEMA + "://" + ENDPOINT_HOST + api)
+                                       .bearerTokenAuthentication(apiKey)
+                                       .sendJsonObject(requestBody);
+                   })
+                   .compose(bufferHttpResponse -> {
+                       AigcMix.getVerboseLogger()
+                              .debug("bufferHttpResponse code is " + bufferHttpResponse.statusCode());
+                       AigcMix.getVerboseLogger()
+                              .debug("bufferHttpResponse body is " + bufferHttpResponse.bodyAsString());
+                       if (bufferHttpResponse.statusCode() != 200) {
+                           return Future.failedFuture(new Exception("Status code: " + bufferHttpResponse.statusCode() + "; Body: " + bufferHttpResponse.bodyAsString()));
+                       }
+                       return Future.succeededFuture(bufferHttpResponse.bodyAsJsonObject());
+                   });
     }
 
     @Override
-    public void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, Cutter<String> cutter, String requestId) {
+    public void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, Cutter<String> cutter, int maxExecutionSeconds, String requestId) {
         AigcMix.getVerboseLogger().info(x -> x
                 .message("Start DeepseekServiceMeta.requestSSE")
                 .context(j -> j
@@ -62,43 +66,57 @@ public class DeepseekServiceMeta implements ServiceMeta {
                         .setSsl(true)
                         .setKeepAlive(true),
                 httpClient -> httpClient.request(HttpMethod.POST, ENDPOINT_PORT, ENDPOINT_HOST, api)
-                        .compose(request -> request
-                                .putHeader("Content-Type", "application/json")
-                                .putHeader("Authorization", "Bearer " + apiKey)
-                                .send(parameters.toBuffer())
-                                .compose(response -> {
-                                    long timer = Keel.getVertx().setTimer(getStreamTimeout(), timeout -> {
-                                        promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
-                                        AigcMix.getVerboseLogger().info(x -> x
-                                                .message("Timeout in DeepseekServiceMeta.requestSSE")
-                                                .context(j -> j
-                                                        .put("requestId", requestId))
-                                        );
-                                    });
-                                    response
-                                            .handler(buffer -> {
-                                                System.out.println("> " + buffer.toString());
-                                                cutter.handle(buffer);
-                                            })
-                                            .endHandler(ended -> {
-                                                cutter.end()
-                                                        .onComplete(ar -> {
-                                                            promise.complete();
-                                                        });
-                                            })
-                                            .exceptionHandler(throwable -> {
-                                                cutter.end()
-                                                        .onComplete(ar -> {
-                                                            promise.fail(throwable);
-                                                        });
-                                            });
-                                    return Future.succeededFuture();
-                                })
-                        )
-                        .onFailure(throwable -> {
-                            cutter.end();
-                            promise.fail(throwable);
-                        })
+                                        .compose(request -> request
+                                                .putHeader("Content-Type", "application/json")
+                                                .putHeader("Authorization", "Bearer " + apiKey)
+                                                .send(parameters.toBuffer())
+                                                .compose(response -> {
+                                                    Long timer;
+                                                    if (maxExecutionSeconds > 0) {
+                                                        timer = Keel.getVertx()
+                                                                    .setTimer(maxExecutionSeconds * 1000L, timeout -> {
+                                                                        promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
+                                                                        AigcMix.getVerboseLogger().info(x -> x
+                                                                                .message("Timeout in DeepseekServiceMeta.requestSSE")
+                                                                                .context(j -> j
+                                                                                        .put("requestId", requestId))
+                                                                        );
+                                                                    });
+                                                    } else {
+                                                        timer = null;
+                                                    }
+                                                    response
+                                                            .handler(buffer -> {
+                                                                AigcMix.getVerboseLogger().info(x -> {
+                                                                    x.message("buffer: " + buffer);
+                                                                });
+                                                                cutter.handle(buffer);
+                                                            })
+                                                            .endHandler(ended -> {
+                                                                if (timer != null) {
+                                                                    Keel.getVertx().cancelTimer(timer);
+                                                                }
+                                                                cutter.end()
+                                                                      .onComplete(ar -> {
+                                                                          promise.complete();
+                                                                      });
+                                                            })
+                                                            .exceptionHandler(throwable -> {
+                                                                if (timer != null) {
+                                                                    Keel.getVertx().cancelTimer(timer);
+                                                                }
+                                                                cutter.end()
+                                                                      .onComplete(ar -> {
+                                                                          promise.fail(throwable);
+                                                                      });
+                                                            });
+                                                    return Future.succeededFuture();
+                                                })
+                                        )
+                                        .onFailure(throwable -> {
+                                            cutter.end();
+                                            promise.fail(throwable);
+                                        })
                                         .eventually(promise::future)
         );
     }
@@ -106,16 +124,5 @@ public class DeepseekServiceMeta implements ServiceMeta {
     @Override
     public SupportedProvider getSupportedProvider() {
         return SupportedProvider.DeepSeek;
-    }
-
-    @Override
-    public long getStreamTimeout() {
-        return streamTimeout;
-    }
-
-    @Override
-    public ServiceMeta setStreamTimeout(long timeout) {
-        this.streamTimeout = timeout;
-        return this;
     }
 }

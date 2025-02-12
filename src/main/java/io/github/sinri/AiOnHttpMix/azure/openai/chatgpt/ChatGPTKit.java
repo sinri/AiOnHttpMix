@@ -139,17 +139,19 @@ public final class ChatGPTKit {
             AzureOpenAIServiceMeta serviceMeta,
             Handler<OpenAIChatGptRequest> handler,
             @NotNull Handler<OpenAIResponseChunk> chunkHandler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
         handler.handle(request);
-        return chatStream(serviceMeta, request, chunkHandler, requestId);
+        return chatStream(serviceMeta, request, chunkHandler, maxExecutionSeconds, requestId);
     }
 
     public Future<Void> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
             JsonObject parameters,
             @NotNull Handler<String> chunkHandler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         parameters.put("stream", true);
@@ -162,7 +164,7 @@ public final class ChatGPTKit {
 
         String api = "/chat/completions";
 
-        serviceMeta.requestSSE(api, parameters, promise, cutter, requestId);
+        serviceMeta.requestSSE(api, parameters, promise, cutter, maxExecutionSeconds, requestId);
 
         return promise.future();
     }
@@ -170,17 +172,19 @@ public final class ChatGPTKit {
     public Future<OpenAIChatGptResponseChoice> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
             Handler<OpenAIChatGptRequest> handler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         OpenAIChatGptRequest request = OpenAIChatGptRequest.create();
         handler.handle(request);
-        return chatStream(serviceMeta, request, requestId);
+        return chatStream(serviceMeta, request, maxExecutionSeconds, requestId);
     }
 
     public Future<Void> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
             OpenAIChatGptRequest parameters,
             @NotNull Handler<OpenAIResponseChunk> chunkHandler,
+            int maxExecutionSeconds,
             String requestId
     ) {
         return this.chatStream(
@@ -203,6 +207,7 @@ public final class ChatGPTKit {
                         chunkHandler.handle(responseChunk);
                     }
                 },
+                maxExecutionSeconds,
                 requestId
         );
     }
@@ -210,28 +215,30 @@ public final class ChatGPTKit {
     public Future<OpenAIChatGptResponseChoice> chatStream(
             AzureOpenAIServiceMeta serviceMeta,
             OpenAIChatGptRequest parameters,
+            int maxExecutionSeconds,
             String requestId
     ) {
         OpenAIChatGptStreamBuffer tempAssistantMessage = new OpenAIChatGptStreamBuffer();
         return this.chatStream(
-                        serviceMeta,
-                        parameters.toJsonObject(),
-                        getStreamBufferFragmentHandler(tempAssistantMessage, requestId),
-                        requestId
-                )
-                .compose(v -> {
-                    return Future.succeededFuture(tempAssistantMessage.toResponseChoice());
-                });
+                           serviceMeta,
+                           parameters.toJsonObject(),
+                           getStreamBufferFragmentHandler(tempAssistantMessage, requestId),
+                           maxExecutionSeconds,
+                           requestId
+                   )
+                   .compose(v -> {
+                       return Future.succeededFuture(tempAssistantMessage.toResponseChoice());
+                   });
     }
 
     public Future<OpenAIEmbeddingResponse> fetchEmbeddingTensorForText(AzureOpenAIServiceMeta serviceMeta, String input, String requestId) {
         return serviceMeta.request(
-                        "/embeddings",
-                        new JsonObject().put("input", input),
-                        requestId
-                )
-                .compose(jsonObject -> {
-                    return Future.succeededFuture(OpenAIEmbeddingResponse.wrap(jsonObject));
-                });
+                                  "/embeddings",
+                                  new JsonObject().put("input", input),
+                                  requestId
+                          )
+                          .compose(jsonObject -> {
+                              return Future.succeededFuture(OpenAIEmbeddingResponse.wrap(jsonObject));
+                          });
     }
 }

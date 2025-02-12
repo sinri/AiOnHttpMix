@@ -6,7 +6,6 @@ import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -22,7 +21,7 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
     private final String deployment;
     private final String apiVersion;
 
-    private long streamTimeout = 180_000L;
+    private final long streamTimeout = 180_000L;
 
     public AzureOpenAIServiceMeta(@NotNull String apiKey, @NotNull String resourceName, @NotNull String deployment, @NotNull String apiVersion) {
         this.apiKey = apiKey;
@@ -108,114 +107,116 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
             @NotNull JsonObject parameters,
             Promise<Void> promise,
             Cutter<String> cutter,
+            int maxExecutionSeconds,
             String requestId
     ) {
-        HttpClientOptions options = new HttpClientOptions()
-                .setKeepAlive(true)
-                .setSsl(true)
-                .setDefaultHost(generateHost())
-                .setDefaultPort(443);
-        HttpClient client = Keel.getVertx().createHttpClient(options);
-
-        AigcMix.getVerboseLogger().info(x -> x
-                .message("Start AzureOpenAIServiceMeta.requestSSE")
-                .context(j -> j
-                        .put("api", api)
-                        .put("input", parameters)
-                        .put("requestId", requestId)
-                )
-        );
-
-        client.request(HttpMethod.POST, generateUri(api))
-                .compose(httpClientRequest -> {
-                    httpClientRequest
-                            .putHeader("Content-Type", "application/json")
-                            .putHeader("api-key", apiKey);
-                    return httpClientRequest.send(parameters.toString())
-                            .compose(httpClientResponse -> {
-                                long timer = Keel.getVertx().setTimer(getStreamTimeout(), timeout -> {
-                                    client.close();
-                                    promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
-                                    AigcMix.getVerboseLogger().warning(x -> x
-                                            .message("Timeout in AzureOpenAIServiceMeta.requestSSE")
-                                            .context(j -> j
-                                                    .put("requestId", requestId)
-                                            )
-                                    );
-                                });
-                                httpClientResponse
-                                        .handler(cutter::handle)
-                                        .endHandler(v -> {
-                                            cutter.end()
-                                                    .onSuccess(cutterEnded -> {
-                                                        Keel.getVertx().cancelTimer(timer);
-                                                        promise.tryComplete();
-                                                        AigcMix.getVerboseLogger().info(x -> x
-                                                                .message("End Success in AzureOpenAIServiceMeta.requestSSE")
-                                                                .context(j -> j
-                                                                        .put("requestId", requestId)
-                                                                )
-                                                        );
-                                                    })
-                                                    .onFailure(throwable -> {
-                                                        Keel.getVertx().cancelTimer(timer);
-                                                        promise.tryFail(throwable);
-                                                        AigcMix.getVerboseLogger().exception(
-                                                                throwable,
-                                                                x -> x
-                                                                        .message("End Failure in AzureOpenAIServiceMeta.requestSSE")
-                                                                        .context(
-                                                                                j -> j
-                                                                                        .put("requestId", requestId)
-                                                                        )
-                                                        );
-                                                    });
-                                        })
-                                        .exceptionHandler(throwable -> {
-                                            promise.tryFail(new RuntimeException("httpClientResponse exception", throwable));
-                                            Keel.getVertx().cancelTimer(timer);
-                                            AigcMix.getVerboseLogger().exception(
-                                                    throwable,
-                                                    x -> x.message("Exception Handler in AzureOpenAIServiceMeta.requestSSE")
-                                                            .context(
-                                                                    j -> j
-                                                                            .put("requestId", requestId)
-                                                            )
-                                            );
-                                        });
-                                return Future.succeededFuture();
-                            });
-                })
-                .onFailure(throwable -> {
-                    promise.tryFail(new RuntimeException("HttpClient request exception for request: " + requestId, throwable));
-                    AigcMix.getVerboseLogger().exception(
-                            throwable,
-                            x -> x.message("HttpClient Exception Handler in AzureOpenAIServiceMeta.requestSSE")
-                                    .context(
-                                            j -> j
-                                                    .put("requestId", requestId)
-                                    )
+        Keel.useHttpClient(
+                new HttpClientOptions()
+                        .setKeepAlive(true)
+                        .setSsl(true)
+                        .setDefaultHost(generateHost())
+                        .setDefaultPort(443),
+                client -> {
+                    AigcMix.getVerboseLogger().info(x -> x
+                            .message("Start AzureOpenAIServiceMeta.requestSSE")
+                            .context(j -> j
+                                    .put("api", api)
+                                    .put("input", parameters)
+                                    .put("requestId", requestId)
+                            )
                     );
-                });
 
-        promise.future().andThen(ar -> {
-            client.close();
-        });
+                    return client.request(HttpMethod.POST, generateUri(api))
+                                 .compose(httpClientRequest -> {
+                                     httpClientRequest
+                                             .putHeader("Content-Type", "application/json")
+                                             .putHeader("api-key", apiKey);
+                                     return httpClientRequest
+                                             .send(parameters.toString())
+                                             .compose(httpClientResponse -> {
+                                                 Long timer;
+                                                 if (maxExecutionSeconds > 0) {
+                                                     timer = Keel.getVertx()
+                                                                 .setTimer(maxExecutionSeconds * 1000L, timeout -> {
+                                                                     client.close();
+                                                                     promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
+                                                                     AigcMix.getVerboseLogger().warning(x -> x
+                                                                             .message("Timeout in AzureOpenAIServiceMeta.requestSSE")
+                                                                             .context(j -> j
+                                                                                     .put("requestId", requestId)
+                                                                             )
+                                                                     );
+                                                                 });
+                                                 } else {
+                                                     timer = null;
+                                                 }
+                                                 httpClientResponse
+                                                         .handler(cutter::handle)
+                                                         .endHandler(v -> {
+                                                             cutter.end()
+                                                                   .onSuccess(cutterEnded -> {
+                                                                       if (timer != null) {
+                                                                           Keel.getVertx().cancelTimer(timer);
+                                                                       }
+                                                                       promise.tryComplete();
+                                                                       AigcMix.getVerboseLogger().info(x -> x
+                                                                               .message("End Success in AzureOpenAIServiceMeta.requestSSE")
+                                                                               .context(j -> j
+                                                                                       .put("requestId", requestId)
+                                                                               )
+                                                                       );
+                                                                   })
+                                                                   .onFailure(throwable -> {
+                                                                       if (timer != null) {
+                                                                           Keel.getVertx().cancelTimer(timer);
+                                                                       }
+                                                                       promise.tryFail(throwable);
+                                                                       AigcMix.getVerboseLogger().exception(
+                                                                               throwable,
+                                                                               x -> x
+                                                                                       .message("End Failure in AzureOpenAIServiceMeta.requestSSE")
+                                                                                       .context(
+                                                                                               j -> j
+                                                                                                       .put("requestId", requestId)
+                                                                                       )
+                                                                       );
+                                                                   });
+                                                         })
+                                                         .exceptionHandler(throwable -> {
+                                                             promise.tryFail(new RuntimeException("httpClientResponse exception", throwable));
+                                                             if (timer != null) {
+                                                                 Keel.getVertx().cancelTimer(timer);
+                                                             }
+                                                             AigcMix.getVerboseLogger().exception(
+                                                                     throwable,
+                                                                     x -> x.message("Exception Handler in AzureOpenAIServiceMeta.requestSSE")
+                                                                           .context(
+                                                                                   j -> j
+                                                                                           .put("requestId", requestId)
+                                                                           )
+                                                             );
+                                                         });
+                                                 return Future.succeededFuture();
+                                             });
+                                 })
+                                 .onFailure(throwable -> {
+                                     promise.tryFail(new RuntimeException("HttpClient request exception for request: " + requestId, throwable));
+                                     AigcMix.getVerboseLogger().exception(
+                                             throwable,
+                                             x -> x.message("HttpClient Exception Handler in AzureOpenAIServiceMeta.requestSSE")
+                                                   .context(
+                                                           j -> j
+                                                                   .put("requestId", requestId)
+                                                   )
+                                     );
+                                 })
+                                 .eventually(promise::future);
+                }
+        );
     }
 
     @Override
     public SupportedProvider getSupportedProvider() {
         return SupportedProvider.AzureOpenAI;
-    }
-
-    @Override
-    public long getStreamTimeout() {
-        return streamTimeout;
-    }
-
-    @Override
-    public AzureOpenAIServiceMeta setStreamTimeout(long timeout) {
-        streamTimeout = timeout;
-        return this;
     }
 }

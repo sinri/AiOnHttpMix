@@ -19,6 +19,7 @@ public interface ServiceMeta {
             @NotNull JsonObject parameters,
             Promise<Void> promise,
             Cutter<String> cutter,
+            int maxExecutionSeconds,
             String requestId
     );
 
@@ -51,8 +52,4 @@ public interface ServiceMeta {
             }
         }
     }
-
-    long getStreamTimeout();
-
-    ServiceMeta setStreamTimeout(long timeout);
 }
