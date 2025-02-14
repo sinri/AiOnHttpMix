@@ -6,6 +6,7 @@ import io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatRequest;
 import io.github.sinri.AiOnHttpMix.mirage.MirageRequestEntity;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.vertx.core.Handler;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @since 1.1.0
@@ -60,6 +61,17 @@ public interface AnyLLMRequest {
      * @since 1.1.5
      */
     AnyLLMRequest addRoleMessage(AnyLLMRole role, String roleMessage);
+
+    /**
+     * @since 1.2.2
+     */
+    @Nullable
+    AnyLLMExtraOptions getExtraOptions();
+
+    /**
+     * @since 1.2.2
+     */
+    AnyLLMRequest setExtraOptions(@Nullable AnyLLMExtraOptions extraOptions);
 
     OpenAIChatGptRequest toChatGptRequest();
 

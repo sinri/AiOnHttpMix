@@ -10,6 +10,7 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.deepseek.DeepseekKit;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekStreamBuffer;
+import io.github.sinri.AiOnHttpMix.deepseek.core.DeepseekServiceMeta;
 import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
@@ -57,6 +58,20 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
      */
     private String mirageService;
 
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public AnyLLMKit useServiceMeta(ServiceMeta serviceMeta, SupportedModel supportedModel) {
+        if (!serviceMeta.isModelSupported(supportedModel)) {
+            throw new IllegalArgumentException("The model " + supportedModel
+                    + " is not supported by the service meta (" + serviceMeta.getClass().getName() + ")");
+        }
+        this.model = supportedModel;
+        this.serviceMeta = serviceMeta;
+        return this;
+    }
+
     @Override
     public AnyLLMKit useAzure(AzureOpenAIServiceMeta azureOpenAIServiceMeta, SupportedModel model) {
         if (model.getProvider() != azureOpenAIServiceMeta.getSupportedProvider()) {
@@ -68,7 +83,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
     }
 
     @Override
-    public AnyLLMKit useDataScope(DashscopeServiceMeta dashscopeServiceMeta, SupportedModel model) {
+    public AnyLLMKit useDashScope(DashscopeServiceMeta dashscopeServiceMeta, SupportedModel model) {
         if (model.getProvider() != dashscopeServiceMeta.getSupportedProvider()) {
             throw new IllegalArgumentException("model is not belong to this provider");
         }
@@ -88,6 +103,19 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
     }
 
     /**
+     * @since 1.2.2
+     */
+    @Override
+    public AnyLLMKit useDeepSeek(DeepseekServiceMeta deepseekServiceMeta, SupportedModel model) {
+        if (model.getProvider() != deepseekServiceMeta.getSupportedProvider()) {
+            throw new IllegalArgumentException("model is not belong to this provider");
+        }
+        this.model = model;
+        this.serviceMeta = deepseekServiceMeta;
+        return this;
+    }
+
+    /**
      * @since 1.1.5
      */
     private AnyLLMKit throughMirage(@NotNull MirageSDK mirageSDK, @NotNull SupportedModel model) {
@@ -98,10 +126,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
             case ChatGPT:
                 this.mirageService = "gpt-4-o";
                 break;
-            case QwenPlus:
-                this.mirageService = null;
-                break;
-            case QwenMax:
+            case QwenPlus, QwenMax, QwenLong:
                 this.mirageService = null;
                 break;
             case Doubao:
@@ -112,6 +137,9 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                 break;
             case DeepSeekChatOnVolces:
                 this.mirageService = "DeepSeek-V3";
+                break;
+            case DeepSeekReasoner, DeepSeekChat:
+                this.mirageService = "main";
                 break;
             //            default:
             //                throw new IllegalArgumentException("Unknown model");
@@ -181,7 +209,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-                case QwenPlus, QwenMax -> new QwenKit()
+                case QwenPlus, QwenMax, QwenLong, DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> new QwenKit()
                         .chatForMessageResponse(
                                 (DashscopeServiceMeta) serviceMeta,
                                 request.toQwenRequest()
@@ -192,18 +220,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-                case DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> new QwenKit()
-                        .chatForMessageResponse(
-                                (DashscopeServiceMeta) serviceMeta,
-                                request.toQwenRequest()
-                                       .setModel(model.getMappedModelCode()),
-                                request.getRequestId()
-                        )
-                        .compose(resp -> {
-                            AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
-                            return Future.succeededFuture(anyLLMResponse);
-                        });
-                case Doubao -> new VolcesKit()
+                case Doubao, KimiOnVolces -> new VolcesKit()
                         .chat(
                                 (VolcesServiceMeta) serviceMeta,
                                 request.toVolcesChatRequest(),
@@ -213,10 +230,21 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> new DeepseekKit()
-                        .chat(
+                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> new VolcesKit()
+                        .chatForDeepSeekV3(
                                 (VolcesServiceMeta) serviceMeta,
                                 request.toDeepseekChatRequest(),
+                                request.getRequestId()
+                        )
+                        .compose(resp -> {
+                            AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                            return Future.succeededFuture(anyLLMResponse);
+                        });
+                case DeepSeekChat, DeepSeekReasoner -> new DeepseekKit()
+                        .chat(
+                                (DeepseekServiceMeta) serviceMeta,
+                                request.toDeepseekChatRequest()
+                                       .setModel(model.getMappedModelCode()),
                                 request.getRequestId()
                         )
                         .compose(resp -> {
@@ -253,7 +281,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                                 request.getMaxExecutionSeconds(),
                                 request.getRequestId()
                         );
-                case QwenPlus, QwenMax, DeepSeekChatOnDashScope, DeepSeekReasonerOnDashScope -> new QwenKit()
+                case QwenPlus, QwenMax, QwenLong, DeepSeekChatOnDashScope, DeepSeekReasonerOnDashScope -> new QwenKit()
                         .chatStreamWithChunkHandler(
                                 (DashscopeServiceMeta) serviceMeta,
                                 request.toQwenRequest()
@@ -268,7 +296,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                                 request.getMaxExecutionSeconds(),
                                 request.getRequestId()
                         );
-                case Doubao -> new VolcesKit()
+                case Doubao, KimiOnVolces -> new VolcesKit()
                         .chatStreamWithChunkHandler(
                                 (VolcesServiceMeta) serviceMeta,
                                 request.toVolcesChatRequest(),
@@ -278,9 +306,19 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                                 request.getMaxExecutionSeconds(),
                                 request.getRequestId()
                         );
-                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> new DeepseekKit()
-                        .chatStreamWithChunkHandler(
+                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> new VolcesKit()
+                        .chatStreamWithChunkHandlerForDeepSeekV3(
                                 (VolcesServiceMeta) serviceMeta,
+                                request.toDeepseekChatRequest(),
+                                chunk -> {
+                                    fragmentHandler.handle(chunk.cloneAsJsonObject().toString());
+                                },
+                                request.getMaxExecutionSeconds(),
+                                request.getRequestId()
+                        );
+                case DeepSeekChat, DeepSeekReasoner -> new DeepseekKit()
+                        .chatStreamWithChunkHandler(
+                                (DeepseekServiceMeta) serviceMeta,
                                 request.toDeepseekChatRequest(),
                                 chunk -> {
                                     fragmentHandler.handle(chunk.cloneAsJsonObject().toString());
@@ -321,7 +359,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-                case QwenPlus, QwenMax, DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> new QwenKit()
+                case QwenPlus, QwenMax, QwenLong, DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> new QwenKit()
                         .chatStreamWithBuffer(
                                 (DashscopeServiceMeta) serviceMeta,
                                 request.toQwenRequest()
@@ -337,7 +375,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-                case Doubao -> new VolcesKit()
+                case Doubao, KimiOnVolces -> new VolcesKit()
                         .chatStreamWithBuffer(
                                 (VolcesServiceMeta) serviceMeta,
                                 request.toVolcesChatRequest(),
@@ -348,10 +386,22 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                             return Future.succeededFuture(anyLLMResponse);
                         });
-                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> new DeepseekKit()
-                        .chatSSEWithBuffer(
+                case DeepSeekReasonerOnVolces, DeepSeekChatOnVolces -> new VolcesKit()
+                        .chatSSEWithBufferForDeepSeekV3(
                                 (VolcesServiceMeta) serviceMeta,
                                 request.toDeepseekChatRequest(),
+                                request.getMaxExecutionSeconds(),
+                                request.getRequestId()
+                        )
+                        .compose(resp -> {
+                            AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
+                            return Future.succeededFuture(anyLLMResponse);
+                        });
+                case DeepSeekChat, DeepSeekReasoner -> new DeepseekKit()
+                        .chatStreamWithBuffer(
+                                (DeepseekServiceMeta) serviceMeta,
+                                request.toDeepseekChatRequest()
+                                       .setModel(model.getMappedModelCode()),
                                 request.getMaxExecutionSeconds(),
                                 request.getRequestId()
                         )
@@ -371,12 +421,12 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                     yield ChatGPTKit.getStreamBufferFragmentHandler((OpenAIChatGptStreamBuffer) buffer,
                             request.getRequestId());
                 }
-                case QwenPlus, QwenMax, DeepSeekChatOnDashScope, DeepSeekReasonerOnDashScope -> {
+                case QwenPlus, QwenMax, QwenLong, DeepSeekChatOnDashScope, DeepSeekReasonerOnDashScope -> {
                     buffer = new QwenStreamBuffer();
                     yield QwenKit.getStreamBufferFragmentHandler((QwenStreamBuffer) buffer,
                             request.getRequestId());
                 }
-                case Doubao -> {
+                case Doubao, KimiOnVolces -> {
                     buffer = new VolcesChatStreamBuffer();
                     yield VolcesKit.getStreamBufferFragmentHandler((VolcesChatStreamBuffer) buffer,
                             request.getRequestId());
@@ -387,6 +437,11 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                             request.getRequestId());
                     //                default:
                     //                    throw new UnsupportedOperationException("Not supported!");
+                }
+                case DeepSeekChat, DeepSeekReasoner -> {
+                    buffer = new DeepseekStreamBuffer();
+                    yield DeepseekKit.getStreamBufferFragmentHandler((DeepseekStreamBuffer) buffer,
+                            request.getRequestId());
                 }
             };
 
@@ -419,6 +474,11 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
     }
 
     @Override
+    public AnyLLMKit useMirageSDK(MirageSDK mirageSDK, SupportedModel supportedModel) {
+        return throughMirage(mirageSDK, model);
+    }
+
+    @Override
     public AnyLLMKit useAzure(MirageSDK mirageSDK, SupportedModel model) {
         if (model.getProvider() != SupportedProvider.AzureOpenAI) {
             throw new IllegalArgumentException("Only ChatGPT supported");
@@ -427,7 +487,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
     }
 
     @Override
-    public AnyLLMKit useDataScope(MirageSDK mirageSDK, SupportedModel model) {
+    public AnyLLMKit useDashScope(MirageSDK mirageSDK, SupportedModel model) {
         if (model.getProvider() != SupportedProvider.DashScope) {
             throw new IllegalArgumentException("Only Qwen supported");
         }
@@ -438,6 +498,17 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
     public AnyLLMKit useVolces(MirageSDK mirageSDK, SupportedModel model) {
         if (model.getProvider() != SupportedProvider.Volces) {
             throw new IllegalArgumentException("Only Volces supported");
+        }
+        return throughMirage(mirageSDK, model);
+    }
+
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public AnyLLMKit useDeepSeek(MirageSDK mirageSDK, SupportedModel model) {
+        if (model.getProvider() != SupportedProvider.DeepSeek) {
+            throw new IllegalArgumentException("Only DeepSeek supported");
         }
         return throughMirage(mirageSDK, model);
     }

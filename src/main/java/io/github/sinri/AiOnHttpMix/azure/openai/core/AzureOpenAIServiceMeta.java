@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.azure.openai.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
+import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
@@ -12,15 +13,34 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class AzureOpenAIServiceMeta implements ServiceMeta {
+    /**
+     * @since 1.2.2
+     */
+    private static final Set<SupportedModel> supportedModels = new HashSet<>();
+
+    static {
+        // since 1.2.2
+        supportedModels.add(SupportedModel.ChatGPT);
+    }
+
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public Set<SupportedModel> getSupportedModels() {
+        return supportedModels;
+    }
 
     private final String apiKey;
     private final String resourceName;
     private final String deployment;
     private final String apiVersion;
-
     private final long streamTimeout = 180_000L;
 
     public AzureOpenAIServiceMeta(@NotNull String apiKey, @NotNull String resourceName, @NotNull String deployment, @NotNull String apiVersion) {
@@ -44,6 +64,7 @@ public class AzureOpenAIServiceMeta implements ServiceMeta {
     public String generateUrl(String api) {
         return "https://" + generateHost() + generateUri(api);
     }
+
 
     @Override
     public Future<JsonObject> request(

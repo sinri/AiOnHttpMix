@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.moonshot.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
+import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
@@ -12,16 +13,37 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class MoonshotServiceMeta implements ServiceMeta {
+    /**
+     * @since 1.2.2
+     */
+    private static final Set<SupportedModel> supportedModels = new HashSet<>();
     private static final String host = "api.moonshot.cn";
     private static final String endpoint = "https://" + host;//+"/v1";
+
+    static {
+        // since 1.2.2
+        // however, no money there, see you later.
+    }
+
     private final String apiKey;
     private final long streamTimeout = 180_000L;
 
     public MoonshotServiceMeta(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public Set<SupportedModel> getSupportedModels() {
+        return supportedModels;
     }
 
     @Override

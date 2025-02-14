@@ -7,7 +7,21 @@ import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
+
 public interface ServiceMeta {
+    /**
+     * @since 1.2.2
+     */
+    Set<SupportedModel> getSupportedModels();
+
+    /**
+     * @since 1.2.2
+     */
+    default boolean isModelSupported(SupportedModel model) {
+        return getSupportedModels().contains(model);
+    }
+
     Future<JsonObject> request(
             String api,
             JsonObject requestBody,

@@ -10,6 +10,7 @@ import io.github.sinri.AiOnHttpMix.mirage.MirageRequestEntity;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.github.sinri.AiOnHttpMix.volces.v3.tool.VolcesChatFunctionDefinition;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
      * @since 1.2.2
      */
     private int maxExecutionSeconds;
+    private @Nullable AnyLLMExtraOptions extraOptions = null;
 
     public AnyLLMRequestImpl() {
         this.requestId = UUID.randomUUID().toString();
@@ -51,6 +53,23 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
         return this;
     }
 
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public @Nullable AnyLLMExtraOptions getExtraOptions() {
+        return extraOptions;
+    }
+
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public AnyLLMRequest setExtraOptions(@Nullable AnyLLMExtraOptions extraOptions) {
+        this.extraOptions = extraOptions;
+        return this;
+    }
+
     @Override
     public OpenAIChatGptRequest toChatGptRequest() {
         OpenAIChatGptRequest req = OpenAIChatGptRequest.create();
@@ -66,6 +85,19 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
         for (var f : functionToolDefinitions) {
             req.addTool(OpenAIChatGptToolDefinition.wrap(f.toJsonObject()));
         }
+
+        if (extraOptions != null) {
+            Double temperature = extraOptions.getTemperature();
+            if (temperature != null) {
+                req.setTemperature(temperature);
+            }
+            String responseFormat = extraOptions.getResponseFormat();
+            if (responseFormat != null) {
+                req.setResponseFormat(OpenAIChatGptRequest.ChatCompletionResponseFormat.valueOf(responseFormat));
+            }
+            //  IncrementalOutput is default for Azure OpenAI ChatGPT
+        }
+
         return req;
     }
 
@@ -89,6 +121,20 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
                 parameters.addTool(QwenToolDefinition.wrap(functionToolDefinition.toJsonObject()));
             });
         });
+        if (extraOptions != null) {
+            Double temperature = extraOptions.getTemperature();
+            if (temperature != null) {
+                qwenRequest.handleParameters(p -> p.setTemperature(temperature.floatValue()));
+            }
+            String responseFormat = extraOptions.getResponseFormat();
+            if (responseFormat != null) {
+                qwenRequest.handleParameters(p -> p.setResultFormat(QwenRequest.Parameters.ResultFormat.valueOf(responseFormat)));
+            }
+            Boolean incrementalOutput = extraOptions.getIncrementalOutput();
+            if (incrementalOutput != null) {
+                qwenRequest.handleParameters(p -> p.setIncrementalOutput(incrementalOutput));
+            }
+        }
         return qwenRequest;
     }
 
@@ -108,6 +154,14 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
         this.functionToolDefinitions.forEach(functionToolDefinition -> {
             request.addToolAsFunction(VolcesChatFunctionDefinition.wrap(functionToolDefinition.toJsonObject()));
         });
+        if (extraOptions != null) {
+            Double temperature = extraOptions.getTemperature();
+            if (temperature != null) {
+                request.setTemperature(temperature);
+            }
+            // Response Format is not supported
+            // Incremental Output is default for Volces
+        }
         return request;
     }
 
@@ -126,6 +180,17 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
         this.functionToolDefinitions.forEach(functionToolDefinition -> {
             chatRequest.addTool(DeepseekChatRequest.ToolDefinition.wrap(functionToolDefinition.toJsonObject()));
         });
+        if (extraOptions != null) {
+            Double temperature = extraOptions.getTemperature();
+            if (temperature != null) {
+                chatRequest.setTemperature(temperature);
+            }
+            String responseFormat = extraOptions.getResponseFormat();
+            if (responseFormat != null) {
+                chatRequest.setResponseFormatType(DeepseekChatRequest.ResponseFormatType.valueOf(responseFormat));
+            }
+            // Incremental Output is default for Volces
+        }
         return chatRequest;
     }
 

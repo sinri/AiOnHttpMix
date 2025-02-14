@@ -4,12 +4,12 @@ import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMRequest;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.github.sinri.keel.core.cutter.CutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -31,6 +31,11 @@ public class MirageSDK {
         this.clientSecret = clientSecret;
     }
 
+    /**
+     * @param model      模型的定义，一般约定使用 {@link SupportedModel#name()} 。
+     * @param service    对应模型定义在Mirage服务内提供的服务；当同一个模型有不同部署时，通过服务区分。
+     * @param useNyaCode 传输内容是否使用NyaCode编码绕过防火墙。
+     */
     private JsonObject buildRequestBody(
             String model,
             String service,
@@ -66,19 +71,20 @@ public class MirageSDK {
         return Keel.useWebClient(webClient -> {
             var url = "https://" + mirageDomain + "/mirage/aigc/llm/sync";
             return webClient.postAbs(url)
-                    .sendJsonObject(body)
-                    .compose(bufferHttpResponse -> {
-                        if (bufferHttpResponse.statusCode() != 200) {
-                            return Future.failedFuture(new Exception("Status Code:" + bufferHttpResponse.statusCode() + "; " + bufferHttpResponse.bodyAsString()));
-                        }
+                            .sendJsonObject(body)
+                            .compose(bufferHttpResponse -> {
+                                if (bufferHttpResponse.statusCode() != 200) {
+                                    return Future.failedFuture(new Exception("Status Code:" + bufferHttpResponse.statusCode() + "; " + bufferHttpResponse.bodyAsString()));
+                                }
 
-                        AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestSync::bufferHttpResponse | " + bufferHttpResponse.bodyAsString());
+                                AigcMix.getVerboseLogger()
+                                       .debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestSync::bufferHttpResponse | " + bufferHttpResponse.bodyAsString());
 
-                        var resp = bufferHttpResponse.bodyAsJsonObject();
-                        MirageSyncResponse mirageSyncResponse = new MirageSyncResponse(resp);
-                        AnyLLMResponse anyLLMResponse = mirageSyncResponse.toAnyLLMResponse();
-                        return Future.succeededFuture(anyLLMResponse);
-                    });
+                                var resp = bufferHttpResponse.bodyAsJsonObject();
+                                MirageSyncResponse mirageSyncResponse = new MirageSyncResponse(resp);
+                                AnyLLMResponse anyLLMResponse = mirageSyncResponse.toAnyLLMResponse();
+                                return Future.succeededFuture(anyLLMResponse);
+                            });
         });
     }
 
@@ -112,23 +118,18 @@ public class MirageSDK {
 
         Promise<Void> promise = Promise.promise();
 
-        HttpClientOptions options = new HttpClientOptions()
-                .setKeepAlive(true)
-                .setSsl(true)
-                .setDefaultHost(mirageDomain)
-                .setDefaultPort(443);
-        HttpClient client = Keel.getVertx().createHttpClient(options);
-
         Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
-            AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestStream::component | " + s);
+            AigcMix.getVerboseLogger().debug(
+                    "io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestStream::component | " + s);
 
             //Keel.getLogger().fatal("MirageSDK.requestStream cut off: " + s);
             var lines = s.split("[\r\n]+");
             for (var line : lines) {
                 if (line.startsWith("data:")) {
                     line = line.replaceAll("^data:\\s*", "");
-                    AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestStream::line | " + line);
+                    AigcMix.getVerboseLogger()
+                           .debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestStream::line | " + line);
 
                     fragmentHandler.handle(line);
                     break;
@@ -136,45 +137,53 @@ public class MirageSDK {
             }
         });
 
-        client.request(HttpMethod.POST, "/mirage/aigc/llm/stream")
-                .compose(httpClientRequest -> {
-                    httpClientRequest.putHeader("Content-Type", "application/json");
-                    return httpClientRequest.send(body.toString())
-                            .compose(httpClientResponse -> {
-                                long timer = Keel.getVertx().setTimer(maxStreamTime, y -> {
-                                    client.close();
-                                    promise.tryFail("TIMEOUT FOR REQUEST");
-                                });
-                                httpClientResponse
-                                        .handler(cutter::handle)
-                                        .endHandler(v -> {
-                                            cutter.end()
-                                                    .onSuccess(cutterEnded -> {
-                                                        Keel.getVertx().cancelTimer(timer);
-                                                        promise.tryComplete();
-                                                    })
-                                                    .onFailure(throwable -> {
-                                                        Keel.getVertx().cancelTimer(timer);
-                                                        promise.tryFail(throwable);
-                                                    });
-                                        })
-                                        .exceptionHandler(throwable -> {
-                                            promise.tryFail(new RuntimeException("httpClientResponse exception", throwable));
-                                            Keel.getVertx().cancelTimer(timer);
-                                        });
-                                return Future.succeededFuture();
-                            });
-                })
-                .onFailure(throwable -> {
-                    promise.tryFail(new RuntimeException("HttpClient request exception for request", throwable));
-                });
-
-        promise.future().andThen(ar -> {
-            client.close();
-            AigcMix.getVerboseLogger().debug("io.github.sinri.AiOnHttpMix.mirage.MirageSDK.requestStream::promise | client closed");
-        });
-
-        return promise.future();
+        return Keel.useHttpClient(
+                           new HttpClientOptions()
+                                   .setKeepAlive(true)
+                                   .setSsl(true)
+                                   .setDefaultHost(mirageDomain)
+                                   .setDefaultPort(443),
+                           client -> {
+                               return client.request(HttpMethod.POST, "/mirage/aigc/llm/stream")
+                                            .compose(httpClientRequest -> {
+                                                httpClientRequest.putHeader("Content-Type", "application/json");
+                                                return httpClientRequest
+                                                        .send(body.toString())
+                                                        .compose(httpClientResponse -> {
+                                                            long timer = Keel.getVertx()
+                                                                             .setTimer(maxStreamTime, y -> {
+                                                                                 client.close();
+                                                                                 promise.tryFail("TIMEOUT FOR REQUEST");
+                                                                             });
+                                                            httpClientResponse
+                                                                    .handler(cutter::handle)
+                                                                    .endHandler(v -> {
+                                                                        cutter.end()
+                                                                              .onSuccess(cutterEnded -> {
+                                                                                  Keel.getVertx()
+                                                                                      .cancelTimer(timer);
+                                                                                  promise.tryComplete();
+                                                                              })
+                                                                              .onFailure(throwable -> {
+                                                                                  Keel.getVertx()
+                                                                                      .cancelTimer(timer);
+                                                                                  promise.tryFail(throwable);
+                                                                              });
+                                                                    })
+                                                                    .exceptionHandler(throwable -> {
+                                                                        promise.tryFail(new RuntimeException("httpClientResponse exception", throwable));
+                                                                        Keel.getVertx().cancelTimer(timer);
+                                                                    });
+                                                            return Future.succeededFuture();
+                                                        });
+                                            })
+                                            .onFailure(throwable -> {
+                                                promise.tryFail(new RuntimeException("HttpClient request exception for request", throwable));
+                                            });
+                           }
+                   )
+                   .eventually(promise::future)
+                   .compose(v -> Future.succeededFuture());
     }
 
     /**

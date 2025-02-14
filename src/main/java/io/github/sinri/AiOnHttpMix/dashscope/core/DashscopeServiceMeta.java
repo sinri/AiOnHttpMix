@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.dashscope.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
+import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
@@ -13,29 +14,47 @@ import io.vertx.ext.web.client.WebClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class DashscopeServiceMeta implements ServiceMeta {
+    /**
+     * @since 1.2.2
+     */
+    private static final Set<SupportedModel> supportedModels = new HashSet<>();
     private final static String hostOfDashscope = "dashscope.aliyuncs.com";
-
     private final static String pathOfDashscopeQwenTextGenerate = "/api/v1/services/aigc/text-generation/generation";
     private final static String endpointOfDashscopeQwenTextGenerate = "https://" + hostOfDashscope + pathOfDashscopeQwenTextGenerate;
-
     private final static String endpointOfDashscopeTextEmbeddingGenerate = "https://" + hostOfDashscope + "/api/v1/services/embeddings/text-embedding/text-embedding";
-
     private final static String pathOfDashscopeQwenMultiModalGenerate = "/api/v1/services/aigc/multimodal-generation/generation";
     private final static String endpointOfDashscopeQwenMultiModalGenerate = "https://" + hostOfDashscope + pathOfDashscopeQwenMultiModalGenerate;
-
     private final static String endpointOfDashscopeWanxiangImageSynthesis = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text2image/image-synthesis";
     private final static String endpointOfDashscopeAsyncTaskQuery = "https://dashscope.aliyuncs.com/api/v1/tasks/";//{task_id}
 
+    static {
+        // since 1.2.2
+        supportedModels.add(SupportedModel.QwenMax);
+        supportedModels.add(SupportedModel.QwenPlus);
+        supportedModels.add(SupportedModel.QwenLong);
+        supportedModels.add(SupportedModel.DeepSeekChatOnDashScope);
+        supportedModels.add(SupportedModel.DeepSeekReasonerOnDashScope);
+    }
+
     private final String apiKey;
     private final long streamTimeout = 180_000L;
-
     public DashscopeServiceMeta(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public Set<SupportedModel> getSupportedModels() {
+        return supportedModels;
     }
 
     public Future<JsonObject> callQwenTextGenerate(

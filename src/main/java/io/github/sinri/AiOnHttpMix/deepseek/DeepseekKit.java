@@ -7,7 +7,6 @@ import io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekResponseChunk;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekResponseChunkString;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekStreamBuffer;
 import io.github.sinri.AiOnHttpMix.deepseek.core.DeepseekServiceMeta;
-import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.github.sinri.keel.core.cutter.CutterOnString;
 import io.vertx.core.Future;
@@ -15,7 +14,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 
-import static io.github.sinri.keel.facade.KeelInstance.Keel;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * DeepSeek的模型，目前并没有非常稳定，树大招风。 按照20250205的情报，官方API已被攻陷，火山引擎的不支持FC。
@@ -32,67 +31,6 @@ public class DeepseekKit {
             DeepseekResponseChunk chunk = new DeepseekResponseChunk(jsonObject);
             buffer.accept(chunk);
         };
-    }
-
-    @Deprecated(since = "1.2.2", forRemoval = true)
-    public Future<JsonObject> chat(
-            VolcesServiceMeta serviceMeta,
-            JsonObject requestBody,
-            String requestId
-    ) {
-        requestBody.put("model", serviceMeta.getModel());
-        return serviceMeta.request(VolcesServiceMeta.pathOfV3ChatCompletions, requestBody, requestId);
-    }
-
-    @Deprecated(since = "1.2.2", forRemoval = true)
-    public Future<DeepseekChatResponse> chat(
-            VolcesServiceMeta serviceMeta,
-            DeepseekChatRequest request,
-            String requestId
-    ) {
-        request.setModel(serviceMeta.getModel());
-        return serviceMeta.request(VolcesServiceMeta.pathOfV3ChatCompletions, request.toJsonObject(), requestId)
-                          .compose(resp -> {
-                              return Future.succeededFuture(DeepseekChatResponse.wrap(resp));
-                          });
-    }
-
-    @Deprecated(since = "1.2.2", forRemoval = true)
-    public Future<Void> chatStreamWithChunkHandler(VolcesServiceMeta serviceMeta,
-                                                   DeepseekChatRequest request,
-                                                   Handler<DeepseekResponseChunk> chunkHandler,
-                                                   int maxExecutionSeconds,
-                                                   String requestId
-    ) {
-        request.setModel(serviceMeta.getModel());
-        request.setStream(true);
-        Promise<Void> promise = Promise.promise();
-
-        Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(component -> {
-            DeepseekResponseChunkString deepseekResponseChunkString = new DeepseekResponseChunkString(component);
-            if (!deepseekResponseChunkString.isDoneChunk() && !deepseekResponseChunkString.isKeepAliveChunk()) {
-                DeepseekResponseChunk chunk = deepseekResponseChunkString.getChunk();
-                if (chunk != null) {
-                    chunkHandler.handle(chunk);
-                }
-            }
-        });
-        serviceMeta.requestSSE(VolcesServiceMeta.pathOfV3ChatCompletions, request.toJsonObject(), promise, cutter, maxExecutionSeconds, requestId);
-        return promise.future();
-    }
-
-    @Deprecated(since = "1.2.2", forRemoval = true)
-    public Future<DeepseekChatResponse> chatSSEWithBuffer(VolcesServiceMeta serviceMeta,
-                                                          DeepseekChatRequest request,
-                                                          int maxExecutionSeconds,
-                                                          String requestId
-    ) {
-        DeepseekStreamBuffer streamBuffer = new DeepseekStreamBuffer();
-        return chatStreamWithChunkHandler(serviceMeta, request, streamBuffer::accept, maxExecutionSeconds, requestId)
-                .compose(v -> {
-                    return Future.succeededFuture(streamBuffer.toResponse());
-                });
     }
 
     public Future<JsonObject> chat(
@@ -154,12 +92,21 @@ public class DeepseekKit {
 
         Promise<Void> promise = Promise.promise();
 
+        AtomicBoolean doneRef = new AtomicBoolean(false);
         Cutter<String> cutter = new CutterOnString();
         cutter.setComponentHandler(s -> {
             DeepseekResponseChunkString deepseekResponseChunkString = new DeepseekResponseChunkString(s);
             if (!deepseekResponseChunkString.isDoneChunk() && !deepseekResponseChunkString.isKeepAliveChunk()) {
                 DeepseekResponseChunk chunk = deepseekResponseChunkString.getChunk();
                 chunkHandler.handle(chunk);
+            } else {
+                if (deepseekResponseChunkString.isDoneChunk()) {
+                    AigcMix.getVerboseLogger().debug("DONE CHUNK MET");
+                    doneRef.set(true);
+                }
+                if (deepseekResponseChunkString.isKeepAliveChunk()) {
+                    AigcMix.getVerboseLogger().debug("KEEPALIVE CHUNK MET");
+                }
             }
         });
 
@@ -171,7 +118,15 @@ public class DeepseekKit {
                 maxExecutionSeconds,
                 requestId
         );
-        return promise.future();
+        return promise.future()
+                      .compose(v -> {
+                          if (!doneRef.get()) {
+                              return Future.failedFuture(new Exception(
+                                      "DeepSeek did not accepted this request, maybe lack of resource."
+                              ));
+                          }
+                          return Future.succeededFuture();
+                      });
     }
 
     public Future<DeepseekChatResponse> chatStreamWithBuffer(
@@ -181,41 +136,60 @@ public class DeepseekKit {
             String requestId
     ) {
         DeepseekStreamBuffer streamBuffer = new DeepseekStreamBuffer();
-        Handler<String> streamHandler = s -> {
-            DeepseekResponseChunkString deepseekResponseChunkString = new DeepseekResponseChunkString(s);
-            if (!deepseekResponseChunkString.isDoneChunk()) {
-                if (!deepseekResponseChunkString.isKeepAliveChunk()) {
-                    try {
-                        DeepseekResponseChunk chunk = deepseekResponseChunkString.getChunk();
-                        streamBuffer.accept(chunk);
-                    } catch (Throwable throwable) {
-                        // ignore it
-                        AigcMix.getVerboseLogger().exception(throwable,
-                                "io.github.sinri.AiOnHttpMix.deepseek.DeepseekKit.chatStreamWithBuffer met error",
-                                context -> context.put("request_id", requestId).put("chunk_string", s)
-                        );
-                        throw new RuntimeException(throwable);
-                    }
-                }
-            } else {
-                streamBuffer.meetDoneFlag();
-            }
-        };
-        return this.chatStreamWithStreamHandler(serviceMeta, request.toJsonObject(), streamHandler, maxExecutionSeconds, requestId)
-                   .compose(v -> {
-                       if (!streamBuffer.isMetDoneFlag()) {
-                           return Keel.asyncSleep(500L);
-                       }
-                       return Future.succeededFuture();
-                   })
+
+        return this.chatStreamWithChunkHandler(
+                           serviceMeta,
+                           request,
+                           streamBuffer::accept,
+                           maxExecutionSeconds,
+                           requestId
+                   )
                    .compose(v -> {
                        if (streamBuffer.isMetDoneFlag()) {
                            DeepseekChatResponse response = streamBuffer.toResponse();
+                           AigcMix.getVerboseLogger().debug("DeepseekChatResponse: " + response.cloneAsJsonObject());
                            return Future.succeededFuture(response);
                        } else {
                            return Future.failedFuture("Stream buffer did not met DONE flag. The cached buffer is " + streamBuffer.toResponse()
                                                                                                                                  .toString());
                        }
                    });
+
+        //        Handler<String> streamHandler = s -> {
+        //            DeepseekResponseChunkString deepseekResponseChunkString = new DeepseekResponseChunkString(s);
+        //            if (!deepseekResponseChunkString.isDoneChunk()) {
+        //                if (!deepseekResponseChunkString.isKeepAliveChunk()) {
+        //                    try {
+        //                        DeepseekResponseChunk chunk = deepseekResponseChunkString.getChunk();
+        //                        streamBuffer.accept(chunk);
+        //                    } catch (Throwable throwable) {
+        //                        // ignore it
+        //                        AigcMix.getVerboseLogger().exception(throwable,
+        //                                "io.github.sinri.AiOnHttpMix.deepseek.DeepseekKit.chatStreamWithBuffer met error",
+        //                                context -> context.put("request_id", requestId).put("chunk_string", s)
+        //                        );
+        //                        throw new RuntimeException(throwable);
+        //                    }
+        //                }
+        //            } else {
+        //                streamBuffer.meetDoneFlag();
+        //            }
+        //        };
+        //        return this.chatStreamWithStreamHandler(serviceMeta, request.toJsonObject(), streamHandler, maxExecutionSeconds, requestId)
+        //                   .compose(v -> {
+        //                       if (!streamBuffer.isMetDoneFlag()) {
+        //                           return Keel.asyncSleep(500L);
+        //                       }
+        //                       return Future.succeededFuture();
+        //                   })
+        //                   .compose(v -> {
+        //                       if (streamBuffer.isMetDoneFlag()) {
+        //                           DeepseekChatResponse response = streamBuffer.toResponse();
+        //                           return Future.succeededFuture(response);
+        //                       } else {
+        //                           return Future.failedFuture("Stream buffer did not met DONE flag. The cached buffer is " + streamBuffer.toResponse()
+        //                                                                                                                                 .toString());
+        //                       }
+        //                   });
     }
 }

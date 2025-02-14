@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.volces.core;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
+import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.vertx.core.Future;
@@ -12,19 +13,41 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class VolcesServiceMeta implements ServiceMeta {
     public static final String pathOfV3ChatCompletions = "/api/v3/chat/completions";
+    /**
+     * @since 1.2.2
+     */
+    private static final Set<SupportedModel> supportedModels = new HashSet<>();
     private static final String hostOfV3ChatCompletions = "ark.cn-beijing.volces.com";
+
+    static {
+        // since 1.2.2
+        supportedModels.add(SupportedModel.Doubao);
+        supportedModels.add(SupportedModel.DeepSeekChatOnVolces);
+        supportedModels.add(SupportedModel.DeepSeekReasonerOnVolces);
+    }
+
     //private static final String endpointOfV3ChatCompletions = "https://" + hostOfV3ChatCompletions + pathOfV3ChatCompletions;
     private final @NotNull String apiKey;
     private final @NotNull String model;
     private final long streamTimeout = 180_000L;
-
     public VolcesServiceMeta(@NotNull String apiKey, @NotNull String model) {
         this.apiKey = apiKey;
         this.model = model;
+    }
+
+    /**
+     * @since 1.2.2
+     */
+    @Override
+    public Set<SupportedModel> getSupportedModels() {
+        return supportedModels;
     }
 
     public @NotNull String getModel() {
