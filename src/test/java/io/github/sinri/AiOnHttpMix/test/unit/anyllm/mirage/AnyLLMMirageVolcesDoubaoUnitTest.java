@@ -7,7 +7,7 @@ import org.junit.Test;
 public class AnyLLMMirageVolcesDoubaoUnitTest extends AbstractAnyLLMMirageUnitTest {
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useVolces(generateMirageSDK(), SupportedModel.Doubao);
+        return new AnyLLMKit().useMirageSDK(generateMirageSDK(), SupportedModel.Doubao);
     }
 
     @Test

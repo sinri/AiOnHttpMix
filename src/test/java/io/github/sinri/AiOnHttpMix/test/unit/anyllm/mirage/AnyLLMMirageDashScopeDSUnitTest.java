@@ -7,7 +7,7 @@ import org.junit.Test;
 public class AnyLLMMirageDashScopeDSUnitTest extends AbstractAnyLLMMirageUnitTest {
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useDashScope(generateMirageSDK(), SupportedModel.DeepSeekChatOnDashScope);
+        return new AnyLLMKit().useMirageSDK(generateMirageSDK(), SupportedModel.DeepSeekChatOnDashScope);
     }
 
     @Test

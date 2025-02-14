@@ -17,7 +17,7 @@ public class AnyLLMPureDeepSeekUnitTest extends AbstractAnyLLMPureUnitTest<Deeps
 
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useDeepSeek(generateServiceMeta(), SupportedModel.DeepSeekReasoner);
+        return new AnyLLMKit().useServiceMeta(generateServiceMeta(), SupportedModel.DeepSeekReasoner);
     }
 
     @Test

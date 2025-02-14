@@ -7,7 +7,7 @@ import org.junit.Test;
 public class AnyLLMMirageVolcesDSUnitTest extends AbstractAnyLLMMirageUnitTest {
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useVolces(generateMirageSDK(), SupportedModel.DeepSeekChatOnVolces);
+        return new AnyLLMKit().useMirageSDK(generateMirageSDK(), SupportedModel.DeepSeekChatOnVolces);
     }
 
     @Test

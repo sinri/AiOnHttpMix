@@ -47,7 +47,12 @@ public interface AnyLLMResponse {
             });
         }
 
-        AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(resp.getFinishReason(), assistantMessage.getContent(), functionCalls);
+        AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(
+                resp.getFinishReason(),
+                assistantMessage.getContent(),
+                functionCalls,
+                null
+        );
         anyLLMResponseChoices.add(anyLLMResponseChoice);
         return new AnyLLMResponseImpl(anyLLMResponseChoices);
     }
@@ -77,7 +82,12 @@ public interface AnyLLMResponse {
                 }
             }
 
-            AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(finishReason, content, functionCalls);
+            AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(
+                    finishReason,
+                    content,
+                    functionCalls,
+                    null
+            );
             anyLLMResponseChoices.add(anyLLMResponseChoice);
         }
 
@@ -108,7 +118,13 @@ public interface AnyLLMResponse {
                 }
             }
 
-            AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(finishReason, content, functionCalls);
+            String reasoningContent = message.getReasoningContent();
+            AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(
+                    finishReason,
+                    content,
+                    functionCalls,
+                    reasoningContent
+            );
             anyLLMResponseChoices.add(anyLLMResponseChoice);
         });
 
@@ -141,7 +157,12 @@ public interface AnyLLMResponse {
                 }
             }
 
-            AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(finishReason, content, functionCalls);
+            AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(
+                    finishReason,
+                    content,
+                    functionCalls,
+                    null
+            );
             anyLLMResponseChoices.add(anyLLMResponseChoice);
         });
 
@@ -179,7 +200,14 @@ public interface AnyLLMResponse {
                 }
             }
 
-            AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(finishReason, content, functionCalls);
+            String reasoningContent = message.getReasoningContent();
+
+            AnyLLMResponseChoice anyLLMResponseChoice = AnyLLMResponseChoice.build(
+                    finishReason,
+                    content,
+                    functionCalls,
+                    reasoningContent
+            );
             anyLLMResponseChoices.add(anyLLMResponseChoice);
         });
 

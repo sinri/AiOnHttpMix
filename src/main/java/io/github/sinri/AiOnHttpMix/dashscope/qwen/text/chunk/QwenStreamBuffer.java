@@ -125,8 +125,7 @@ public class QwenStreamBuffer implements LLMStreamBuffer {
                 entries.put("role", this.role.name());
             }
             entries.put("content", this.content.toString());
-            // todo if needed for all?
-            entries.put("reasoning_reason", this.reasoningReason.toString());
+            entries.put("reasoning_content", this.reasoningReason.toString());
             List<QwenToolCall.FunctionCall> tcList = this.toolCalls.toToolCalls();
             if (!tcList.isEmpty()) {
                 JsonArray tcArray = new JsonArray();

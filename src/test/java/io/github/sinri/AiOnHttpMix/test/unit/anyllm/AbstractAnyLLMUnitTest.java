@@ -28,6 +28,8 @@ public abstract class AbstractAnyLLMUnitTest extends AnyUnitTest
                     String content = anyLLMResponseChoice.getContent();
                     Assert.assertNotNull(content);
                     getUnitTestLogger().info("content: " + content);
+                    String reasoningContent = anyLLMResponseChoice.getReasoningContent();
+                    getUnitTestLogger().info("reasoningContent: " + reasoningContent);
                     return Future.succeededFuture();
                 })));
     }
@@ -42,6 +44,8 @@ public abstract class AbstractAnyLLMUnitTest extends AnyUnitTest
                     String content = anyLLMResponseChoice.getContent();
                     Assert.assertNotNull(content);
                     getUnitTestLogger().info("content: " + content);
+                    String reasoningContent = anyLLMResponseChoice.getReasoningContent();
+                    getUnitTestLogger().info("reasoningContent: " + reasoningContent);
                     return Future.succeededFuture();
                 })));
     }

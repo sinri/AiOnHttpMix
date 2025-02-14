@@ -25,7 +25,7 @@ public class AnyLLMPureVolcesDoubaoUnitTest extends AbstractAnyLLMPureUnitTest<V
 
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useVolces(generateServiceMeta(), SupportedModel.Doubao);
+        return new AnyLLMKit().useServiceMeta(generateServiceMeta(), SupportedModel.Doubao);
     }
 
     @Test

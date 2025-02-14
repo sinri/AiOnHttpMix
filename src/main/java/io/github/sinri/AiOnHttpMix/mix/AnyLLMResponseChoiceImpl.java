@@ -1,5 +1,8 @@
 package io.github.sinri.AiOnHttpMix.mix;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 /**
@@ -9,11 +12,21 @@ class AnyLLMResponseChoiceImpl implements AnyLLMResponseChoice {
     private final String finishReason;
     private final String content;
     private final List<AnyLLMResponseToolFunctionCall> functionCalls;
+    /**
+     * @since 1.2.3
+     */
+    private final String reasoningContent;
 
-    public AnyLLMResponseChoiceImpl(String finishReason, String content, List<AnyLLMResponseToolFunctionCall> functionCalls) {
+    public AnyLLMResponseChoiceImpl(
+            String finishReason,
+            String content,
+            List<AnyLLMResponseToolFunctionCall> functionCalls,
+            @Nullable String reasoningContent
+    ) {
         this.finishReason = finishReason;
         this.content = content;
         this.functionCalls = functionCalls;
+        this.reasoningContent = reasoningContent;
     }
 
     @Override
@@ -27,8 +40,16 @@ class AnyLLMResponseChoiceImpl implements AnyLLMResponseChoice {
     }
 
     @Override
-    public List<AnyLLMResponseToolFunctionCall> getFunctionCalls() {
+    public @NotNull List<AnyLLMResponseToolFunctionCall> getFunctionCalls() {
         return functionCalls;
+    }
+
+    /**
+     * @since 1.2.3
+     */
+    @Override
+    public @Nullable String getReasoningContent() {
+        return reasoningContent;
     }
 
     /**

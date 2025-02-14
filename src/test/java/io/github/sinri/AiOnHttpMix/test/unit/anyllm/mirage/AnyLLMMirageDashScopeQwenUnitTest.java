@@ -7,7 +7,7 @@ import org.junit.Test;
 public class AnyLLMMirageDashScopeQwenUnitTest extends AbstractAnyLLMMirageUnitTest {
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useDashScope(generateMirageSDK(), SupportedModel.QwenPlus);
+        return new AnyLLMKit().useMirageSDK(generateMirageSDK(), SupportedModel.QwenPlus);
     }
 
     @Test

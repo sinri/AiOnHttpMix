@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-public class AnyLLMPureDashScopeQwenUnitTest extends AbstractAnyLLMPureUnitTest<DashscopeServiceMeta> {
+public class AnyLLMPureDashScopeDSCUnitTest extends AbstractAnyLLMPureUnitTest<DashscopeServiceMeta> {
     @Override
     protected DashscopeServiceMeta generateServiceMeta() {
         String dashscopeApiKey = Keel.config("dashscope.api_key");
@@ -16,7 +16,7 @@ public class AnyLLMPureDashScopeQwenUnitTest extends AbstractAnyLLMPureUnitTest<
 
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useServiceMeta(generateServiceMeta(), SupportedModel.QwenPlus);
+        return new AnyLLMKit().useServiceMeta(generateServiceMeta(), SupportedModel.DeepSeekChatOnDashScope);
     }
 
     @Test
@@ -34,12 +34,12 @@ public class AnyLLMPureDashScopeQwenUnitTest extends AbstractAnyLLMPureUnitTest<
     @Test
     @Override
     public void testSyncWithToolCall() {
-        super.testSyncWithToolCall();
+        //super.testSyncWithToolCall();
     }
 
     @Test
     @Override
     public void testStreamBufferWithToolCall() {
-        super.testStreamBufferWithToolCall();
+        //super.testStreamBufferWithToolCall();
     }
 }

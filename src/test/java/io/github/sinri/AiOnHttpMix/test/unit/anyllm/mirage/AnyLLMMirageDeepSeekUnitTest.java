@@ -8,7 +8,7 @@ import org.junit.Test;
 public class AnyLLMMirageDeepSeekUnitTest extends AbstractAnyLLMMirageUnitTest {
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useDeepSeek(generateMirageSDK(), SupportedModel.DeepSeekChat);
+        return new AnyLLMKit().useMirageSDK(generateMirageSDK(), SupportedModel.DeepSeekChat);
     }
 
     @Test

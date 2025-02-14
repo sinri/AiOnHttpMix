@@ -15,7 +15,6 @@ import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
-import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit;
 import io.github.sinri.AiOnHttpMix.volces.v3.chunk.VolcesChatStreamBuffer;
@@ -72,48 +71,6 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
         return this;
     }
 
-    @Override
-    public AnyLLMKit useAzure(AzureOpenAIServiceMeta azureOpenAIServiceMeta, SupportedModel model) {
-        if (model.getProvider() != azureOpenAIServiceMeta.getSupportedProvider()) {
-            throw new IllegalArgumentException("model is not belong to this provider");
-        }
-        this.model = model;
-        this.serviceMeta = azureOpenAIServiceMeta;
-        return this;
-    }
-
-    @Override
-    public AnyLLMKit useDashScope(DashscopeServiceMeta dashscopeServiceMeta, SupportedModel model) {
-        if (model.getProvider() != dashscopeServiceMeta.getSupportedProvider()) {
-            throw new IllegalArgumentException("model is not belong to this provider");
-        }
-        this.model = SupportedModel.QwenPlus;
-        this.serviceMeta = dashscopeServiceMeta;
-        return this;
-    }
-
-    @Override
-    public AnyLLMKit useVolces(VolcesServiceMeta volcesServiceMeta, SupportedModel model) {
-        if (model.getProvider() != volcesServiceMeta.getSupportedProvider()) {
-            throw new IllegalArgumentException("model is not belong to this provider");
-        }
-        this.model = model;
-        this.serviceMeta = volcesServiceMeta;
-        return this;
-    }
-
-    /**
-     * @since 1.2.2
-     */
-    @Override
-    public AnyLLMKit useDeepSeek(DeepseekServiceMeta deepseekServiceMeta, SupportedModel model) {
-        if (model.getProvider() != deepseekServiceMeta.getSupportedProvider()) {
-            throw new IllegalArgumentException("model is not belong to this provider");
-        }
-        this.model = model;
-        this.serviceMeta = deepseekServiceMeta;
-        return this;
-    }
 
     /**
      * @since 1.1.5
@@ -478,38 +435,5 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
         return throughMirage(mirageSDK, model);
     }
 
-    @Override
-    public AnyLLMKit useAzure(MirageSDK mirageSDK, SupportedModel model) {
-        if (model.getProvider() != SupportedProvider.AzureOpenAI) {
-            throw new IllegalArgumentException("Only ChatGPT supported");
-        }
-        return throughMirage(mirageSDK, model);
-    }
 
-    @Override
-    public AnyLLMKit useDashScope(MirageSDK mirageSDK, SupportedModel model) {
-        if (model.getProvider() != SupportedProvider.DashScope) {
-            throw new IllegalArgumentException("Only Qwen supported");
-        }
-        return throughMirage(mirageSDK, model);
-    }
-
-    @Override
-    public AnyLLMKit useVolces(MirageSDK mirageSDK, SupportedModel model) {
-        if (model.getProvider() != SupportedProvider.Volces) {
-            throw new IllegalArgumentException("Only Volces supported");
-        }
-        return throughMirage(mirageSDK, model);
-    }
-
-    /**
-     * @since 1.2.2
-     */
-    @Override
-    public AnyLLMKit useDeepSeek(MirageSDK mirageSDK, SupportedModel model) {
-        if (model.getProvider() != SupportedProvider.DeepSeek) {
-            throw new IllegalArgumentException("Only DeepSeek supported");
-        }
-        return throughMirage(mirageSDK, model);
-    }
 }

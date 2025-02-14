@@ -7,7 +7,7 @@ import org.junit.Test;
 public class AnyLLMMirageAzureUnitTest extends AbstractAnyLLMMirageUnitTest {
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useAzure(generateMirageSDK(), SupportedModel.ChatGPT);
+        return new AnyLLMKit().useMirageSDK(generateMirageSDK(), SupportedModel.ChatGPT);
     }
 
     @Test

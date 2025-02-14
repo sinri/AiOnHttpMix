@@ -9,7 +9,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class AnyLLMPureAzureUnitTest extends AbstractAnyLLMPureUnitTest<AzureOpenAIServiceMeta> {
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useAzure(generateServiceMeta(), SupportedModel.ChatGPT);
+        return new AnyLLMKit().useServiceMeta(generateServiceMeta(), SupportedModel.ChatGPT);
     }
 
     private String getServiceName() {

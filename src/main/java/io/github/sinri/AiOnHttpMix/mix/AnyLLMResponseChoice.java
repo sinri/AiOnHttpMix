@@ -2,6 +2,8 @@ package io.github.sinri.AiOnHttpMix.mix;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,13 +12,16 @@ import java.util.List;
  * @since 1.1.0
  */
 public interface AnyLLMResponseChoice {
-    static AnyLLMResponseChoice build(String finishReason, String content, List<AnyLLMResponseToolFunctionCall> functionCalls) {
-        return new AnyLLMResponseChoiceImpl(finishReason, content, functionCalls);
+    static AnyLLMResponseChoice build(
+            String finishReason,
+            String content,
+            List<AnyLLMResponseToolFunctionCall> functionCalls,
+            @Nullable String reasoningContent
+    ) {
+        return new AnyLLMResponseChoiceImpl(finishReason, content, functionCalls, reasoningContent);
     }
 
     /**
-     * @param jsonObject
-     * @return
      * @since 1.1.4
      */
     static AnyLLMResponseChoice wrap(JsonObject jsonObject) {
@@ -32,14 +37,24 @@ public interface AnyLLMResponseChoice {
                 }
             });
         }
-        return build(finishReason, content, functionCalls);
+        String reasoningContent = jsonObject.getString("reasoning_content");
+        return build(finishReason, content, functionCalls, reasoningContent);
     }
 
+    @Nullable
     String getFinishReason();
 
+    @Nullable
     String getContent();
 
+    @NotNull
     List<AnyLLMResponseToolFunctionCall> getFunctionCalls();
+
+    /**
+     * @since 1.2.3
+     */
+    @Nullable
+    String getReasoningContent();
 
     /**
      * @since 1.1.1
@@ -47,11 +62,9 @@ public interface AnyLLMResponseChoice {
     default JsonObject toJsonObject() {
         JsonArray jsonArray = new JsonArray();
         List<AnyLLMResponseToolFunctionCall> functionCalls = getFunctionCalls();
-        if (functionCalls != null) {
-            functionCalls.forEach(functionCall -> {
-                jsonArray.add(functionCall.toJsonObject());
-            });
-        }
+        functionCalls.forEach(functionCall -> {
+            jsonArray.add(functionCall.toJsonObject());
+        });
         return new JsonObject()
                 .put("finish_reason", getFinishReason())
                 .put("content", getContent())
