@@ -136,15 +136,28 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
     }
 
     /**
+     * @param anyLLMResponseToolFunctionCall as of 1.2.6, it should not be null.
+     * @param fixedArgument                  as of 1.2.6, a new nullable fixed argument is added to this method to fit
+     *                                       various context.
      * @since 1.1.2
      */
-    public Future<Object> callRegisterFunction(AnyLLMResponseToolFunctionCall anyLLMResponseToolFunctionCall) {
+    public <R> Future<R> callRegisterFunction(
+            @NotNull AnyLLMResponseToolFunctionCall anyLLMResponseToolFunctionCall,
+            @Nullable JsonObject fixedArgument
+    ) {
         FunctionCallAdapter registeredFunction =
                 this.getRegisteredFunction(anyLLMResponseToolFunctionCall.getFunctionName());
         if (registeredFunction == null) {
             return Future.failedFuture(new UnsupportedOperationException("Function not registered"));
         }
-        return registeredFunction.callFunction(new JsonObject(anyLLMResponseToolFunctionCall.getFunctionArguments()));
+        String functionArguments = anyLLMResponseToolFunctionCall.getFunctionArguments();
+        JsonObject argsAsJsonObject;
+        try {
+            argsAsJsonObject = new JsonObject(functionArguments);
+        } catch (Throwable e) {
+            argsAsJsonObject = null;
+        }
+        return registeredFunction.callFunction(argsAsJsonObject, fixedArgument);
     }
 
     public Future<AnyLLMResponse> request(Handler<AnyLLMRequest> requestHandler) {
