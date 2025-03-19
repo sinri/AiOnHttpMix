@@ -9,6 +9,9 @@ import io.vertx.core.Handler;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Represents a request to an LLM (Language Learning Model) system, providing methods for configuring the request
+ * with messages, function tool definitions, and other options.
+ *
  * @since 1.1.0
  */
 public interface AnyLLMRequest {

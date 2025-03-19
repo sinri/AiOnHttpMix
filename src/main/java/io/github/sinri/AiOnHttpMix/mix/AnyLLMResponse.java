@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Represents a response from any LLM (Language Learning Model) that standardizes the output format across different LLM providers.
+ * This interface allows for the creation of an LLM response object from various provider-specific response types, such as OpenAI, Qwen, and Volces.
+ * The standardized response includes choices, each with a finish reason, content, function calls, and reasoning content if applicable.
  * @since 1.1.0
  */
 public interface AnyLLMResponse {
