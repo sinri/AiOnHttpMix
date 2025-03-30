@@ -1,10 +1,14 @@
 package io.github.sinri.AiOnHttpMix.volces.v3.request;
 
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
+import io.github.sinri.AiOnHttpMix.volces.v3.visual.VolcesVisualChatMessageContent;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public interface VolcesChatMessageForRequest extends JsonifiableEntity<VolcesChatMessageForRequest> {
     static VolcesChatMessageForRequest create() {
@@ -31,6 +35,23 @@ public interface VolcesChatMessageForRequest extends JsonifiableEntity<VolcesCha
 
     default VolcesChatMessageForRequest setContent(@Nullable String content) {
         this.toJsonObject().put("content", content);
+        return this;
+    }
+
+    @Nullable
+    default List<VolcesVisualChatMessageContent> getVisualContent() {
+        List<JsonObject> content = readJsonObjectArray("content");
+        if (content == null) return null;
+        return content.stream().map(VolcesVisualChatMessageContent::wrap)
+                      .toList();
+    }
+
+    default VolcesChatMessageForRequest setVisualContent(@NotNull List<VolcesVisualChatMessageContent> visualContents) {
+        JsonArray a = new JsonArray();
+        visualContents.forEach(vc -> {
+            a.add(vc.toJsonObject());
+        });
+        this.toJsonObject().put("content", a);
         return this;
     }
 

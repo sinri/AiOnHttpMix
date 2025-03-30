@@ -12,6 +12,7 @@ public interface VolcesChatResponseMessage extends UnmodifiableJsonifiableEntity
     static VolcesChatResponseMessage wrap(JsonObject jsonObject) {
         return new VolcesChatResponseMessageImpl(jsonObject);
     }
+
     /**
      * @return 固定为 assistant
      */
@@ -26,6 +27,16 @@ public interface VolcesChatResponseMessage extends UnmodifiableJsonifiableEntity
     default String getContent() {
         return readString("content");
     }
+
+    //    /**
+    //     * @since 1.2.6
+    //     */
+    //    @Nullable
+    //    default List<VolcesVisualChatMessageContent> getVisualContent() {
+    //        List<JsonObject> content = readJsonObjectArray("content");
+    //        if (content == null) return null;
+    //        return content.stream().map(VolcesVisualChatMessageContent::wrap).toList();
+    //    }
 
     /**
      * content 与 tool_calls 字段二者至少有一个为非空
