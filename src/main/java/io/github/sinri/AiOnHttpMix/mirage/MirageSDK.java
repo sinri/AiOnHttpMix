@@ -22,7 +22,9 @@ public class MirageSDK {
     private final String clientSecret;
     /**
      * @since 1.1.5
+     * @deprecated set max stream time by request!
      */
+    @Deprecated(since = "1.2.6")
     private long maxStreamTime = 180_000L;
 
     public MirageSDK(String mirageDomain, String clientCode, String clientSecret) {
@@ -61,6 +63,22 @@ public class MirageSDK {
         return body;
     }
 
+    /**
+     * @since 1.2.6
+     */
+    public Future<AnyLLMResponse> requestSync(
+            MirageServiceEnum mirageService,
+            boolean useNyaCode,
+            MirageRequestEntity llmRequestBody
+    ) {
+        return requestSync(
+                mirageService.getMappedSupportedModel().name(),
+                mirageService.getServiceCode(),
+                useNyaCode,
+                llmRequestBody
+        );
+    }
+
     public Future<AnyLLMResponse> requestSync(
             String model,
             String service,
@@ -91,7 +109,10 @@ public class MirageSDK {
     /**
      * @param fragmentHandler 针对一个已经格式化好的SSE Chunk的JSON对象字符串表达的处理器
      * @since 1.1.5
+     * @deprecated set max stream time by request, use
+     *         {@link MirageSDK#requestStream(String, String, boolean, MirageRequestEntity, long, Handler)} instead.
      */
+    @Deprecated(since = "1.2.6")
     public Future<Void> requestStream(
             String model,
             String service,
@@ -100,6 +121,26 @@ public class MirageSDK {
             Handler<String> fragmentHandler
     ) {
         return requestStream(model, service, useNyaCode, llmRequestBody, getMaxStreamTime(), fragmentHandler);
+    }
+
+    /**
+     * @since 1.2.6
+     */
+    public Future<Void> requestStream(
+            MirageServiceEnum mirageService,
+            boolean useNyaCode,
+            MirageRequestEntity llmRequestBody,
+            long maxStreamTime,
+            Handler<String> fragmentHandler
+    ) {
+        return requestStream(
+                mirageService.getMappedSupportedModel().name(),
+                mirageService.getServiceCode(),
+                useNyaCode,
+                llmRequestBody,
+                maxStreamTime,
+                fragmentHandler
+        );
     }
 
     /**
@@ -188,14 +229,18 @@ public class MirageSDK {
 
     /**
      * @since 1.1.5
+     * @deprecated set max stream time by request!
      */
+    @Deprecated(since = "1.2.6")
     public long getMaxStreamTime() {
         return maxStreamTime;
     }
 
     /**
      * @since 1.1.5
+     * @deprecated set max stream time by request!
      */
+    @Deprecated(since = "1.2.6")
     public MirageSDK setMaxStreamTime(long maxStreamTime) {
         this.maxStreamTime = maxStreamTime;
         return this;

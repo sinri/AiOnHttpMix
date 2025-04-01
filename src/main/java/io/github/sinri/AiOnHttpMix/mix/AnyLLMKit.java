@@ -420,6 +420,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                                this.mirageService,
                                true,
                                request.toMirageRequestEntity(),
+                               request.getMaxExecutionSeconds() * 1000L,
                                s -> {
                                    AigcMix.getVerboseLogger()
                                           .debug("io.github.sinri.AiOnHttpMix.mix.AnyLLMKit" +

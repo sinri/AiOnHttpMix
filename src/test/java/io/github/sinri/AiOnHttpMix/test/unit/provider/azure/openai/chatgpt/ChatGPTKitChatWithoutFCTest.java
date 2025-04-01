@@ -100,6 +100,8 @@ public class ChatGPTKitChatWithoutFCTest extends AbstractChatGPTKitChatUnitTest
 
     @Override
     protected String getServiceName() {
-        return "gpt-4-o";
+        //        return "gpt-4-o";
+        //        return "o3-mini";
+        return "o1";
     }
 }
