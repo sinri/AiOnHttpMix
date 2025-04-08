@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix;
+package io.github.sinri.AiOnHttpMix.mix.chat;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.ChatGPTKit;
@@ -12,6 +12,7 @@ import io.github.sinri.AiOnHttpMix.deepseek.DeepseekKit;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekStreamBuffer;
 import io.github.sinri.AiOnHttpMix.deepseek.core.DeepseekServiceMeta;
 import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
+import io.github.sinri.AiOnHttpMix.mix.FunctionCallAdapter;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
@@ -423,7 +424,7 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
                                request.getMaxExecutionSeconds() * 1000L,
                                s -> {
                                    AigcMix.getVerboseLogger()
-                                          .debug("io.github.sinri.AiOnHttpMix.mix.AnyLLMKit" +
+                                          .debug("io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMKit" +
                                                   ".requestWithStreamBuffer::component | " + s);
                                 /*
                                 {"output":{"choices":[{"message":{"content":"筑","role":"assistant"},
@@ -445,8 +446,8 @@ public class AnyLLMKit implements AnyLLMKitThroughSDKMixin<AnyLLMKit>, AnyLLMKit
     }
 
     @Override
-    public AnyLLMKit useMirageSDK(MirageSDK mirageSDK, SupportedModel supportedModel) {
-        return throughMirage(mirageSDK, model);
+    public AnyLLMKit useMirageSDK(@NotNull MirageSDK mirageSDK, @NotNull SupportedModel supportedModel) {
+        return throughMirage(mirageSDK, supportedModel);
     }
 
 

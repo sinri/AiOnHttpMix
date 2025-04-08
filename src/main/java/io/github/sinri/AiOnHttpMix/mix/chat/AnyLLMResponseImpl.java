@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix;
+package io.github.sinri.AiOnHttpMix.mix.chat;
 
 import java.util.List;
 

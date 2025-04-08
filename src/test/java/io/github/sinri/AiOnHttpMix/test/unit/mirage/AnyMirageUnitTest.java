@@ -1,10 +1,10 @@
 package io.github.sinri.AiOnHttpMix.test.unit.mirage;
 
 import io.github.sinri.AiOnHttpMix.mirage.MirageRequestEntity;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseChoice;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseToolFunctionCall;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMSimpleRoleMessagePair;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponseChoice;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponseToolFunctionCall;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMSimpleRoleMessagePair;
 import io.github.sinri.AiOnHttpMix.test.unit.core.AnyUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentDefinition;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentType;

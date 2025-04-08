@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.test.unit.anyllm.mirage;
 
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMKit;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import org.junit.Test;
 

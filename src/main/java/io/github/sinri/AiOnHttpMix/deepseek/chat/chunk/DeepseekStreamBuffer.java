@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.deepseek.chat.chunk;
 
 import io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatResponse;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponse;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;

@@ -1,14 +1,14 @@
-package io.github.sinri.AiOnHttpMix.mix;
+package io.github.sinri.AiOnHttpMix.mix.chat;
 
-import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
+import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.keel.core.SelfInterface;
 import io.github.sinri.keel.core.TechnicalPreview;
 
-public interface AnyLLMKitThroughSDKMixin<S> extends SelfInterface<S> {
+public interface AnyLLMKitThroughMirageMixin<S> extends SelfInterface<S> {
     /**
      * @since 1.2.2 if test passed, deprecated other detailed use-methods.
      */
     @TechnicalPreview(since = "1.2.2")
-    S useServiceMeta(ServiceMeta serviceMeta, SupportedModel supportedModel);
+    S useMirageSDK(MirageSDK mirageSDK, SupportedModel supportedModel);
 }

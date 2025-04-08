@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.dashscope.qwen;
 
+import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLRole;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
 
 public enum QwenRole {
@@ -15,5 +16,12 @@ public enum QwenRole {
             case assistant -> AnyLLMRole.assistant;
             case tool -> AnyLLMRole.tool;
         };
+    }
+
+    /**
+     * @since 1.3.0
+     */
+    public QwenVLRole toQwenVLRole() {
+        return QwenVLRole.valueOf(this.name());
     }
 }

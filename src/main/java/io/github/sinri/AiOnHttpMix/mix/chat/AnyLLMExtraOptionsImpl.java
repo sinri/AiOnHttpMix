@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix;
+package io.github.sinri.AiOnHttpMix.mix.chat;
 
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
 import io.vertx.core.json.JsonObject;

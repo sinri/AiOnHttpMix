@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix;
+package io.github.sinri.AiOnHttpMix.mix.chat;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

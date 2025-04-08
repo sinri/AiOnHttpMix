@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.test.unit.anyllm.pure;
 
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMKit;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import org.junit.Test;

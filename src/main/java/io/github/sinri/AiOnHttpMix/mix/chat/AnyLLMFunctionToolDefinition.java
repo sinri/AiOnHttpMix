@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix;
+package io.github.sinri.AiOnHttpMix.mix.chat;
 
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentDefinition;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentType;

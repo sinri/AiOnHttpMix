@@ -1,9 +1,9 @@
 package io.github.sinri.AiOnHttpMix.mirage;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMKit;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMRequest;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMKit;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMRequest;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponse;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.keel.core.cutter.Cutter;
 import io.github.sinri.keel.core.cutter.CutterOnString;

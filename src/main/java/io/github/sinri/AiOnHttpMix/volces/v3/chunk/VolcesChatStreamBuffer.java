@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.volces.v3.chunk;
 
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponse;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.*;

@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.mix.rag;
 
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMSimpleRoleMessagePair;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMSimpleRoleMessagePair;
 import io.vertx.core.Future;
 
 import java.util.List;

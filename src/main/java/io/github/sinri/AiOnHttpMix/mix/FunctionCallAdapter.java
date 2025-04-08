@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.mix;
 
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMFunctionToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentDefinition;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;

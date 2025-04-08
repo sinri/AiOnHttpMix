@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix;
+package io.github.sinri.AiOnHttpMix.mix.chat;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptToolDefinition;
@@ -7,6 +7,7 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.tool.QwenToolDefinition;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatRequest;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.message.DeepseekMessageInRequest;
 import io.github.sinri.AiOnHttpMix.mirage.MirageRequestEntity;
+import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.github.sinri.AiOnHttpMix.volces.v3.tool.VolcesChatFunctionDefinition;
@@ -27,7 +28,7 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
     /**
      * @since 1.2.2
      */
-    private int maxExecutionSeconds;
+    private int maxExecutionSeconds = 180;
     private @Nullable AnyLLMExtraOptions extraOptions = null;
 
     public AnyLLMRequestImpl() {

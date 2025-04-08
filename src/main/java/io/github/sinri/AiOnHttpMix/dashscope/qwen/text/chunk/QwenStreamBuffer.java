@@ -6,7 +6,7 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.QwenResponseBase;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.message.QwenMessage;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.response.QwenResponseInMessageFormat;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.tool.QwenToolCall;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponse;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.vertx.core.json.JsonArray;

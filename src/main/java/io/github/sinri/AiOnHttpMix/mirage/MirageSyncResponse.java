@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.mirage;
 
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponse;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;

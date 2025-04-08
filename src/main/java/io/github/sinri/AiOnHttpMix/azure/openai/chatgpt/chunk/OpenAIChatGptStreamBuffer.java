@@ -5,7 +5,7 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.AssistantMessage
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseChoice;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseFunctionCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponse;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;

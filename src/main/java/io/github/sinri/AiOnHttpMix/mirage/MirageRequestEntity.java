@@ -1,8 +1,8 @@
 package io.github.sinri.AiOnHttpMix.mirage;
 
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMFunctionToolDefinition;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMSimpleRoleMessagePair;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMSimpleRoleMessagePair;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentDefinition;
 import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentType;
 import io.github.sinri.keel.core.json.JsonifiableEntity;

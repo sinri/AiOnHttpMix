@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix;
+package io.github.sinri.AiOnHttpMix.mix.chat;
 
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.Nullable;

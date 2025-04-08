@@ -1,8 +1,8 @@
 package io.github.sinri.AiOnHttpMix.test.unit.anyllm;
 
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMRequest;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseChoice;
-import io.github.sinri.AiOnHttpMix.mix.AnyLLMResponseToolFunctionCall;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMRequest;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponseChoice;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponseToolFunctionCall;
 import io.github.sinri.AiOnHttpMix.test.unit.core.AnyUnitTest;
 import io.vertx.core.Future;
 import org.junit.Assert;
