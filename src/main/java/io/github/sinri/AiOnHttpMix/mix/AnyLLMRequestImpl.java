@@ -10,6 +10,7 @@ import io.github.sinri.AiOnHttpMix.mirage.MirageRequestEntity;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.github.sinri.AiOnHttpMix.volces.v3.tool.VolcesChatFunctionDefinition;
+import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -93,7 +94,10 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
             }
             String responseFormat = extraOptions.getResponseFormat();
             if (responseFormat != null) {
-                req.setResponseFormat(OpenAIChatGptRequest.ChatCompletionResponseFormat.valueOf(responseFormat));
+                JsonObject x = new JsonObject(responseFormat);
+                String type = x.getString("type");
+                JsonObject jsonSchema = x.getJsonObject("json_schema");
+                req.setResponseFormat(OpenAIChatGptRequest.ChatCompletionResponseFormat.valueOf(type), jsonSchema);
             }
             //  IncrementalOutput is default for Azure OpenAI ChatGPT
         }

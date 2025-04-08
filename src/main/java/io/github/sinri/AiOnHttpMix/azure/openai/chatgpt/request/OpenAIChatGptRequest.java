@@ -5,9 +5,11 @@ import io.github.sinri.AiOnHttpMix.utils.FunctionToolDefinition;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * @see <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions">Chat completions</a>
+ * @see <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions">Chat
+ *         completions</a>
  */
 public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptRequest> {
     static OpenAIChatGptRequest create() {
@@ -20,7 +22,8 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
 
     /**
      * What sampling temperature to use, between 0 and 2.
-     * Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.
+     * Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused
+     * and deterministic.
      * We generally recommend altering this or top_p but not both.
      *
      * @param temperature Amongst (0,2), default 1.
@@ -28,7 +31,8 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
     OpenAIChatGptRequest setTemperature(double temperature);
 
     /**
-     * An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
+     * An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of
+     * the tokens with top_p probability mass.
      * So 0.1 means only the tokens comprising the top 10% probability mass are considered.
      * We generally recommend altering this or temperature but not both.
      *
@@ -38,7 +42,8 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
 
     /**
      * If set, partial message deltas will be sent, like in ChatGPT.
-     * Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a data: [DONE] message.
+     * Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a
+     * data: [DONE] message.
      */
     OpenAIChatGptRequest useStream();
 
@@ -54,7 +59,8 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
 
     /**
      * Number between -2.0 and 2.0.
-     * Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.
+     * Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's
+     * likelihood to talk about new topics.
      *
      * @param presencePenalty Amongst (-2.0,2.0), default 0.
      */
@@ -62,7 +68,8 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
 
     /**
      * Number between -2.0 and 2.0.
-     * Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
+     * Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's
+     * likelihood to repeat the same line verbatim.
      *
      * @param frequencyPenalty Amongst (-2.0,2.0), default 0.
      */
@@ -75,7 +82,9 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
     /**
      * To generate a list of messages comprising the conversation so far.
      *
-     * @see <a href="https://github.com/openai/openai-cookbook/blob/main/examples/How_to_format_inputs_to_ChatGPT_models.ipynb">Example Python code</a>
+     * @see <a
+     *         href="https://github.com/openai/openai-cookbook/blob/main/examples/How_to_format_inputs_to_ChatGPT_models.ipynb">Example
+     *         Python code</a>
      */
     OpenAIChatGptRequest addMessage(OpenAIChatGptMessage message);
 
@@ -96,8 +105,10 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
     OpenAIChatGptRequest setN(int n);
 
     /**
-     * If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same `seed` and parameters should return the same result.
-     * Determinism isn't guaranteed, and you should refer to the `system_fingerprint` response parameter to monitor changes in the backend.
+     * If specified, our system will make a best effort to sample deterministically, such that repeated requests with
+     * the same `seed` and parameters should return the same result.
+     * Determinism isn't guaranteed, and you should refer to the `system_fingerprint` response parameter to monitor
+     * changes in the backend.
      *
      * @param seed default 0.
      */
@@ -109,8 +120,11 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
     /**
      * An object specifying the format that the model must output.
      * Used to enable JSON mode.
+     *
+     * @param responseFormat ResponseFormatText {@code type: text} or ResponseFormatJsonObject {@code type: json_object}
+     *                       or ResponseFormatJsonSchema {@code type:json_schema, json_schema:...}
      */
-    OpenAIChatGptRequest setResponseFormat(ChatCompletionResponseFormat responseFormat);
+    OpenAIChatGptRequest setResponseFormat(ChatCompletionResponseFormat responseFormat, @Nullable JsonObject jsonSchema);
 
     /**
      * To generate a list of tools the model may call.
@@ -119,11 +133,11 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
      */
     OpenAIChatGptRequest addTool(OpenAIChatGptToolDefinition toolDefinition);
 
-//    default E addTool(Handler<OpenAIToolDefinitionMixin.FunctionToolDefinitionBuilder> handler) {
-//        OpenAIToolDefinitionMixin.FunctionToolDefinitionBuilder builder = ChatGPTKit.ToolDefinition.builder();
-//        handler.handle(builder);
-//        return addTool(builder.build());
-//    }
+    //    default E addTool(Handler<OpenAIToolDefinitionMixin.FunctionToolDefinitionBuilder> handler) {
+    //        OpenAIToolDefinitionMixin.FunctionToolDefinitionBuilder builder = ChatGPTKit.ToolDefinition.builder();
+    //        handler.handle(builder);
+    //        return addTool(builder.build());
+    //    }
 
     default OpenAIChatGptRequest addTool(Handler<FunctionToolDefinition.FunctionToolDefinitionBuilder<OpenAIChatGptToolDefinition.Builder, OpenAIChatGptToolDefinition>> handler) {
         var builder = new OpenAIChatGptToolDefinition.Builder();
@@ -135,7 +149,8 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
      * Controls which (if any) function is called by the model.
      * `none` means the model will not call a function and instead generates a message.
      * `auto` means the model can pick between generating a message or calling a function.
-     * Specifying a particular function via @code{{"type": "function", "function": {"name": "my_function"}}} forces the model to call that function.
+     * Specifying a particular function via @code{{"type": "function", "function": {"name": "my_function"}}} forces the
+     * model to call that function.
      */
     OpenAIChatGptRequest setToolChoice(OpenAIChatGptRequestToolChoiceOption toolChoiceOption);
 
@@ -151,5 +166,12 @@ public interface OpenAIChatGptRequest extends JsonifiableEntity<OpenAIChatGptReq
          * Response format is a JSON object.
          */
         json_object,
+        /**
+         * The type of response format being defined: json_schema
+         * Possible values: json_schema
+         *
+         * @since 1.2.6
+         */
+        json_schema,
     }
 }

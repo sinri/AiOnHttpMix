@@ -52,10 +52,12 @@ public interface AnyLLMRequest {
 
     AnyLLMRequest addFunctionToolDefinition(AnyLLMFunctionToolDefinition functionToolDefinition);
 
+    @Deprecated(since = "1.2.6")
     default AnyLLMRequest addSystemMessage(String systemMessage) {
         return this.addRoleMessage(AnyLLMRole.system, systemMessage);
     }
 
+    @Deprecated(since = "1.2.6")
     default AnyLLMRequest addUserMessage(String userMessage) {
         return this.addRoleMessage(AnyLLMRole.user, userMessage);
     }

@@ -5,6 +5,7 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.message.OpenAIChatGptMes
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 class OpenAIChatGptRequestImpl implements OpenAIChatGptRequest {
     private JsonObject jsonObject;
@@ -77,8 +78,13 @@ class OpenAIChatGptRequestImpl implements OpenAIChatGptRequest {
     }
 
     @Override
-    public OpenAIChatGptRequest setResponseFormat(ChatCompletionResponseFormat responseFormat) {
-        this.jsonObject.put("response_format", responseFormat.name());
+    public OpenAIChatGptRequest setResponseFormat(ChatCompletionResponseFormat responseFormat, @Nullable JsonObject jsonSchema) {
+        JsonObject x = new JsonObject();
+        x.put("type", responseFormat.name());
+        if (responseFormat == ChatCompletionResponseFormat.json_schema) {
+            x.put("json_schema", jsonSchema);
+        }
+        this.jsonObject.put("response_format", x);
         return this;
     }
 
