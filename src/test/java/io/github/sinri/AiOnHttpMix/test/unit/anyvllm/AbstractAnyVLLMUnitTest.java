@@ -13,9 +13,7 @@ public abstract class AbstractAnyVLLMUnitTest extends AnyUnitTest {
     protected abstract AnyVLLMServiceAdapter buildAnyVLLMServiceAdapter();
 
     protected <R> Future<R> withAnyVLLMKit(Function<AnyVLLMKit, Future<R>> usage) {
-        AnyVLLMKit anyVLLMKit = new AnyVLLMKit();
-        anyVLLMKit.setServiceAdapter(buildAnyVLLMServiceAdapter());
-
+        AnyVLLMKit anyVLLMKit = new AnyVLLMKit(buildAnyVLLMServiceAdapter());
         return usage.apply(anyVLLMKit);
     }
 

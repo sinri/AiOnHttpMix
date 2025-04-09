@@ -1,7 +1,6 @@
 package io.github.sinri.AiOnHttpMix.test.unit.anyvllm;
 
 import io.github.sinri.AiOnHttpMix.mix.vl.AnyVLLMServiceAdapter;
-import io.github.sinri.AiOnHttpMix.mix.vl.AnyVLLMServiceAdapterThroughSDK;
 import io.github.sinri.AiOnHttpMix.utils.SupportedVLModel;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import io.vertx.core.Future;
@@ -26,9 +25,7 @@ public class AnyVLLMPureVolcesDoubaoUnitTest extends AbstractAnyVLLMUnitTest {
 
     @Override
     protected AnyVLLMServiceAdapter buildAnyVLLMServiceAdapter() {
-        return new AnyVLLMServiceAdapterThroughSDK()
-                .setServiceMeta(generateServiceMeta())
-                .setVlModel(SupportedVLModel.DoubaoVL);
+        return AnyVLLMServiceAdapter.throughSDK(generateServiceMeta(), SupportedVLModel.DoubaoVL);
     }
 
     @Test

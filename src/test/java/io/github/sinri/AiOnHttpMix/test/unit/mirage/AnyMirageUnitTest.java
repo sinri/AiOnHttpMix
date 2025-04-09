@@ -56,6 +56,7 @@ public abstract class AnyMirageUnitTest extends AnyUnitTest
                         getService(),
                         true,
                         generateRequestWithoutFC(),
+                        180_000L,
                         s -> getUnitTestLogger().info("chunk: " + s)
                 )));
     }
@@ -116,6 +117,7 @@ public abstract class AnyMirageUnitTest extends AnyUnitTest
                         getService(),
                         true,
                         generateRequestWithFC(),
+                        180_000L,
                         s -> getUnitTestLogger().info("chunk: " + s)
                 )));
     }

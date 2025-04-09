@@ -11,11 +11,10 @@ import io.github.sinri.AiOnHttpMix.volces.v3.chunk.VolcesChatResponseChunk;
 import io.github.sinri.AiOnHttpMix.volces.v3.chunk.VolcesChatStreamBuffer;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;
 import io.github.sinri.AiOnHttpMix.volces.v3.response.VolcesChatResponse;
-import io.github.sinri.keel.core.cutter.Cutter;
-import io.github.sinri.keel.core.cutter.CutterOnString;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutter;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 
 import java.util.Objects;
@@ -84,9 +83,8 @@ public final class VolcesKit {
             String requestId
     ) {
         requestBody.put("model", serviceMeta.getModel()).put("stream", true);
-        Promise<Void> promise = Promise.promise();
-        Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(s -> {
+
+        IntravenouslyCutter<String> cutter = new IntravenouslyCutterOnString(s -> {
             AigcMix.getVerboseLogger().debug(x -> x
                     .message("Component Handler in VolcesKit.chatStreamWithStringHandler")
                     .context(
@@ -96,17 +94,17 @@ public final class VolcesKit {
                     )
             );
             handler.handle(s);
+            return Future.succeededFuture();
         });
+
         requestBody.put("model", serviceMeta.getModel());
-        serviceMeta.requestSSE(
+        return serviceMeta.requestSSE(
                 VolcesServiceMeta.pathOfV3ChatCompletions,
                 requestBody,
-                promise,
                 cutter,
                 maxExecutionSeconds,
                 requestId
         );
-        return promise.future();
     }
 
     public Future<Void> chatStreamWithChunkHandler(
@@ -222,10 +220,8 @@ public final class VolcesKit {
     ) {
         request.setModel(serviceMeta.getModel());
         request.setStream(true);
-        Promise<Void> promise = Promise.promise();
 
-        Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(component -> {
+        IntravenouslyCutter<String> cutter = new IntravenouslyCutterOnString(component -> {
             DeepseekResponseChunkString deepseekResponseChunkString = new DeepseekResponseChunkString(component);
             if (!deepseekResponseChunkString.isDoneChunk() && !deepseekResponseChunkString.isKeepAliveChunk()) {
                 DeepseekResponseChunk chunk = deepseekResponseChunkString.getChunk();
@@ -233,9 +229,10 @@ public final class VolcesKit {
                     chunkHandler.handle(chunk);
                 }
             }
+            return Future.succeededFuture();
         });
-        serviceMeta.requestSSE(VolcesServiceMeta.pathOfV3ChatCompletions, request.toJsonObject(), promise, cutter, maxExecutionSeconds, requestId);
-        return promise.future();
+
+        return serviceMeta.requestSSE(VolcesServiceMeta.pathOfV3ChatCompletions, request.toJsonObject(), cutter, maxExecutionSeconds, requestId);
     }
 
     /**

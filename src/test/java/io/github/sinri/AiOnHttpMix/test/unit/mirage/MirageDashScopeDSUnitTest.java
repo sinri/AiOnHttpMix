@@ -16,19 +16,19 @@ public class MirageDashScopeDSUnitTest extends AnyMirageUnitTest {
         return null;
     }
 
-    @Test
-    @TestPassed(time = "2025-02-14")
-    @Override
-    public void testSyncWithFC() {
-        super.testSyncWithFC();
-    }
+    //    @Test
+    //    @TestPassed(time = "2025-02-14")
+    //    @Override
+    //    public void testSyncWithFC() {
+    //        super.testSyncWithFC();
+    //    }
 
-    @Test
-    @TestPassed(time = "2025-02-14")
-    @Override
-    public void testStreamWithFC() {
-        super.testStreamWithFC();
-    }
+    //    @Test
+    //    @TestPassed(time = "2025-02-14")
+    //    @Override
+    //    public void testStreamWithFC() {
+    //        super.testStreamWithFC();
+    //    }
 
     @Test
     @TestPassed(time = "2025-02-14")

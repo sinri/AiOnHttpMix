@@ -1,8 +1,7 @@
 package io.github.sinri.AiOnHttpMix.utils;
 
-import io.github.sinri.keel.core.cutter.Cutter;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutter;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,11 +27,10 @@ public interface ServiceMeta {
             String requestId
     );
 
-    void requestSSE(
+    Future<Void> requestSSE(
             String api,
             @NotNull JsonObject parameters,
-            Promise<Void> promise,
-            Cutter<String> cutter,
+            IntravenouslyCutter<String> cutter,
             int maxExecutionSeconds,
             String requestId
     );

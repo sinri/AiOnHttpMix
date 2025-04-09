@@ -1,10 +1,12 @@
 package io.github.sinri.AiOnHttpMix.test.unit.anyllm;
 
+import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponseChoice;
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponseToolFunctionCall;
 import io.github.sinri.AiOnHttpMix.test.unit.core.AnyUnitTest;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 import org.junit.Assert;
 
 import java.util.List;
@@ -14,8 +16,8 @@ public abstract class AbstractAnyLLMUnitTest extends AnyUnitTest
     @Override
     public AnyLLMRequest generateRequestWithoutToolCall() {
         return AnyLLMRequest.create()
-                            .addSystemMessage("你是个数学大师")
-                            .addUserMessage("如何定义i？");
+                            .addRoleMessage(AnyLLMRole.system, "你是个数学大师")
+                            .addRoleMessage(AnyLLMRole.user, "如何定义i？");
     }
 
     @Override
@@ -53,8 +55,8 @@ public abstract class AbstractAnyLLMUnitTest extends AnyUnitTest
     @Override
     public AnyLLMRequest generateRequestWithToolCall() {
         return AnyLLMRequest.create()
-                            .addSystemMessage("你是一个仓储管理员")
-                            .addUserMessage("仓库里现在货号为88883333的菜刀还有多少量？")
+                            .addRoleMessage(AnyLLMRole.system, "你是一个仓储管理员")
+                            .addRoleMessage(AnyLLMRole.user, "仓库里现在货号为88883333的菜刀还有多少量？")
                             .addFunctionToolDefinition(builder -> builder
                                     .functionName("inventory_query")
                                     .functionDescription("query the number of a certain product in inventory")
@@ -97,6 +99,13 @@ public abstract class AbstractAnyLLMUnitTest extends AnyUnitTest
                     String functionArguments = anyLLMResponseToolFunctionCall.getFunctionArguments();
                     getUnitTestLogger().info("functionName: " + functionName);
                     getUnitTestLogger().info("functionArguments: " + functionArguments);
+                    try {
+                        JsonObject parsed = new JsonObject(functionArguments);
+                        getUnitTestLogger().info("Parsed functionArguments: ", parsed);
+                    } catch (Throwable throwable) {
+                        //                        getUnitTestLogger().exception(throwable);
+                        Assert.fail(throwable.getMessage());
+                    }
                     return Future.succeededFuture();
                 })
         ));

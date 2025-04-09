@@ -2,7 +2,6 @@ package io.github.sinri.AiOnHttpMix.test.unit.anyvllm;
 
 import io.github.sinri.AiOnHttpMix.dashscope.core.DashscopeServiceMeta;
 import io.github.sinri.AiOnHttpMix.mix.vl.AnyVLLMServiceAdapter;
-import io.github.sinri.AiOnHttpMix.mix.vl.AnyVLLMServiceAdapterThroughSDK;
 import io.github.sinri.AiOnHttpMix.utils.SupportedVLModel;
 import io.vertx.core.Future;
 import org.junit.Test;
@@ -17,9 +16,7 @@ public class AnyVLLMPureDashScopeQwenUnitTest extends AbstractAnyVLLMUnitTest {
 
     @Override
     protected AnyVLLMServiceAdapter buildAnyVLLMServiceAdapter() {
-        return new AnyVLLMServiceAdapterThroughSDK()
-                .setServiceMeta(generateServiceMeta())
-                .setVlModel(SupportedVLModel.QwenVLPlus);
+        return AnyVLLMServiceAdapter.throughSDK(generateServiceMeta(), SupportedVLModel.QwenVLPlus);
     }
 
 

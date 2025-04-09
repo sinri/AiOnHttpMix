@@ -4,7 +4,7 @@ import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
-import io.github.sinri.keel.core.cutter.Cutter;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClientOptions;
@@ -37,6 +37,7 @@ public class VolcesServiceMeta implements ServiceMeta {
     private final @NotNull String apiKey;
     private final @NotNull String model;
     private final long streamTimeout = 180_000L;
+
     public VolcesServiceMeta(@NotNull String apiKey, @NotNull String model) {
         this.apiKey = apiKey;
         this.model = model;
@@ -97,7 +98,7 @@ public class VolcesServiceMeta implements ServiceMeta {
     }
 
     @Override
-    public void requestSSE(String api, @NotNull JsonObject parameters, Promise<Void> promise, Cutter<String> cutter, int maxExecutionSeconds, String requestId) {
+    public Future<Void> requestSSE(String api, @NotNull JsonObject parameters, IntravenouslyCutter<String> cutter, int maxExecutionSeconds, String requestId) {
         AigcMix.getVerboseLogger().info(x -> x
                 .message("Start VolcesServiceMeta.requestSSE")
                 .context(j -> j
@@ -105,85 +106,77 @@ public class VolcesServiceMeta implements ServiceMeta {
                         .put("requestId", requestId)
                         .put("input", parameters))
         );
-
-        Keel.useHttpClient(
-                new HttpClientOptions()
-                        .setKeepAlive(true)
-                        .setSsl(true)
-                        .setDefaultHost(hostOfV3ChatCompletions)
-                        .setDefaultPort(443),
-                client -> {
-                    return client.request(HttpMethod.POST, api)
-                                 .compose(httpClientRequest -> {
-                                     httpClientRequest
-                                             .putHeader("Content-Type", "application/json")
-                                             .putHeader("Authorization", "Bearer " + apiKey);
-                                     return httpClientRequest
-                                             .send(parameters.toString())
-                                             .onSuccess(httpClientResponse -> {
-                                                 Long timer;
-                                                 if (maxExecutionSeconds > 0) {
-                                                     timer = Keel.getVertx()
-                                                                 .setTimer(maxExecutionSeconds * 1000L, timeout -> {
-                                                                     promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
-                                                                     AigcMix.getVerboseLogger()
-                                                                            .info(x -> x
-                                                                                    .message("Timeout in VolcesServiceMeta.requestSSE")
-                                                                                    .context(j -> j
-                                                                                            .put("requestId", requestId))
-                                                                            );
-                                                                 });
-                                                 } else {
-                                                     timer = null;
-                                                 }
-                                                 httpClientResponse
-                                                         .handler(cutter::handle)
-                                                         .endHandler(v -> {
-                                                             // seems volces SSE does not auto end
-                                                             cutter.end()
-                                                                   .onSuccess(cutterEnded -> {
-                                                                       promise.complete();
-                                                                       AigcMix.getVerboseLogger()
-                                                                              .info(x -> x
-                                                                                      .message("End Success in VolcesServiceMeta.requestSSE")
+        Promise<Object> promise = Promise.promise();
+        return Keel.useHttpClient(
+                           new HttpClientOptions()
+                                   .setKeepAlive(true)
+                                   .setSsl(true)
+                                   .setDefaultHost(hostOfV3ChatCompletions)
+                                   .setDefaultPort(443),
+                           client -> {
+                               return client.request(HttpMethod.POST, api)
+                                            .compose(httpClientRequest -> {
+                                                httpClientRequest
+                                                        .putHeader("Content-Type", "application/json")
+                                                        .putHeader("Authorization", "Bearer " + apiKey);
+                                                return httpClientRequest
+                                                        .send(parameters.toString())
+                                                        .onSuccess(httpClientResponse -> {
+                                                            Long timer;
+                                                            if (maxExecutionSeconds > 0) {
+                                                                timer = Keel.getVertx()
+                                                                            .setTimer(maxExecutionSeconds * 1000L, timeout -> {
+                                                                                promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
+                                                                                AigcMix.getVerboseLogger()
+                                                                                       .info(x -> x
+                                                                                               .message("Timeout in VolcesServiceMeta.requestSSE")
+                                                                                               .context(j -> j
+                                                                                                       .put("requestId", requestId))
+                                                                                       );
+                                                                            });
+                                                            } else {
+                                                                timer = null;
+                                                            }
+                                                            httpClientResponse
+                                                                    .handler(cutter::acceptFromStream)
+                                                                    .endHandler(v -> {
+                                                                        // seems volces SSE does not auto end
+                                                                        cutter.stopHere();
+                                                                        promise.complete();
+                                                                        AigcMix.getVerboseLogger()
+                                                                               .info(x -> x
+                                                                                       .message("End Success in VolcesServiceMeta.requestSSE")
+                                                                                       .context(j -> j
+                                                                                               .put("requestId", requestId))
+                                                                               );
+                                                                    })
+                                                                    .exceptionHandler(throwable -> {
+                                                                        cutter.stopHere();
+                                                                        promise.fail(new RuntimeException("httpClientResponse exception", throwable));
+                                                                        AigcMix.getVerboseLogger().exception(
+                                                                                throwable,
+                                                                                x -> x.message("HttpClient Response Failure in VolcesServiceMeta.requestSSE")
                                                                                       .context(j -> j
                                                                                               .put("requestId", requestId))
-                                                                              );
-                                                                   })
-                                                                   .onFailure(throwable -> {
-                                                                       promise.fail(throwable);
-                                                                       AigcMix.getVerboseLogger()
-                                                                              .exception(
-                                                                                      throwable,
-                                                                                      x -> x.message("End Failure in VolcesServiceMeta.requestSSE")
-                                                                                            .context(j -> j
-                                                                                                    .put("requestId", requestId))
-                                                                              );
-                                                                   });
-                                                         })
-                                                         .exceptionHandler(throwable -> {
-                                                             promise.fail(new RuntimeException("httpClientResponse exception", throwable));
-                                                             AigcMix.getVerboseLogger().exception(
-                                                                     throwable,
-                                                                     x -> x.message("HttpClient Response Failure in VolcesServiceMeta.requestSSE")
-                                                                           .context(j -> j
-                                                                                   .put("requestId", requestId))
-                                                             );
-                                                         });
-                                             });
-                                 })
-                                 .onFailure(throwable -> {
-                                     promise.fail(new RuntimeException("httpClient request exception", throwable));
-                                     AigcMix.getVerboseLogger().exception(
-                                             throwable,
-                                             x -> x.message("HttpClient Failure in VolcesServiceMeta.requestSSE")
-                                                   .context(j -> j
-                                                           .put("requestId", requestId))
-                                     );
-                                 })
-                                 .eventually(promise::future);
-                }
-        );
+                                                                        );
+                                                                    });
+                                                        });
+                                            })
+                                            .onFailure(throwable -> {
+                                                promise.fail(new RuntimeException("httpClient request exception", throwable));
+                                                AigcMix.getVerboseLogger().exception(
+                                                        throwable,
+                                                        x -> x.message("HttpClient Failure in VolcesServiceMeta.requestSSE")
+                                                              .context(j -> j
+                                                                      .put("requestId", requestId))
+                                                );
+                                            })
+                                            .eventually(promise::future);
+                           }
+                   )
+                   .compose(v -> {
+                       return cutter.waitForAllHandled();
+                   });
     }
 
     @Override

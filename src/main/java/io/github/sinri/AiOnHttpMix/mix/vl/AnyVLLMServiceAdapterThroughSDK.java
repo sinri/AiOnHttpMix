@@ -13,17 +13,12 @@ import io.vertx.core.Future;
  */
 public class AnyVLLMServiceAdapterThroughSDK implements AnyVLLMServiceAdapter {
 
-    private ServiceMeta serviceMeta;
-    private SupportedVLModel vlModel;
+    private final ServiceMeta serviceMeta;
+    private final SupportedVLModel vlModel;
 
-    public AnyVLLMServiceAdapterThroughSDK setServiceMeta(ServiceMeta serviceMeta) {
+    public AnyVLLMServiceAdapterThroughSDK(ServiceMeta serviceMeta, SupportedVLModel vlModel) {
         this.serviceMeta = serviceMeta;
-        return this;
-    }
-
-    public AnyVLLMServiceAdapterThroughSDK setVlModel(SupportedVLModel vlModel) {
         this.vlModel = vlModel;
-        return this;
     }
 
     @Override

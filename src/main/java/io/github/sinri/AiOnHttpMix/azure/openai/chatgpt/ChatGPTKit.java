@@ -12,11 +12,10 @@ import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptRe
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseFunctionCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.response.OpenAIChatGptResponseToolCall;
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
-import io.github.sinri.keel.core.cutter.Cutter;
-import io.github.sinri.keel.core.cutter.CutterOnString;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutter;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
@@ -155,18 +154,15 @@ public final class ChatGPTKit {
             String requestId
     ) {
         parameters.put("stream", true);
-        Promise<Void> promise = Promise.promise();
 
-        Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(s -> {
+        IntravenouslyCutter<String> cutter = new IntravenouslyCutterOnString(s -> {
             chunkHandler.handle(s);
+            return Future.succeededFuture();
         });
 
         String api = "/chat/completions";
 
-        serviceMeta.requestSSE(api, parameters, promise, cutter, maxExecutionSeconds, requestId);
-
-        return promise.future();
+        return serviceMeta.requestSSE(api, parameters, cutter, maxExecutionSeconds, requestId);
     }
 
     public Future<OpenAIChatGptResponseChoice> chatStream(

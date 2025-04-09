@@ -13,11 +13,10 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLResponse;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.vl.QwenVLStreamBuffer;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
-import io.github.sinri.keel.core.cutter.Cutter;
-import io.github.sinri.keel.core.cutter.CutterOnString;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutter;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 
 public final class QwenKit {
@@ -87,9 +86,7 @@ public final class QwenKit {
             int maxExecutionSeconds,
             String requestId
     ) {
-        Promise<Void> promise = Promise.promise();
-        Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(s -> {
+        IntravenouslyCutter<String> cutter = new IntravenouslyCutterOnString(s -> {
             AigcMix.getVerboseLogger().debug(x -> x
                     .message("Component Handler in QwenKit.chatStreamWithStringHandler")
                     .context(j -> j
@@ -97,10 +94,11 @@ public final class QwenKit {
                             .put("request_id", requestId))
             );
             handler.handle(s);
+            return Future.succeededFuture();
         });
+
         return serviceMeta.callQwenTextGenerateStream(
                 chatRequest,
-                promise,
                 cutter,
                 maxExecutionSeconds,
                 requestId
@@ -260,9 +258,7 @@ public final class QwenKit {
             int maxExecutionSeconds,
             String requestId
     ) {
-        Promise<Void> promise = Promise.promise();
-        Cutter<String> cutterOnString = new CutterOnString();
-        cutterOnString.setComponentHandler(s -> {
+        IntravenouslyCutter<String> cutterOnString = new IntravenouslyCutterOnString(s -> {
             AigcMix.getVerboseLogger().debug(x -> x
                     .message("Component Handler in QwenKit.chatVLStreamWithStringHandler")
                     .context(j -> j
@@ -271,10 +267,11 @@ public final class QwenKit {
                     )
             );
             handler.handle(s);
+            return Future.succeededFuture();
         });
+
         return serviceMeta.callQwenMultiModalGenerateStream(
                 jsonObject,
-                promise,
                 cutterOnString,
                 maxExecutionSeconds,
                 requestId

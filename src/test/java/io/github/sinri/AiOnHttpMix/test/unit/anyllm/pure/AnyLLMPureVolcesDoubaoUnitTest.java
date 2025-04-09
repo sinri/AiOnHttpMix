@@ -1,6 +1,7 @@
 package io.github.sinri.AiOnHttpMix.test.unit.anyllm.pure;
 
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMKit;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class AnyLLMPureVolcesDoubaoUnitTest extends AbstractAnyLLMPureUnitTest<V
 
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useServiceMeta(generateServiceMeta(), SupportedModel.Doubao);
+        return new AnyLLMKit(AnyLLMServiceAdapter.throughSDK(generateServiceMeta(), SupportedModel.Doubao));
     }
 
     @Test

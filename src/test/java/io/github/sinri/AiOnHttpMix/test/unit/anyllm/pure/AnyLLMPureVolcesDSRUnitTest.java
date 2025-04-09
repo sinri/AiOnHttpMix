@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.test.unit.anyllm.pure;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMKit;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.volces.core.VolcesServiceMeta;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class AnyLLMPureVolcesDSRUnitTest extends AbstractAnyLLMPureUnitTest<Volc
 
     @Override
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useServiceMeta(generateServiceMeta(), SupportedModel.DeepSeekChatOnVolces);
+        return new AnyLLMKit(AnyLLMServiceAdapter.throughSDK(generateServiceMeta(), SupportedModel.DeepSeekChatOnVolces));
     }
 
     @Test

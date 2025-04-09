@@ -7,8 +7,8 @@ import io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekResponseChunk;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekResponseChunkString;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekStreamBuffer;
 import io.github.sinri.AiOnHttpMix.deepseek.core.DeepseekServiceMeta;
-import io.github.sinri.keel.core.cutter.Cutter;
-import io.github.sinri.keel.core.cutter.CutterOnString;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutter;
+import io.github.sinri.keel.core.cutter.IntravenouslyCutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
@@ -62,20 +62,18 @@ public class DeepseekKit {
     ) {
         requestBody.put("stream", true);
 
-        Promise<Void> promise = Promise.promise();
+        IntravenouslyCutter<String> cutter = new IntravenouslyCutterOnString(s -> {
+            streamHandler.handle(s);
+            return Future.succeededFuture();
+        });
 
-        Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(streamHandler);
-
-        serviceMeta.requestSSE(
+        return serviceMeta.requestSSE(
                 "/chat/completions",
                 requestBody,
-                promise,
                 cutter,
                 maxExecutionSeconds,
                 requestId
         );
-        return promise.future();
     }
 
     /**
@@ -93,8 +91,7 @@ public class DeepseekKit {
         Promise<Void> promise = Promise.promise();
 
         AtomicBoolean doneRef = new AtomicBoolean(false);
-        Cutter<String> cutter = new CutterOnString();
-        cutter.setComponentHandler(s -> {
+        IntravenouslyCutter<String> cutter = new IntravenouslyCutterOnString(s -> {
             DeepseekResponseChunkString deepseekResponseChunkString = new DeepseekResponseChunkString(s);
             if (!deepseekResponseChunkString.isDoneChunk() && !deepseekResponseChunkString.isKeepAliveChunk()) {
                 DeepseekResponseChunk chunk = deepseekResponseChunkString.getChunk();
@@ -108,25 +105,25 @@ public class DeepseekKit {
                     AigcMix.getVerboseLogger().debug("KEEPALIVE CHUNK MET");
                 }
             }
+            return Future.succeededFuture();
         });
 
-        serviceMeta.requestSSE(
+        return serviceMeta.requestSSE(
                 "/chat/completions",
                 request.toJsonObject(),
-                promise,
                 cutter,
                 maxExecutionSeconds,
                 requestId
         );
-        return promise.future()
-                      .compose(v -> {
-                          if (!doneRef.get()) {
-                              return Future.failedFuture(new Exception(
-                                      "DeepSeek did not accepted this request, maybe lack of resource."
-                              ));
-                          }
-                          return Future.succeededFuture();
-                      });
+        //        return promise.future()
+        //                      .compose(v -> {
+        //                          if (!doneRef.get()) {
+        //                              return Future.failedFuture(new Exception(
+        //                                      "DeepSeek did not accepted this request, maybe lack of resource."
+        //                              ));
+        //                          }
+        //                          return Future.succeededFuture();
+        //                      });
     }
 
     public Future<DeepseekChatResponse> chatStreamWithBuffer(

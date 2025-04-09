@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.test.unit.anyllm.pure;
 
 import io.github.sinri.AiOnHttpMix.azure.openai.core.AzureOpenAIServiceMeta;
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMKit;
+import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import org.junit.Test;
 
@@ -9,7 +10,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class AnyLLMPureAzureUnitTest extends AbstractAnyLLMPureUnitTest<AzureOpenAIServiceMeta> {
     public AnyLLMKit createAnyLLMKit() {
-        return new AnyLLMKit().useServiceMeta(generateServiceMeta(), SupportedModel.ChatGPT);
+        return new AnyLLMKit(AnyLLMServiceAdapter.throughSDK(generateServiceMeta(), SupportedModel.ChatGPT));
     }
 
     private String getServiceName() {
