@@ -22,4 +22,19 @@ public interface AnyVLLMServiceAdapter {
         requestHandler.handle(anyVLLMRequest);
         return request(anyVLLMRequest);
     }
+
+    /**
+     * @param request         请求
+     * @param fragmentHandler 针对一个已经格式化好的SSE Chunk的JSON对象字符串表达的处理器
+     * @since 1.1.3
+     */
+    Future<Void> request(AnyVLLMRequest request, Handler<String> fragmentHandler);
+
+    default Future<AnyVLLMResponse> requestWithStreamBuffer(Handler<AnyVLLMRequest> requestHandler) {
+        AnyVLLMRequest anyVLLMRequest = AnyVLLMRequest.create();
+        requestHandler.handle(anyVLLMRequest);
+        return requestWithStreamBuffer(anyVLLMRequest);
+    }
+
+    Future<AnyVLLMResponse> requestWithStreamBuffer(AnyVLLMRequest request);
 }
