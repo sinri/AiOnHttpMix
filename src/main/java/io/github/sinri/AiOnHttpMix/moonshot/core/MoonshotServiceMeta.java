@@ -1,12 +1,10 @@
 package io.github.sinri.AiOnHttpMix.moonshot.core;
 
-import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.IntravenouslyCutter;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -74,61 +72,23 @@ public class MoonshotServiceMeta implements ServiceMeta {
 
     @Override
     public Future<Void> requestSSE(String api, @NotNull JsonObject parameters, IntravenouslyCutter<String> cutter, int maxExecutionSeconds, String requestId) {
-        Promise<Object> promise = Promise.promise();
-        return Keel.useHttpClient(
-                           new HttpClientOptions()
-                                   .setKeepAlive(true)
-                                   .setSsl(true)
-                                   .setDefaultHost(host)
-                                   .setDefaultPort(443),
-                           client -> client.request(HttpMethod.POST, api)
-                                           .compose(httpClientRequest -> {
-                                               httpClientRequest
-                                                       .putHeader("Content-Type", "application/json")
-                                                       .putHeader("Authorization", "Bearer " + this.apiKey);
-                                               return httpClientRequest.send(parameters.toString())
-                                                                       .onSuccess(httpClientResponse -> {
-                                                                           Long timer;
-                                                                           if (maxExecutionSeconds > 0) {
-                                                                               timer = Keel.getVertx()
-                                                                                           .setTimer(maxExecutionSeconds * 1000L, theTimer -> {
-                                                                                               promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
-                                                                                               AigcMix.getVerboseLogger()
-                                                                                                      .info(x -> x
-                                                                                                              .message("Timeout in MoonshotServiceMeta.requestSSE")
-                                                                                                              .context(j -> j
-                                                                                                                      .put("requestId", requestId))
-                                                                                                      );
-                                                                                           });
-                                                                           } else {
-                                                                               timer = null;
-                                                                           }
-                                                                           httpClientResponse
-                                                                                   .handler(cutter::acceptFromStream)
-                                                                                   .endHandler(v -> {
-                                                                                       if (timer != null) {
-                                                                                           Keel.getVertx().cancelTimer(timer);
-                                                                                       }
-                                                                                       cutter.stopHere();
-                                                                                       promise.complete();
-                                                                                   })
-                                                                                   .exceptionHandler(throwable -> {
-                                                                                       if (timer != null) {
-                                                                                           Keel.getVertx().cancelTimer(timer);
-                                                                                       }
-                                                                                       cutter.stopHere();
-                                                                                       promise.fail(new RuntimeException("httpClientResponse exception for request id " + requestId, throwable));
-                                                                                   });
-                                                                       });
-                                           })
-                                           .onFailure(throwable -> {
-                                               promise.fail(new RuntimeException("httpClient request exception for request id " + requestId, throwable));
-                                           })
-                                           .eventually(promise::future)
-                   )
-                   .compose(v -> {
-                       return cutter.waitForAllHandled();
-                   });
+        return ServiceMeta.requestSSEImpl(
+                new HttpClientOptions()
+                        .setKeepAlive(true)
+                        .setSsl(true)
+                        .setDefaultHost(host)
+                        .setDefaultPort(443),
+                client -> client.request(HttpMethod.POST, api)
+                                .compose(httpClientRequest -> {
+                                    httpClientRequest
+                                            .putHeader("Content-Type", "application/json")
+                                            .putHeader("Authorization", "Bearer " + this.apiKey);
+                                    return httpClientRequest.send(parameters.toString());
+                                }),
+                cutter,
+                maxExecutionSeconds * 1000L,
+                requestId
+        );
     }
 
     public Future<JsonObject> requestGet(String api, String requestId) {

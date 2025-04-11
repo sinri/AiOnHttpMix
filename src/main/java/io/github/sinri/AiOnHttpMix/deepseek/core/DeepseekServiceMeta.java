@@ -6,7 +6,6 @@ import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.utils.SupportedProvider;
 import io.github.sinri.keel.core.cutter.IntravenouslyCutter;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -78,71 +77,20 @@ public class DeepseekServiceMeta implements ServiceMeta {
 
     @Override
     public Future<Void> requestSSE(String api, @NotNull JsonObject parameters, IntravenouslyCutter<String> cutter, int maxExecutionSeconds, String requestId) {
-        AigcMix.getVerboseLogger().info(x -> x
-                .message("Start DeepseekServiceMeta.requestSSE")
-                .context(j -> j
-                        .put("api", api)
-                        .put("requestId", requestId)
-                        .put("input", parameters)
-                )
+        return ServiceMeta.requestSSEImpl(
+                new HttpClientOptions()
+                        .setSsl(true)
+                        .setKeepAlive(true),
+                httpClient -> httpClient.request(HttpMethod.POST, ENDPOINT_PORT, ENDPOINT_HOST, api)
+                                        .compose(request -> request
+                                                .putHeader("Content-Type", "application/json")
+                                                .putHeader("Authorization", "Bearer " + apiKey)
+                                                .send(parameters.toBuffer())
+                                        ),
+                cutter,
+                maxExecutionSeconds * 1000L,
+                requestId
         );
-        Promise<Object> promise = Promise.promise();
-        return Keel.useHttpClient(
-                           new HttpClientOptions()
-                                   .setSsl(true)
-                                   .setKeepAlive(true),
-                           httpClient -> httpClient.request(HttpMethod.POST, ENDPOINT_PORT, ENDPOINT_HOST, api)
-                                                   .compose(request -> request
-                                                           .putHeader("Content-Type", "application/json")
-                                                           .putHeader("Authorization", "Bearer " + apiKey)
-                                                           .send(parameters.toBuffer())
-                                                           .compose(response -> {
-                                                               Long timer;
-                                                               if (maxExecutionSeconds > 0) {
-                                                                   timer = Keel.getVertx()
-                                                                               .setTimer(maxExecutionSeconds * 1000L, timeout -> {
-                                                                                   promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
-                                                                                   AigcMix.getVerboseLogger().info(x -> x
-                                                                                           .message("Timeout in DeepseekServiceMeta.requestSSE")
-                                                                                           .context(j -> j
-                                                                                                   .put("requestId", requestId))
-                                                                                   );
-                                                                               });
-                                                               } else {
-                                                                   timer = null;
-                                                               }
-                                                               response
-                                                                       .handler(buffer -> {
-                                                                           AigcMix.getVerboseLogger().info(x -> {
-                                                                               x.message("buffer: " + buffer);
-                                                                           });
-                                                                           cutter.acceptFromStream(buffer);
-                                                                       })
-                                                                       .endHandler(ended -> {
-                                                                           if (timer != null) {
-                                                                               Keel.getVertx().cancelTimer(timer);
-                                                                           }
-                                                                           cutter.stopHere();
-                                                                       })
-                                                                       .exceptionHandler(throwable -> {
-                                                                           if (timer != null) {
-                                                                               Keel.getVertx().cancelTimer(timer);
-                                                                           }
-                                                                           cutter.stopHere();
-                                                                           promise.fail(throwable);
-                                                                       });
-                                                               return Future.succeededFuture();
-                                                           })
-                                                   )
-                                                   .onFailure(throwable -> {
-                                                       cutter.stopHere();
-                                                       promise.fail(throwable);
-                                                   })
-                                                   .eventually(promise::future)
-                   )
-                   .compose(v -> {
-                       return cutter.waitForAllHandled();
-                   });
     }
 
     @Override

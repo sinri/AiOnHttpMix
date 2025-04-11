@@ -1,6 +1,6 @@
-package io.github.sinri.AiOnHttpMix.test.unit.mirage;
+package io.github.sinri.AiOnHttpMix.test.unit.mirage.chat;
 
-import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
+import io.github.sinri.AiOnHttpMix.mirage.chat.MirageSDK;
 import io.vertx.core.Future;
 
 import java.util.function.Function;

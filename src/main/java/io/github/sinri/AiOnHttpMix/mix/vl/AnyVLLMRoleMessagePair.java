@@ -14,7 +14,10 @@ public record AnyVLLMRoleMessagePair(AnyLLMRole role, List<AnyVLLMMessageCompone
     public JsonObject toJsonObject() {
         JsonArray array = new JsonArray();
         content.forEach(item -> {
-            array.add(item.toJsonObject());
+            array.add(new JsonObject()
+                    .put("type", item.type())
+                    .put("value", item.value())
+            );
         });
         return new JsonObject()
                 .put("role", role.name())

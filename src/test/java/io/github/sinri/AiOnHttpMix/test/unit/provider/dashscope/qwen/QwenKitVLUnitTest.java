@@ -104,7 +104,7 @@ public class QwenKitVLUnitTest extends AbstractQwenKitUnitTest implements LLMUni
                 .chatVLStreamWithBuffer(
                         getServiceMeta(),
                         generateRequest(),
-                        0,
+                        180,
                         generateRequestId()
                 )
                 .compose(resp -> {

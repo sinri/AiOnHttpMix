@@ -38,4 +38,13 @@ public class AnyVLLMPureVolcesDoubaoUnitTest extends AbstractAnyVLLMUnitTest {
                              });
         }));
     }
+
+    @Test
+    public void testCommonVLStream() {
+        async(() -> withAnyVLLMKit(anyVLLMKit -> {
+            return anyVLLMKit.request(buildVLLMRequest(), s -> {
+                getUnitTestLogger().info("s: " + s);
+            });
+        }));
+    }
 }

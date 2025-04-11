@@ -6,7 +6,7 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.tool.QwenToolDefinition;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatRequest;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.message.DeepseekMessageInRequest;
-import io.github.sinri.AiOnHttpMix.mirage.MirageRequestEntity;
+import io.github.sinri.AiOnHttpMix.mirage.chat.MirageRequestEntity;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesChatRole;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;

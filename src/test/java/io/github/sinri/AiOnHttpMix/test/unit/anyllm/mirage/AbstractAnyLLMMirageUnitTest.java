@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.test.unit.anyllm.mirage;
 
-import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
+import io.github.sinri.AiOnHttpMix.mirage.chat.MirageSDK;
 import io.github.sinri.AiOnHttpMix.test.unit.anyllm.AbstractAnyLLMUnitTest;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;

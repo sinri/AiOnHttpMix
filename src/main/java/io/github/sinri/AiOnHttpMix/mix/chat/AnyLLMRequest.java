@@ -3,7 +3,7 @@ package io.github.sinri.AiOnHttpMix.mix.chat;
 import io.github.sinri.AiOnHttpMix.azure.openai.chatgpt.request.OpenAIChatGptRequest;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.DeepseekChatRequest;
-import io.github.sinri.AiOnHttpMix.mirage.MirageRequestEntity;
+import io.github.sinri.AiOnHttpMix.mirage.chat.MirageRequestEntity;
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
 import io.github.sinri.AiOnHttpMix.mix.FunctionCallAdapter;
 import io.github.sinri.AiOnHttpMix.volces.v3.request.VolcesChatRequest;

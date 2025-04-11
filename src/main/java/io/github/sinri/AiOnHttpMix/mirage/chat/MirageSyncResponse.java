@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mirage;
+package io.github.sinri.AiOnHttpMix.mirage.chat;
 
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMResponse;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntityImpl;

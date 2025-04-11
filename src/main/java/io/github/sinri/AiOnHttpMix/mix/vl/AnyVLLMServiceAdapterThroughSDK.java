@@ -49,21 +49,28 @@ public class AnyVLLMServiceAdapterThroughSDK implements AnyVLLMServiceAdapter {
     public Future<Void> request(AnyVLLMRequest request, Handler<String> fragmentHandler) {
         return switch (vlModel) {
             case QwenVLMax, QwenVLPlus -> new QwenKit()
-                    .chatVLStreamWithStringHandler(
+                    .chatVLStreamWithChunkHandler(
                             (DashscopeServiceMeta) serviceMeta,
                             request.toQwenRequest()
                                    .setModel(this.vlModel.getMappedModelCode())
-                                   .toJsonObject(),
-                            fragmentHandler,
+                                   .handleParameters(p -> p
+                                           .setIncrementalOutput(true)
+                                   ),
+                            s -> {
+                                String extracted = s.cloneAsJsonObject().toString();
+                                fragmentHandler.handle(extracted);
+                            },
                             request.getMaxExecutionSeconds(),
                             request.getRequestId()
                     );
             case DoubaoVL -> new VolcesKit()
-                    .chatStreamWithStringHandler(
+                    .chatStreamWithChunkHandler(
                             (VolcesServiceMeta) this.serviceMeta,
-                            request.toVolcesRequest()
-                                   .toJsonObject(),
-                            fragmentHandler,
+                            request.toVolcesRequest(),
+                            s -> {
+                                String extracted = s.cloneAsJsonObject().toString();
+                                fragmentHandler.handle(extracted);
+                            },
                             request.getMaxExecutionSeconds(),
                             request.getRequestId()
                     );
@@ -77,7 +84,10 @@ public class AnyVLLMServiceAdapterThroughSDK implements AnyVLLMServiceAdapter {
                     .chatVLStreamWithBuffer(
                             (DashscopeServiceMeta) serviceMeta,
                             request.toQwenRequest()
-                                   .setModel(this.vlModel.getMappedModelCode()),
+                                   .setModel(this.vlModel.getMappedModelCode())
+                                   .handleParameters(p -> p
+                                           .setIncrementalOutput(true)
+                                   ),
                             request.getMaxExecutionSeconds(),
                             request.getRequestId()
                     )

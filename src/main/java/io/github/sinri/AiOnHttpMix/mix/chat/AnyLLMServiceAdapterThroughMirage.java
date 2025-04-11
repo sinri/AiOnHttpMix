@@ -7,7 +7,7 @@ import io.github.sinri.AiOnHttpMix.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.dashscope.qwen.text.chunk.QwenStreamBuffer;
 import io.github.sinri.AiOnHttpMix.deepseek.DeepseekKit;
 import io.github.sinri.AiOnHttpMix.deepseek.chat.chunk.DeepseekStreamBuffer;
-import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
+import io.github.sinri.AiOnHttpMix.mirage.chat.MirageSDK;
 import io.github.sinri.AiOnHttpMix.utils.LLMStreamBuffer;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.github.sinri.AiOnHttpMix.volces.v3.VolcesKit;

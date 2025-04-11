@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.mix.chat;
 
-import io.github.sinri.AiOnHttpMix.mirage.MirageSDK;
+import io.github.sinri.AiOnHttpMix.mirage.chat.MirageSDK;
 import io.github.sinri.AiOnHttpMix.utils.ServiceMeta;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import io.vertx.core.Future;

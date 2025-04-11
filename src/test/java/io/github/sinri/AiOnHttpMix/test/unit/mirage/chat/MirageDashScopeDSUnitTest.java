@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.test.unit.mirage;
+package io.github.sinri.AiOnHttpMix.test.unit.mirage.chat;
 
 import io.github.sinri.AiOnHttpMix.test.unit.core.TestPassed;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;

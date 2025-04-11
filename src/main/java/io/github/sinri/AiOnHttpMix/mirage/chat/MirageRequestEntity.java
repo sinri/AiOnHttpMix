@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mirage;
+package io.github.sinri.AiOnHttpMix.mirage.chat;
 
 import io.github.sinri.AiOnHttpMix.mix.AnyLLMRole;
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMFunctionToolDefinition;
@@ -30,34 +30,6 @@ public class MirageRequestEntity implements JsonifiableEntity<MirageRequestEntit
     public static MirageRequestEntity fromNayCodeEncodedString(@NotNull String nyacode) {
         return new MirageRequestEntity(new JsonObject(Keel.stringHelper().decodeFromNyaCode(nyacode)));
     }
-
-    @Deprecated(since = "1.1.5")
-    public String getSystemPrompt() {
-        return readString("system_prompt");
-    }
-
-    @Deprecated(since = "1.1.5")
-    public MirageRequestEntity setSystemPrompt(String systemPrompt) {
-        this.jsonObject.put("system_prompt", systemPrompt);
-        return this;
-    }
-
-    @Deprecated(since = "1.1.5")
-    public MirageRequestEntity addUserPrompt(String userPrompt) {
-        JsonArray array = this.jsonObject.getJsonArray("user_prompt_array");
-        if (array == null) {
-            array = new JsonArray();
-            this.jsonObject.put("user_prompt_array", array);
-        }
-        array.add(userPrompt);
-        return this;
-    }
-
-    @Deprecated(since = "1.1.5")
-    public List<String> getUserPromptList() {
-        return readStringArray("user_prompt_array");
-    }
-
     /**
      * @since 1.1.5
      */

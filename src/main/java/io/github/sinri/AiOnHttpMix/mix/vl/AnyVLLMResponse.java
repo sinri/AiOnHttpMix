@@ -15,6 +15,21 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 
 public interface AnyVLLMResponse {
+    static AnyVLLMResponse fromMirageVLResponseData(JsonObject jsonObject) {
+        String role = jsonObject.getString("role");
+        var resp = new AnyVLLMResponseImpl(AnyLLMRole.valueOf(role));
+
+        JsonArray content = jsonObject.getJsonArray("content");
+        content.forEach(item -> {
+            var x = (JsonObject) item;
+            if (x.containsKey("text")) {
+                resp.addContentComponent(new AnyVLLMMessageComponent(AnyVLLMMessageComponentType.text, x.getString("text")));
+            }
+        });
+
+        return resp;
+    }
+
     static AnyVLLMResponse from(VolcesChatResponse volcesResp) {
         List<VolcesChatResponseChoice> choices = volcesResp.getChoices();
         VolcesChatResponseChoice choice = choices.get(0);

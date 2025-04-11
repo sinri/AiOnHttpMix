@@ -1,19 +1,19 @@
-package io.github.sinri.AiOnHttpMix.test.unit.mirage;
+package io.github.sinri.AiOnHttpMix.test.unit.mirage.chat;
 
 import io.github.sinri.AiOnHttpMix.test.unit.core.TestPassed;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
 import org.junit.Test;
 
-public class MirageAzureUnitTest extends AnyMirageUnitTest {
+public class MirageDashScopeQwenUnitTest extends AnyMirageUnitTest {
 
     @Override
     public String getModel() {
-        return SupportedModel.ChatGPT.name();
+        return SupportedModel.QwenPlus.name();
     }
 
     @Override
     public String getService() {
-        return "gpt-4-o";
+        return null;
     }
 
     @Test
