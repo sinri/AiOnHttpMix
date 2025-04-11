@@ -16,19 +16,35 @@ import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
+/**
+ * Interface defining the contract for a service provider,
+ * which includes methods to interact with a Language Model (LLM) Service.
+ * It provides capabilities to send requests, manage supported models, and handle Server-Sent Events (SSE).
+ */
 public interface ServiceMeta {
     /**
+     * Initiates a Server-Sent Events (SSE) request using the provided HTTP client options and request function.
+     * The method processes the response with the given cutter and ensures the operation does not exceed the specified
+     * maximum execution time.
+     *
+     * @param httpClientOptions the options for the HTTP client
+     * @param requestFunction   a function that takes an HttpClient and returns a Future of HttpClientResponse
+     * @param cutter            the cutter to process the incoming stream data
+     * @param maxExecutionTime  the maximum execution time in milliseconds, must be a positive integer
+     * @param requestId         the unique identifier for the request
+     * @return a Future that completes when the SSE request is finished or fails if an error occurs
      * @since 1.3.0
      */
     static Future<Void> requestSSEImpl(
             HttpClientOptions httpClientOptions,
             Function<HttpClient, Future<HttpClientResponse>> requestFunction,
             IntravenouslyCutter<String> cutter,
-            long maxExecution,
+            long maxExecutionTime,
             String requestId
     ) {
-        if (maxExecution <= 0)
+        if (maxExecutionTime <= 0) {
             throw new IllegalArgumentException("maxExecution must be a positive integer");
+        }
         return Keel.useHttpClient(
                 httpClientOptions,
                 client -> {
@@ -38,15 +54,12 @@ public interface ServiceMeta {
                           .andThen(ar -> {
                               if (ar.succeeded()) {
                                   var httpClientResponse = ar.result();
-                                  long timer = Keel.getVertx()
-                                                   .setTimer(maxExecution, timeout -> {
-                                                       client.close();
-                                                       promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
-                                                   });
+                                  long timer = Keel.getVertx().setTimer(maxExecutionTime, timeout -> {
+                                      client.close();
+                                      promise.tryFail("TIMEOUT FOR REQUEST " + requestId);
+                                  });
                                   httpClientResponse
-                                          .handler(buffer -> {
-                                              cutter.acceptFromStream(buffer);
-                                          })
+                                          .handler(cutter::acceptFromStream)
                                           .endHandler(ended -> {
                                               Keel.getVertx().cancelTimer(timer);
                                               promise.complete();
@@ -87,12 +100,34 @@ public interface ServiceMeta {
         return getSupportedModels().contains(model);
     }
 
+    /**
+     * Sends a request, which is specified by a request ID and a JsonObject as its payload,
+     * to the LLM Service through specified API.
+     *
+     * @param api         the endpoint of the API to which the request is sent
+     * @param requestBody the JSON object representing the body of the request
+     * @param requestId   the unique identifier for the request
+     * @return a Future that completes with a JsonObject representing the response from the API
+     */
     Future<JsonObject> request(
             String api,
             JsonObject requestBody,
             String requestId
     );
 
+    /**
+     * Initiates a Server-Sent Events (SSE) request, which is specified by a request ID and a JsonObject as its
+     * payload, to the LLM Service through specified API.
+     * The method processes the incoming stream data using the provided cutter and ensures the operation does not exceed
+     * the specified maximum execution time.
+     *
+     * @param api                 the endpoint of the API to which the request is sent
+     * @param parameters          the JSON object representing the parameters for the request
+     * @param cutter              the cutter to process the incoming stream data
+     * @param maxExecutionSeconds the maximum execution time in seconds, must be a positive integer
+     * @param requestId           the unique identifier for the request
+     * @return a Future that completes when the SSE request is finished or fails if an error occurs
+     */
     Future<Void> requestSSE(
             String api,
             @NotNull JsonObject parameters,
