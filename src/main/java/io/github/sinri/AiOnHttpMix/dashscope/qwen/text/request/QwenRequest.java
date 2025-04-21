@@ -11,6 +11,10 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+
 public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
     static QwenRequest create() {
         return new QwenRequestImpl();
@@ -328,6 +332,33 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
             return this;
         }
 
+        /**
+         * @since 1.3.1 for Qwen-MT模型
+         */
+        @Nullable
+        default TranslationOptions getTranslationOptions() {
+            JsonObject x = this.toJsonObject().getJsonObject("translation_options");
+            if (x == null) return null;
+            return TranslationOptions.wrap(x);
+        }
+
+        /**
+         * @since 1.3.1 for Qwen-MT模型
+         */
+        default Parameters setTranslationOptions(TranslationOptions translationOptions) {
+            this.toJsonObject().put("translation_options", translationOptions.toJsonObject());
+            return this;
+        }
+
+        /**
+         * @since 1.3.1 for Qwen-MT模型
+         */
+        default Parameters handleTranslationOptions(Handler<TranslationOptions> translationOptionsHandler) {
+            TranslationOptions translationOptions = TranslationOptions.create();
+            translationOptionsHandler.handle(translationOptions);
+            return setTranslationOptions(translationOptions);
+        }
+
         enum ResultFormat {
             text, message
         }
@@ -379,6 +410,198 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
             default SearchOptions setForcedSearch(boolean forced_search) {
                 this.toJsonObject().put("forced_search", forced_search);
                 return this;
+            }
+        }
+
+        /**
+         * Represents a set of options for translation, including the source and target languages.
+         * This interface extends {@link JsonifiableEntity} to allow conversion to and from a JSON object.
+         * It provides methods to get and set the source and target languages for translation.
+         *
+         * <p>Note: The actual implementation of this interface is expected to provide
+         * functionality for reading from and writing to a JSON object, as well as
+         * managing other translation-related properties such as terms, tm_list, and domains,
+         * which are not fully specified in this documentation.
+         *
+         * @since 1.3.1
+         */
+        interface TranslationOptions extends JsonifiableEntity<TranslationOptions> {
+            static TranslationOptions create() {
+                return new QwenRequestParametersTranslationOptionsImpl();
+            }
+
+            static TranslationOptions wrap(JsonObject jsonObject) {
+                return new QwenRequestParametersTranslationOptionsImpl(jsonObject);
+            }
+
+            @Nullable
+            default Language getSourceLang() {
+                String sourceLang = readString("source_lang");
+                if (sourceLang == null) return null;
+                return Language.valueOf(sourceLang);
+            }
+
+            default TranslationOptions setSourceLang(Language sourceLang) {
+                this.toJsonObject().put("source_lang", sourceLang.getCode());
+                return this;
+            }
+
+            @Nullable
+            default Language getTargetLang() {
+                String targetLang = readString("target_lang");
+                if (targetLang == null) return null;
+                return Language.valueOf(targetLang);
+            }
+
+            default TranslationOptions setTargetLang(Language targetLang) {
+                this.toJsonObject().put("target_lang", targetLang.getCode());
+                return this;
+            }
+
+
+            /**
+             * 添加术语以干预翻译
+             *
+             * @param source 术语原文
+             * @param target 术语译文
+             */
+            default TranslationOptions addTerm(String source, String target) {
+                JsonArray terms = this.toJsonObject().getJsonArray("terms");
+                if (terms == null) {
+                    terms = new JsonArray();
+                    this.toJsonObject().put("terms", terms);
+                }
+                terms.add(new JsonObject()
+                        .put("source", source)
+                        .put("target", target)
+                );
+                return this;
+            }
+
+            /**
+             * @return 干预翻译的术语组装成的Map
+             */
+            default Map<String, String> getTerms() {
+                JsonArray terms = this.toJsonObject().getJsonArray("terms");
+                if (terms == null) {
+                    return Map.of();
+                }
+                TreeMap<String, String> termsMap = new TreeMap<>();
+                terms.forEach(x -> {
+                    var y = (JsonObject) x;
+                    String source = y.getString("source");
+                    String target = y.getString("target");
+                    termsMap.put(source, target);
+                });
+                return Collections.unmodifiableNavigableMap(termsMap);
+            }
+
+
+            /**
+             * 使用翻译记忆
+             *
+             * @param source 模板句原文
+             * @param target 模板句译文
+             */
+            default TranslationOptions addTemplate(String source, String target) {
+                JsonArray terms = this.toJsonObject().getJsonArray("tm_list");
+                if (terms == null) {
+                    terms = new JsonArray();
+                    this.toJsonObject().put("tm_list", terms);
+                }
+                terms.add(new JsonObject()
+                        .put("source", source)
+                        .put("target", target)
+                );
+                return this;
+            }
+
+            /**
+             * @return 翻译记忆（翻译模板？）所组装出的Map
+             */
+            default Map<String, String> getTemplates() {
+                JsonArray template = this.toJsonObject().getJsonArray("tm_list");
+                if (template == null) {
+                    return Map.of();
+                }
+                TreeMap<String, String> templateMap = new TreeMap<>();
+                template.forEach(x -> {
+                    var y = (JsonObject) x;
+                    String source = y.getString("source");
+                    String target = y.getString("target");
+                    templateMap.put(source, target);
+                });
+                return Collections.unmodifiableNavigableMap(templateMap);
+            }
+
+            /**
+             * @return 领域提示
+             */
+            default String getDomains() {
+                return this.toJsonObject().getString("domains");
+            }
+
+            /**
+             * 如果您希望翻译的风格更符合某个领域的特性，如法律、政务领域翻译用语应当严肃正式，社交领域用语应当口语化，可以用一段自然语言文本描述您的领域，将其提供给大模型作为提示。
+             *
+             * @param domains 领域提示
+             */
+            default TranslationOptions setDomains(String domains) {
+                this.toJsonObject().put("domains", domains);
+                return this;
+            }
+
+            /**
+             * @see <a href="https://help.aliyun.com/zh/model-studio/user-guide/machine-translation#f1c944081ca13"
+             *         >支持的语言</a>
+             * @since 1.3.1
+             */
+            enum Language {
+                CHINESE("Chinese", "中文"),
+                ENGLISH("English", "英语"),
+                JAPANESE("Japanese", "日语"),
+                KOREAN("Korean", "韩语"),
+                THAI("Thai", "泰语"),
+                FRENCH("French", "法语"),
+                GERMAN("German", "德语"),
+                SPANISH("Spanish", "西班牙语"),
+                ARABIC("Arabic", "阿拉伯语"),
+                INDONESIAN("Indonesian", "印尼语"),
+                VIETNAMESE("Vietnamese", "越南语"),
+                PORTUGUESE("Portuguese", "巴西葡萄牙语"),
+                ITALIAN("Italian", "意大利语"),
+                DUTCH("Dutch", "荷兰语"),
+                RUSSIAN("Russian", "俄语"),
+                KHMER("Khmer", "高棉语"),
+                CEBUANO("Cebuano", "宿务语"),
+                FILIPINO("Filipino", "菲律宾语"),
+                CZECH("Czech", "捷克语"),
+                POLISH("Polish", "波兰语"),
+                PERSIAN("Persian", "波斯语"),
+                HEBREW("Hebrew", "希伯来语"),
+                TURKISH("Turkish", "土耳其语"),
+                HINDI("Hindi", "印地语"),
+                BENGALI("Bengali", "孟加拉语"),
+                URDU("Urdu", "乌尔都语"),
+                AUTO("auto", "自动");
+
+                private final String code;
+                private final String chineseName;
+
+                Language(String code, String chineseName) {
+                    this.code = code;
+                    this.chineseName = chineseName;
+                }
+
+                public String getCode() {
+                    return code;
+                }
+
+                public String getChineseName() {
+                    return chineseName;
+                }
+
+
             }
         }
     }
