@@ -38,6 +38,8 @@ public class GptImageGenerateImageTest extends KeelUnitTest {
                                       .setSize(Size.PORTRAIT)
                                       .setQuality(Quality.low)
                                       .setNumber(1)
+                                      .setOutputCompression(80)
+                                      .setOutputFormat(OutputFormat.png)
                               )
                               .compose(imagesInBase64 -> {
                                   String s = imagesInBase64.get(0);
