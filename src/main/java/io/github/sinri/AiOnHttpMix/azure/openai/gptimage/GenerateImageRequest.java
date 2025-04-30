@@ -3,6 +3,9 @@ package io.github.sinri.AiOnHttpMix.azure.openai.gptimage;
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
+/**
+ * @since 1.3.1
+ */
 public class GenerateImageRequest extends SimpleJsonifiableEntity {
     public GenerateImageRequest(JsonObject jsonObject) {
         super(jsonObject);

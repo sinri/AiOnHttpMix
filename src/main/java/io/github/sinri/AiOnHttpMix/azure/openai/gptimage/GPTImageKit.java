@@ -12,6 +12,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 /**
  * @see <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/dall-e?tabs=gpt-image-1">How to
  *         use Azure OpenAI image generation models</a>
+ * @since 1.3.1
  */
 public class GPTImageKit {
     private final String resourceName;
@@ -37,29 +38,6 @@ public class GPTImageKit {
     public Future<List<String>> generateImage(GenerateImageRequest request) {
         return Keel.useWebClient(webClient -> webClient
                            .postAbs(getUrlToGenerateImage())
-                           .putHeader("api-key", apiKey)
-                           .sendJsonObject(request.toJsonObject())
-                   )
-                   .compose(bufferHttpResponse -> {
-                       try {
-                           JsonObject body = bufferHttpResponse.bodyAsJsonObject();
-                           JsonArray data = body.getJsonArray("data");
-                           List<String> base64Images = new ArrayList<>();
-                           data.forEach(item -> {
-                               String imageInBase64 = ((JsonObject) item).getString("b64_json");
-                               base64Images.add(imageInBase64);
-                           });
-                           return Future.succeededFuture(base64Images);
-                       } catch (Throwable throwable) {
-                           return Future.failedFuture(new Exception(bufferHttpResponse.bodyAsString(), throwable));
-                       }
-                   });
-    }
-
-    @Deprecated
-    public Future<List<String>> editImageX(EditImageRequestAsJsonObject request) {
-        return Keel.useWebClient(webClient -> webClient
-                           .postAbs(getUrlToEditImage())
                            .putHeader("api-key", apiKey)
                            .sendJsonObject(request.toJsonObject())
                    )

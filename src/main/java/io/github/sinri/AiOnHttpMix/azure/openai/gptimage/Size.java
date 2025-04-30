@@ -1,5 +1,8 @@
 package io.github.sinri.AiOnHttpMix.azure.openai.gptimage;
 
+/**
+ * @since 1.3.1
+ */
 public enum Size {
     SQUARE("1024x1024"),
     PORTRAIT("1024x1536"),
