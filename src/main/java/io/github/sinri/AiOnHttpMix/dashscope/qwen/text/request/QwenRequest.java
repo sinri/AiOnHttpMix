@@ -535,6 +535,8 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
             }
 
             /**
+             * 领域提示语句暂时只支持英文。
+             *
              * @return 领域提示
              */
             default String getDomains() {
@@ -543,6 +545,7 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
 
             /**
              * 如果您希望翻译的风格更符合某个领域的特性，如法律、政务领域翻译用语应当严肃正式，社交领域用语应当口语化，可以用一段自然语言文本描述您的领域，将其提供给大模型作为提示。
+             * 领域提示语句暂时只支持英文。
              *
              * @param domains 领域提示
              */
