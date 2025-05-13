@@ -133,7 +133,7 @@ class AnyLLMRequestImpl implements AnyLLMRequest {
             }
             String responseFormat = extraOptions.getResponseFormat();
             if (responseFormat != null) {
-                qwenRequest.handleParameters(p -> p.setResultFormat(QwenRequest.Parameters.ResultFormat.valueOf(responseFormat)));
+                qwenRequest.handleParameters(p -> p.setResponseFormatType(QwenRequest.Parameters.ResponseFormat.valueOf(responseFormat)));
             }
             Boolean incrementalOutput = extraOptions.getIncrementalOutput();
             if (incrementalOutput != null) {
