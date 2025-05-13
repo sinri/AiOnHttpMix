@@ -73,7 +73,7 @@ public class AnyLLMKit implements AnyLLMServiceAdapter {
      *                                       various context.
      * @since 1.1.2
      */
-    public <R> Future<R> callRegisterFunction(
+    public Future<String> callRegisterFunction(
             @NotNull AnyLLMResponseToolFunctionCall anyLLMResponseToolFunctionCall,
             @Nullable JsonObject fixedArgument
     ) {

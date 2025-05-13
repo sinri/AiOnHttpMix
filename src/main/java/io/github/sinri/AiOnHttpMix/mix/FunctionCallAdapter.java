@@ -36,7 +36,7 @@ public interface FunctionCallAdapter {
      */
     @NotNull
     @Deprecated(since = "1.2.6", forRemoval = true)
-    default <R> Future<R> callFunction(@Nullable JsonObject arguments) {
+    default Future<String> callFunction(@Nullable JsonObject arguments) {
         return callFunction(arguments, null);
     }
 
@@ -48,7 +48,7 @@ public interface FunctionCallAdapter {
      * @since 1.2.6
      */
     @NotNull
-    <R> Future<R> callFunction(@Nullable JsonObject arguments, @Nullable JsonObject fixedArgument);
+    Future<String> callFunction(@Nullable JsonObject arguments, @Nullable JsonObject fixedArgument);
 
 
 }

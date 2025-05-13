@@ -1,6 +1,7 @@
 package io.github.sinri.AiOnHttpMix.moonshot.kimi.impl;
 
 import io.github.sinri.AiOnHttpMix.moonshot.kimi.KimiKit;
+import io.github.sinri.AiOnHttpMix.utils.FunctionToolArgumentType;
 import io.vertx.core.json.JsonObject;
 import io.vertx.json.schema.common.dsl.ObjectSchemaBuilder;
 import io.vertx.json.schema.draft7.dsl.Schemas;
@@ -62,24 +63,24 @@ public class KimiFunctionToolDefinitionImpl implements KimiKit.FunctionToolDefin
         }
 
         public Builder propertyAsNumber(String name, String desc) {
-            return property(name, "number", desc);
+            return property(name, FunctionToolArgumentType.CODE_OF_NUMBER, desc);
         }
 
         public Builder propertyAsBoolean(String name, String desc) {
-            return property(name, "boolean", desc);
+            return property(name, FunctionToolArgumentType.CODE_OF_BOOLEAN, desc);
         }
 
         protected Builder property(String name, String type, String desc) {
-            if (Objects.equals(type, "string")) {
+            if (Objects.equals(type, FunctionToolArgumentType.CODE_OF_STRING)) {
                 propertiesSchemaJson.property(name, Schemas.stringSchema()
                         .withKeyword("description", desc));
-            } else if (Objects.equals(type, "int")) {
+            } else if (Objects.equals(type, FunctionToolArgumentType.CODE_OF_INTEGER)) {
                 propertiesSchemaJson.property(name, Schemas.intSchema()
                         .withKeyword("description", desc));
-            } else if (Objects.equals(type, "number")) {
+            } else if (Objects.equals(type, FunctionToolArgumentType.CODE_OF_NUMBER)) {
                 propertiesSchemaJson.property(name, Schemas.numberSchema()
                         .withKeyword("description", desc));
-            } else if (Objects.equals(type, "boolean")) {
+            } else if (Objects.equals(type, FunctionToolArgumentType.CODE_OF_BOOLEAN)) {
                 propertiesSchemaJson.property(name, Schemas.booleanSchema()
                         .withKeyword("description", desc));
             } else {

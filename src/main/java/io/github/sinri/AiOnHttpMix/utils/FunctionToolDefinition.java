@@ -65,19 +65,19 @@ public interface FunctionToolDefinition<E> extends JsonifiableEntity<E>, SelfInt
         }
 
         public B propertyAsString(String name, String desc) {
-            return property(name, "string", desc);
+            return property(name, FunctionToolArgumentType.CODE_OF_STRING, desc);
         }
 
         public B propertyAsInt(String name, String desc) {
-            return property(name, "int", desc);
+            return property(name, FunctionToolArgumentType.CODE_OF_INTEGER, desc);
         }
 
         public B propertyAsNumber(String name, String desc) {
-            return property(name, "number", desc);
+            return property(name, FunctionToolArgumentType.CODE_OF_NUMBER, desc);
         }
 
         public B propertyAsBoolean(String name, String desc) {
-            return property(name, "boolean", desc);
+            return property(name, FunctionToolArgumentType.CODE_OF_BOOLEAN, desc);
         }
 
         /**
@@ -91,22 +91,23 @@ public interface FunctionToolDefinition<E> extends JsonifiableEntity<E>, SelfInt
          * @since 1.1.2
          */
         public B property(FunctionToolArgumentDefinition argumentDefinition) {
-            return property(argumentDefinition.name(), argumentDefinition.argumentType().getCode(), argumentDefinition.desc());
+            return property(argumentDefinition.name(), argumentDefinition.argumentType()
+                                                                         .getCode(), argumentDefinition.desc());
         }
 
         protected B property(String name, String type, String desc) {
-            if (Objects.equals(type, "string")) {
+            if (Objects.equals(type, FunctionToolArgumentType.CODE_OF_STRING)) {
                 propertiesSchemaJson.property(name, Schemas.stringSchema()
-                        .withKeyword("description", desc));
-            } else if (Objects.equals(type, "int")) {
+                                                           .withKeyword("description", desc));
+            } else if (Objects.equals(type, FunctionToolArgumentType.CODE_OF_INTEGER)) {
                 propertiesSchemaJson.property(name, Schemas.intSchema()
-                        .withKeyword("description", desc));
-            } else if (Objects.equals(type, "number")) {
+                                                           .withKeyword("description", desc));
+            } else if (Objects.equals(type, FunctionToolArgumentType.CODE_OF_NUMBER)) {
                 propertiesSchemaJson.property(name, Schemas.numberSchema()
-                        .withKeyword("description", desc));
-            } else if (Objects.equals(type, "boolean")) {
+                                                           .withKeyword("description", desc));
+            } else if (Objects.equals(type, FunctionToolArgumentType.CODE_OF_BOOLEAN)) {
                 propertiesSchemaJson.property(name, Schemas.booleanSchema()
-                        .withKeyword("description", desc));
+                                                           .withKeyword("description", desc));
             } else {
                 throw new IllegalArgumentException();
             }

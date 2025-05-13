@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.test.unit.anyllm.mirage;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMKit;
 import io.github.sinri.AiOnHttpMix.mix.chat.AnyLLMServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.SupportedModel;
@@ -26,6 +27,7 @@ public class AnyLLMMirageDashScopeQwenUnitTest extends AbstractAnyLLMMirageUnitT
     @Test
     @Override
     public void testSyncWithToolCall() {
+        AigcMix.enableVerboseLogger();
         super.testSyncWithToolCall();
     }
 
