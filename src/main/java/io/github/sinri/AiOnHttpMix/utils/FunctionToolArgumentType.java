@@ -19,8 +19,6 @@ public enum FunctionToolArgumentType {
     }
 
     /**
-     * @param code
-     * @return
      * @since 1.1.5
      */
     public static FunctionToolArgumentType fromCode(String code) {

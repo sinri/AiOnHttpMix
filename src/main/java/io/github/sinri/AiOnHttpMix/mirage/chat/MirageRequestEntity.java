@@ -77,7 +77,7 @@ public class MirageRequestEntity implements JsonifiableEntity<MirageRequestEntit
         if (arguments != null) {
             arguments.forEach(d -> {
                 var j = new JsonObject()
-                        .put("type", d.argumentType().name())
+                        .put("type", d.argumentType().getCode())
                         .put("name", d.name())
                         .put("description", d.desc());
                 argumentsArray.add(j);
