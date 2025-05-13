@@ -57,7 +57,9 @@ public class AnyLLMServiceAdapterThroughSDK implements AnyLLMServiceAdapter {
                         AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                         return Future.succeededFuture(anyLLMResponse);
                     });
-            case QwenPlus, QwenMax, QwenLong, DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> new QwenKit()
+            case QwenPlus, QwenMax, QwenTurbo, QwenLong,
+                 QwenPlusLatest, QwenMaxLatest, QwenTurboLatest,
+                 DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> new QwenKit()
                     .chatForMessageResponse(
                             (DashscopeServiceMeta) serviceMeta,
                             request.toQwenRequest()
@@ -117,7 +119,9 @@ public class AnyLLMServiceAdapterThroughSDK implements AnyLLMServiceAdapter {
                             request.getMaxExecutionSeconds(),
                             request.getRequestId()
                     );
-            case QwenPlus, QwenMax, QwenLong, DeepSeekChatOnDashScope, DeepSeekReasonerOnDashScope -> new QwenKit()
+            case QwenPlus, QwenMax, QwenTurbo, QwenLong,
+                 QwenPlusLatest, QwenMaxLatest, QwenTurboLatest,
+                 DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> new QwenKit()
                     .chatStreamWithChunkHandler(
                             (DashscopeServiceMeta) serviceMeta,
                             request.toQwenRequest()
@@ -179,7 +183,9 @@ public class AnyLLMServiceAdapterThroughSDK implements AnyLLMServiceAdapter {
                         AnyLLMResponse anyLLMResponse = AnyLLMResponse.from(resp);
                         return Future.succeededFuture(anyLLMResponse);
                     });
-            case QwenPlus, QwenMax, QwenLong, DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> new QwenKit()
+            case QwenPlus, QwenMax, QwenTurbo, QwenLong,
+                 QwenPlusLatest, QwenMaxLatest, QwenTurboLatest,
+                 DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> new QwenKit()
                     .chatStreamWithBuffer(
                             (DashscopeServiceMeta) serviceMeta,
                             request.toQwenRequest()

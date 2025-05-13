@@ -55,6 +55,9 @@ public interface QwenMessage extends JsonifiableEntity<QwenMessage> {
 
 
     /**
+     * As of 1.2.2, for DeepSeek.
+     * As of 1.3.4, for Qwen 3.
+     *
      * @since 1.2.2 For DeepSeek on Bailian Platform of Aliyun
      */
     @TechnicalPreview(since = "1.2.2")

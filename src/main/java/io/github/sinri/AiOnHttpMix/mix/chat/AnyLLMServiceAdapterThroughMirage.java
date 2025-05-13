@@ -43,7 +43,9 @@ public class AnyLLMServiceAdapterThroughMirage implements AnyLLMServiceAdapter {
     private String generateMirageService(SupportedModel supportedModel) {
         return switch (model) {
             case ChatGPT -> "gpt-4-o";
-            case QwenPlus, QwenMax, QwenLong, DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> null;
+            case QwenPlus, QwenMax, QwenTurbo, QwenLong,
+                 QwenPlusLatest, QwenMaxLatest, QwenTurboLatest,
+                 DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> null;
             case Doubao -> "doubao-pro-128k";
             case KimiOnVolces -> "moonshot-v1-128k";
             case DeepSeekReasonerOnVolces -> "DeepSeek-R1";
@@ -86,7 +88,9 @@ public class AnyLLMServiceAdapterThroughMirage implements AnyLLMServiceAdapter {
                 yield ChatGPTKit.getStreamBufferFragmentHandler((OpenAIChatGptStreamBuffer) buffer,
                         request.getRequestId());
             }
-            case QwenPlus, QwenMax, QwenLong, DeepSeekChatOnDashScope, DeepSeekReasonerOnDashScope -> {
+            case QwenPlus, QwenMax, QwenTurbo, QwenLong,
+                 QwenPlusLatest, QwenMaxLatest, QwenTurboLatest,
+                 DeepSeekReasonerOnDashScope, DeepSeekChatOnDashScope -> {
                 buffer = new QwenStreamBuffer();
                 yield QwenKit.getStreamBufferFragmentHandler((QwenStreamBuffer) buffer,
                         request.getRequestId());

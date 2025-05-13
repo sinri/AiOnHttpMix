@@ -20,7 +20,11 @@ public enum SupportedModel {
      */
     ChatGPT(SupportedProvider.AzureOpenAI),
     QwenPlus(SupportedProvider.DashScope, QwenModel.QWEN_PLUS.getModelCode()),
+    QwenPlusLatest(SupportedProvider.DashScope, QwenModel.QWEN_PLUS_LATEST.getModelCode()),
     QwenMax(SupportedProvider.DashScope, QwenModel.QWEN_MAX.getModelCode()),
+    QwenMaxLatest(SupportedProvider.DashScope, QwenModel.QWEN_MAX_LATEST.getModelCode()),
+    QwenTurbo(SupportedProvider.DashScope, QwenModel.QWEN_TURBO.getModelCode()),
+    QwenTurboLatest(SupportedProvider.DashScope, QwenModel.QWEN_TURBO_LATEST.getModelCode()),
     /**
      * @since 1.2.2
      */

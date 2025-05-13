@@ -129,6 +129,74 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
             return new QwenRequestParametersImpl(jsonObject);
         }
 
+        /**
+         * 是否开启思考模式，适用于 Qwen3 商业版与开源版模型。
+         *
+         * @since 1.3.4
+         */
+        default Boolean getEnableThinking() {
+            return this.toJsonObject().getBoolean("enable_thinking");
+        }
+
+        /**
+         * 是否开启思考模式，适用于 Qwen3 商业版与开源版模型。
+         * <p>
+         * Qwen3 开源版默认值为 True，Qwen3 商业版模型默认值为 False。
+         *
+         * @since 1.3.4
+         */
+        default Parameters setEnableThinking(boolean enable_thinking) {
+            this.toJsonObject().put("enable_thinking", enable_thinking);
+            return this;
+        }
+
+        /**
+         * 思考过程的最大长度.
+         *
+         * @since 1.3.4
+         */
+        default Integer getThinkingBudget() {
+            return readInteger("thinking_budget");
+        }
+
+        /**
+         * 思考过程的最大长度，在enable_thinking为true时生效，
+         * 适用于qwen-plus-2025-04-28、qwen-plus-latest、qwen-turbo-2025-04-28、qwen-turbo-latest
+         * 与 Qwen3 全系模型。详情请参见限制思考长度。
+         *
+         * @since 1.3.4
+         */
+        default Parameters setThinkingBudget(int thinking_budget) {
+            this.toJsonObject().put("thinking_budget", thinking_budget);
+            return this;
+        }
+
+        /**
+         * 返回内容的格式。
+         *
+         * @since 1.3.4
+         */
+        default ResponseFormat getResponseFormatType() {
+            return ResponseFormat.valueOf(this.readString("response_format", "type"));
+        }
+
+        /**
+         * 返回内容的格式。
+         * 可选值：{@code {"type": "text"}}或{@code {"type": "json_object"}}。
+         * 设置为{@code {"type": "json_object"}}时会输出标准格式的JSON字符串。
+         * 如果指定该参数为{@code {"type": "json_object"}}，您需要在 System Message 或 User Message 中指引模型输出 JSON 格式，
+         * 如：“请按照json格式输出。”
+         *
+         * @see <a
+         *         href="https://help.aliyun.com/zh/model-studio/json-mode?spm=a2c4g.11186623.0.0.770648232o8gte">结构化输出</a>
+         * @since 1.3.4
+         */
+        default Parameters setResponseFormatType(ResponseFormat response_format) {
+            this.toJsonObject().put("response_format", new JsonObject()
+                    .put("type", response_format.name()));
+            return this;
+        }
+
         @Nullable
         default ResultFormat getResultFormat() {
             String resultFormat = readString("result_format");
@@ -357,6 +425,10 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
             TranslationOptions translationOptions = TranslationOptions.create();
             translationOptionsHandler.handle(translationOptions);
             return setTranslationOptions(translationOptions);
+        }
+
+        enum ResponseFormat {
+            text, json_object
         }
 
         enum ResultFormat {

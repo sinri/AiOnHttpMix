@@ -26,6 +26,10 @@ public enum MirageServiceEnum {
     QwenPlus(null, SupportedModel.QwenPlus),
     QwenMax(null, SupportedModel.QwenMax),
     QwenLong(null, SupportedModel.QwenLong),
+    QwenPlusLatest(null, SupportedModel.QwenPlusLatest),
+    QwenMaxLatest(null, SupportedModel.QwenMaxLatest),
+    QwenTurbo(null, SupportedModel.QwenTurbo),
+    QwenTurboLatest(null, SupportedModel.QwenTurboLatest),
     DashscopeDeepSeekV3(null, SupportedModel.DeepSeekChatOnDashScope),
     DashscopeDeepSeekR1(null, SupportedModel.DeepSeekReasonerOnDashScope),
     ;
