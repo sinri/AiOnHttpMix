@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AigcMix {
+
     private static final KeelIssueRecorder<KeelEventLog> silentVerboseLogger;
     @Nonnull
     private static final AtomicReference<KeelIssueRecorder<KeelEventLog>> verboseLoggerRef;
