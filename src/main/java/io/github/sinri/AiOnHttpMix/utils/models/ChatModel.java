@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.utils.model;
+package io.github.sinri.AiOnHttpMix.utils.models;
 
 import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
 

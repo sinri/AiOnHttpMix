@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.dashscope;
 
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.model.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import io.github.sinri.keel.facade.tesuto.unit.KeelUnitTest;

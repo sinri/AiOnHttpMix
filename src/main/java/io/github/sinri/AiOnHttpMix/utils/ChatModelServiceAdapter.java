@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.utils;
 
-import io.github.sinri.AiOnHttpMix.utils.model.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
 import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
 import io.github.sinri.keel.core.cutter.IntravenouslyCutterOnString;

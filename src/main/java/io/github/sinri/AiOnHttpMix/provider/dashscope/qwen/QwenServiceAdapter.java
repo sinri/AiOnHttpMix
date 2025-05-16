@@ -3,7 +3,7 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen;
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.model.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.providers.DashscopeServiceProvider;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
 import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
