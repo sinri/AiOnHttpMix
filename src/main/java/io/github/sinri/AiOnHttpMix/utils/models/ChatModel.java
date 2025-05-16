@@ -10,6 +10,7 @@ import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
  */
 public interface ChatModel {
     QwenPlusModel qwenPlus = new QwenPlusModel();
+    QwenPlusLatestModel qwenPlusLatest = new QwenPlusLatestModel();
     ChatGPT4OModel chatgpt4o = new ChatGPT4OModel();
     DoubaoPro32kModel doubaoPro32k = new DoubaoPro32kModel();
 

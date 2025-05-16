@@ -55,7 +55,7 @@ public class DoubaoLowLevelUnitTest extends KeelUnitTest {
             KeelConfigElement doubaoConfig = Keel.getConfiguration()
                                                  .extract("provider", "volces", "doubao");
             Assert.assertNotNull(doubaoConfig);
-            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.doubao.buildServiceMeta(doubaoConfig);
+            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.doubao.buildServiceAdapter(doubaoConfig);
             return chatModelServiceAdapter.request(
                                                   ChatModel.doubaoPro32k,
                                                   generateRequest(false),
@@ -74,7 +74,7 @@ public class DoubaoLowLevelUnitTest extends KeelUnitTest {
             KeelConfigElement doubaoConfig = Keel.getConfiguration()
                                                  .extract("provider", "volces", "doubao");
             Assert.assertNotNull(doubaoConfig);
-            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.doubao.buildServiceMeta(doubaoConfig);
+            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.doubao.buildServiceAdapter(doubaoConfig);
             return chatModelServiceAdapter.requestStream(
                                                   ChatModel.doubaoPro32k,
                                                   generateRequest(true),

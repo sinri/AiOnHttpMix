@@ -29,7 +29,7 @@ public final class DoubaoModelService implements ChatModelSeries {
     }
 
     @Override
-    public ChatModelServiceAdapter buildServiceMeta(KeelConfigElement config) {
+    public ChatModelServiceAdapter buildServiceAdapter(KeelConfigElement config) {
         String apiKey = config.readString(List.of("apiKey"));
         Map<String, String> modelDeploymentMap = new HashMap<>();
         KeelConfigElement models = config.extract("model");

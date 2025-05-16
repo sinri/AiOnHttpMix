@@ -38,7 +38,7 @@ public class ChatGptLowLevelUnitTest extends KeelUnitTest {
             KeelConfigElement chatgptConfig = Keel.getConfiguration()
                                                   .extract("provider", "azure", "openai", "EighthTower");
             Assert.assertNotNull(chatgptConfig);
-            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.chatgpt.buildServiceMeta(chatgptConfig);
+            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.chatgpt.buildServiceAdapter(chatgptConfig);
             return chatModelServiceAdapter.request(
                                                   ChatModel.chatgpt4o,
                                                   generateRequest(false),
@@ -57,7 +57,7 @@ public class ChatGptLowLevelUnitTest extends KeelUnitTest {
             KeelConfigElement chatgptConfig = Keel.getConfiguration()
                                                   .extract("provider", "azure", "openai", "EighthTower");
             Assert.assertNotNull(chatgptConfig);
-            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.chatgpt.buildServiceMeta(chatgptConfig);
+            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.chatgpt.buildServiceAdapter(chatgptConfig);
             return chatModelServiceAdapter.requestStream(
                                                   ChatModel.chatgpt4o,
                                                   generateRequest(true),

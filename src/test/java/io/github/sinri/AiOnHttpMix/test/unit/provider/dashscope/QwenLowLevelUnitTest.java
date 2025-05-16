@@ -1,29 +1,18 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.dashscope;
 
-import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
-import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
-import io.github.sinri.keel.facade.configuration.KeelConfigElement;
-import io.github.sinri.keel.facade.tesuto.unit.KeelUnitTest;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.UUID;
 
-import static io.github.sinri.keel.facade.KeelInstance.Keel;
-
-public class QwenLowLevelUnitTest extends KeelUnitTest {
+/**
+ * 对Qwen的底层服务进行单元测试。
+ */
+public class QwenLowLevelUnitTest extends AbstractQwenServiceAdapterUnitTest {
     public QwenLowLevelUnitTest() {
-    }
-
-    @Before
-    @Override
-    public void setUp() {
-
     }
 
     private JsonObject generateRequest(boolean useStreamIncrement) {
@@ -49,10 +38,7 @@ public class QwenLowLevelUnitTest extends KeelUnitTest {
     @Test
     public void test1() {
         async(() -> {
-            KeelConfigElement dashscopeConfig = Keel.getConfiguration().extract("provider", "dashscope");
-            Assert.assertNotNull(dashscopeConfig);
-            ChatModelServiceAdapter adapter = ChatModelSeries.qwen.buildServiceMeta(dashscopeConfig);
-            return adapter.request(
+            return getServiceAdapter().request(
                     ChatModel.qwenPlus,
                     generateRequest(false),
                     UUID.randomUUID().toString()).compose(resp -> {
@@ -65,10 +51,7 @@ public class QwenLowLevelUnitTest extends KeelUnitTest {
     @Test
     public void test2() {
         async(() -> {
-            KeelConfigElement dashscopeConfig = Keel.getConfiguration().extract("dashscope");
-            Assert.assertNotNull(dashscopeConfig);
-            ChatModelServiceAdapter adapter = ChatModelSeries.qwen.buildServiceMeta(dashscopeConfig);
-            return adapter.requestStream(
+            return getServiceAdapter().requestStream(
                     ChatModel.qwenPlus,
                     generateRequest(true),
                     chunk -> {

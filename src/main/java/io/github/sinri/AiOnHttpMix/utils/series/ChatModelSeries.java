@@ -19,5 +19,5 @@ public interface ChatModelSeries {
 
     String getName();
 
-    ChatModelServiceAdapter buildServiceMeta(KeelConfigElement config);
+    ChatModelServiceAdapter buildServiceAdapter(KeelConfigElement config);
 }

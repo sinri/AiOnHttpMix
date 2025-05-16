@@ -3,17 +3,16 @@ package io.github.sinri.AiOnHttpMix.utils.models;
 import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
 
 /**
- * 表示Qwen-Plus聊天模型的实现。
- * 该类为单例，名称为"qwen-plus"。
- * @since 2.0.0
+ * 表示Qwen-Plus-Latest聊天模型的实现。
+ * 该类为单例，名称为"qwen-plus-latest"。
  */
-public final class QwenPlusModel implements ChatModel {
+public final class QwenPlusLatestModel implements ChatModel {
     /**
      * 模型名称常量。
      */
-    public final static String NAME = "qwen-plus";
+    public final static String NAME = "qwen-plus-latest";
 
-    QwenPlusModel() {
+    QwenPlusLatestModel() {
 
     }
 
