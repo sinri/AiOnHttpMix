@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.utils;
 
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
-import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 import io.github.sinri.keel.core.cutter.IntravenouslyCutterOnString;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpClient;
@@ -10,13 +10,12 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonObject;
 
-import java.util.Set;
 import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 
-public interface ChatModelServiceAdapter {
+public interface ChatModelServiceAdapter{
 
     static Future<Void> callStreamWithCutter(
             HttpClientOptions httpClientOptions,
@@ -38,17 +37,11 @@ public interface ChatModelServiceAdapter {
                                 }));
     }
 
-    ServiceProvider getServiceProvider();
-
-    Set<ChatModelSeries> getChatModelSeries();
-
-    default boolean isChatModelSeriesSupported(ChatModelSeries chatModelSeries) {
-        return getChatModelSeries().contains(chatModelSeries);
+    default ServiceProvider getServiceProvider() {
+        return getSpecification().getServiceProvider();
     }
 
-    default boolean isChatModelSupported(ChatModel chatModel) {
-        return this.isChatModelSeriesSupported(chatModel.getSeries());
-    }
+    ModelSpecification getSpecification();
 
     Future<JsonObject> request(
             ChatModel chatModel,

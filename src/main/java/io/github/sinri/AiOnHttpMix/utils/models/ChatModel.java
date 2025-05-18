@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.utils.models;
 
-import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 
 /**
  * 本接口定义了一种具体的大语言模型，其规格和风格是确定的。
@@ -14,7 +14,6 @@ public interface ChatModel {
     ChatGPT4OModel chatgpt4o = new ChatGPT4OModel();
     DoubaoPro32kModel doubaoPro32k = new DoubaoPro32kModel();
 
-    ChatModelSeries getSeries();
-
-    String getName();
+    String getModelName();
+    ModelSpecification getSpecification();
 }

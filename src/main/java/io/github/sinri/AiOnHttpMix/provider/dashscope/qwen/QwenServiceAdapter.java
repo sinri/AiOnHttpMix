@@ -6,14 +6,13 @@ import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.providers.DashscopeServiceProvider;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
-import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
+import io.github.sinri.AiOnHttpMix.utils.specification.QwenModelSpecification;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
@@ -22,12 +21,6 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @since 2.0.0
  */
 public class QwenServiceAdapter implements ChatModelServiceAdapter {
-    private static final Set<ChatModelSeries> supportedChatModelSeriesSet = new HashSet<>();
-
-    static {
-        supportedChatModelSeriesSet.add(ChatModelSeries.qwen);
-    }
-
     private final String apiKey;
 
     public QwenServiceAdapter(String apiKey) {
@@ -40,17 +33,15 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
     }
 
     @Override
-    public Set<ChatModelSeries> getChatModelSeries() {
-        return supportedChatModelSeriesSet;
+    public ModelSpecification getSpecification() {
+        return ModelSpecification.qwen;
     }
 
     @Override
     public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
-        if (!isChatModelSupported(chatModel)) {
-            throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
-        }
+        getSpecification().assertChatModelCompatible(chatModel);
 
-        requestPayload.put("model", chatModel.getName());
+        requestPayload.put("model", chatModel.getModelName());
 
         AigcMix.getVerboseLogger().info(x -> x
                 .message("Start DashscopeServiceMeta.request")
@@ -86,11 +77,9 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
 
     @Override
     public Future<Void> requestStream(ChatModel chatModel, JsonObject requestPayload, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
-        if (!isChatModelSupported(chatModel)) {
-            throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
-        }
+        getSpecification().assertChatModelCompatible(chatModel);
 
-        requestPayload.put("model", chatModel.getName());
+        requestPayload.put("model", chatModel.getModelName());
 
         AigcMix.getVerboseLogger()
                .info("Start DashscopeServiceMeta.requestStream", j -> j

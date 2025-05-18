@@ -2,7 +2,8 @@ package io.github.sinri.AiOnHttpMix.test.unit.provider.azure.openai;
 
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
-import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
+import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import io.github.sinri.keel.facade.tesuto.unit.KeelUnitTest;
 import io.vertx.core.Future;
@@ -38,7 +39,10 @@ public class ChatGptLowLevelUnitTest extends KeelUnitTest {
             KeelConfigElement chatgptConfig = Keel.getConfiguration()
                                                   .extract("provider", "azure", "openai", "EighthTower");
             Assert.assertNotNull(chatgptConfig);
-            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.chatgpt.buildServiceAdapter(chatgptConfig);
+            ChatModelServiceAdapter chatModelServiceAdapter = ServiceProvider.azureOpenAI.buildServiceAdapter(
+                    ModelSpecification.chatgpt,
+                    chatgptConfig
+            );
             return chatModelServiceAdapter.request(
                                                   ChatModel.chatgpt4o,
                                                   generateRequest(false),
@@ -57,7 +61,10 @@ public class ChatGptLowLevelUnitTest extends KeelUnitTest {
             KeelConfigElement chatgptConfig = Keel.getConfiguration()
                                                   .extract("provider", "azure", "openai", "EighthTower");
             Assert.assertNotNull(chatgptConfig);
-            ChatModelServiceAdapter chatModelServiceAdapter = ChatModelSeries.chatgpt.buildServiceAdapter(chatgptConfig);
+            ChatModelServiceAdapter chatModelServiceAdapter = ServiceProvider.azureOpenAI.buildServiceAdapter(
+                    ModelSpecification.chatgpt,
+                    chatgptConfig
+            );
             return chatModelServiceAdapter.requestStream(
                                                   ChatModel.chatgpt4o,
                                                   generateRequest(true),

@@ -5,17 +5,16 @@ import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
-import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
+
 /**
  * Azure OpenAI ChatGPT 服务适配器。
  * <p>
@@ -27,11 +26,6 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @since 2.0.0
  */
 public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
-    private final static Set<ChatModelSeries> supportedChatModelSeriesSet = new HashSet<>();
-
-    static {
-        supportedChatModelSeriesSet.add(ChatModelSeries.chatgpt);
-    }
 
     private final String apiKey;
     private final String resourceName;
@@ -41,10 +35,10 @@ public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
     /**
      * 构造方法。
      *
-     * @param apiKey      Azure OpenAI API 密钥
+     * @param apiKey       Azure OpenAI API 密钥
      * @param resourceName Azure 资源名称
-     * @param deployment  部署名称
-     * @param apiVersion  API 版本号
+     * @param deployment   部署名称
+     * @param apiVersion   API 版本号
      */
     public ChatGPTServiceAdapter(String apiKey, String resourceName, String deployment, String apiVersion) {
         this.apiKey = apiKey;
@@ -63,14 +57,9 @@ public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
         return ServiceProvider.azureOpenAI;
     }
 
-    /**
-     * 获取支持的模型系列。
-     *
-     * @return 支持的 ChatModelSeries 集合
-     */
     @Override
-    public Set<ChatModelSeries> getChatModelSeries() {
-        return supportedChatModelSeriesSet;
+    public ModelSpecification getSpecification() {
+        return ModelSpecification.chatgpt;
     }
 
     /**
@@ -105,15 +94,13 @@ public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
     /**
      * 发起 ChatGPT 聊天补全请求。
      *
-     * @param chatModel  聊天模型
+     * @param chatModel      聊天模型
      * @param requestPayload 请求体
-     * @param requestId   请求 ID
+     * @param requestId      请求 ID
      */
     @Override
     public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
-        if (!isChatModelSupported(chatModel)) {
-            throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
-        }
+        getSpecification().assertChatModelCompatible(chatModel);
 
         var url = generateUrl("/chat/completions");
         AigcMix.getVerboseLogger().info(x -> x
@@ -153,16 +140,14 @@ public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
      * 发起流式聊天补全请求。
      *
      * @param chatModel         聊天模型
-     * @param requestPayload        请求参数
+     * @param requestPayload    请求参数
      * @param cutterProcessFunc SSE 数据处理函数
      * @param cutterTimeout     超时时间（毫秒）
      * @param requestId         请求 ID
      */
     @Override
     public Future<Void> requestStream(ChatModel chatModel, JsonObject requestPayload, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
-        if (!isChatModelSupported(chatModel)) {
-            throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
-        }
+        getSpecification().assertChatModelCompatible(chatModel);
 
         var uri = generateUri("/chat/completions");
         return ChatModelServiceAdapter.callStreamWithCutter(

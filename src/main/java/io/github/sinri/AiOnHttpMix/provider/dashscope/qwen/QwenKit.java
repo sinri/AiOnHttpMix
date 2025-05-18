@@ -6,7 +6,7 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.strea
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.stream.QwenResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.stream.QwenResponseFragment;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.QwenResponse;
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.models.QwenModelSeries;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
@@ -22,7 +22,7 @@ public class QwenKit {
 
     public Future<JsonObject> chat(
             QwenServiceAdapter qwenServiceAdapter,
-            ChatModel chatModel,
+            QwenModelSeries chatModel,
             JsonObject rawRequest,
             String requestId
     ) {
@@ -31,7 +31,7 @@ public class QwenKit {
 
     public Future<QwenResponse> chat(
             QwenServiceAdapter qwenServiceAdapter,
-            ChatModel chatModel,
+            QwenModelSeries chatModel,
             QwenRequest request,
             String requestId
     ) {
@@ -43,7 +43,7 @@ public class QwenKit {
 
     public Future<Void> chatStream(
             QwenServiceAdapter qwenServiceAdapter,
-            ChatModel chatModel,
+            QwenModelSeries chatModel,
             JsonObject rawRequest,
             Function<String, Future<Void>> chunkProcessFunc,
             long cutterTimeout,
@@ -54,7 +54,7 @@ public class QwenKit {
 
     public Future<Void> chatStream(
             QwenServiceAdapter qwenServiceAdapter,
-            ChatModel chatModel,
+            QwenModelSeries chatModel,
             QwenRequest request,
             Function<QwenResponseChunk, Future<Void>> chunkProcessFunc,
             long cutterTimeout,
@@ -75,7 +75,7 @@ public class QwenKit {
 
     public Future<QwenResponse> chatStream(
             QwenServiceAdapter qwenServiceAdapter,
-            ChatModel chatModel,
+            QwenModelSeries chatModel,
             QwenRequest request,
             long cutterTimeout,
             String requestId

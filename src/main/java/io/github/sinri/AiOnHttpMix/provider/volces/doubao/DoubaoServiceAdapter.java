@@ -5,31 +5,42 @@ import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
-import io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries;
-import io.github.sinri.AiOnHttpMix.utils.series.DoubaoModelService;
+import io.github.sinri.AiOnHttpMix.utils.specification.DoubaoModelSpecification;
+import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
+import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
+
 /**
  * @since 2.0.0
  */
 public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
-    private static final Set<ChatModelSeries> supportedChatModelSeriesSet = new HashSet<>();
-
-    static {
-        supportedChatModelSeriesSet.add(ChatModelSeries.doubao);
-    }
 
     private final Map<String, String> modelDeploymentMap;
     private final String apiKey;
+
+    public DoubaoServiceAdapter(KeelConfigElement config) {
+        String apiKey = config.readString(List.of("apiKey"));
+        Map<String, String> modelDeploymentMap = new HashMap<>();
+        KeelConfigElement models = config.extract("model");
+        if (models != null) {
+            models.getChildren().forEach((k, v) -> {
+                modelDeploymentMap.put(k, v.getValueAsString());
+            });
+        }
+
+        this.apiKey = apiKey;
+        this.modelDeploymentMap = modelDeploymentMap;
+    }
 
     public DoubaoServiceAdapter(String apiKey, Map<String, String> modelDeploymentMap) {
         this.apiKey = apiKey;
@@ -42,19 +53,17 @@ public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
     }
 
     @Override
-    public Set<ChatModelSeries> getChatModelSeries() {
-        return supportedChatModelSeriesSet;
+    public ModelSpecification getSpecification() {
+        return ModelSpecification.doubao;
     }
 
     @Override
     public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
-        if (!isChatModelSupported(chatModel)) {
-            throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
-        }
+        getSpecification().assertChatModelCompatible(chatModel);
 
-        String url = "https://" + DoubaoModelService.hostOfV3ChatCompletions + DoubaoModelService.pathOfV3ChatCompletions;
+        String url = "https://" + DoubaoModelSpecification.hostOfV3ChatCompletions + DoubaoModelSpecification.pathOfV3ChatCompletions;
 
-        requestPayload.put("model", this.modelDeploymentMap.get(chatModel.getName()));
+        requestPayload.put("model", this.modelDeploymentMap.get(chatModel.getModelName()));
 
         AigcMix.getVerboseLogger().info(x -> x
                 .message("Start VolcesServiceMeta.request")
@@ -89,19 +98,17 @@ public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
 
     @Override
     public Future<Void> requestStream(ChatModel chatModel, JsonObject requestPayload, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
-        if (!isChatModelSupported(chatModel)) {
-            throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
-        }
+        getSpecification().assertChatModelCompatible(chatModel);
 
-        requestPayload.put("model", this.modelDeploymentMap.get(chatModel.getName()));
+        requestPayload.put("model", this.modelDeploymentMap.get(chatModel.getModelName()));
         return ChatModelServiceAdapter.callStreamWithCutter(
                 new HttpClientOptions()
                         .setKeepAlive(true)
                         .setSsl(true)
-                        .setDefaultHost(DoubaoModelService.hostOfV3ChatCompletions)
+                        .setDefaultHost(DoubaoModelSpecification.hostOfV3ChatCompletions)
                         .setDefaultPort(443),
                 client -> {
-                    return client.request(HttpMethod.POST, DoubaoModelService.pathOfV3ChatCompletions)
+                    return client.request(HttpMethod.POST, DoubaoModelSpecification.pathOfV3ChatCompletions)
                                  .compose(httpClientRequest -> {
                                      httpClientRequest
                                              .putHeader("Content-Type", "application/json")

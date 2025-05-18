@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.utils.series;
+package io.github.sinri.AiOnHttpMix.utils.specification;
 
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
@@ -10,20 +10,22 @@ import java.util.List;
 /**
  * 表示Qwen模型系列的实现。
  * 该类为单例，名称为"Qwen"。
+ *
  * @since 2.0.0
  */
-public final class QwenModelSeries implements ChatModelSeries {
+public class QwenModelSpecification implements ModelSpecification {
     /**
      * 模型系列名称常量。
      */
-    public static final String NAME = "Qwen";
+    public static final String SPECIFICATION_NAME = "Qwen";
 
-    QwenModelSeries() {
+    QwenModelSpecification() {
 
     }
 
     /**
      * 获取服务提供方。
+     *
      * @return Dashscope服务提供方
      */
     @Override
@@ -33,21 +35,13 @@ public final class QwenModelSeries implements ChatModelSeries {
 
     /**
      * 获取模型系列名称。
+     *
      * @return 模型系列名称
      */
     @Override
-    public String getName() {
-        return NAME;
+    public String getSpecificationName() {
+        return SPECIFICATION_NAME;
     }
 
-    /**
-     * 构建服务元信息。
-     * @param config 配置项
-     * @return Qwen服务适配器
-     */
-    @Override
-    public ChatModelServiceAdapter buildServiceAdapter(KeelConfigElement config) {
-        String apiKey = config.readString(List.of("apiKey"));
-        return new QwenServiceAdapter(apiKey);
-    }
+
 }

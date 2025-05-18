@@ -15,7 +15,7 @@ In this project, we use HTTP API to use the models.
 Some of the models are designed with same API format, that means they can share one Request-and-Response implementation; 
 meanwhile, others are not shareable.
 For the models share one API format, even one endpoint, we defined a **model series** to group them.
-The model series are defined as `io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries`.
+The model series are defined as `io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification`.
 
 A service provider would provide service for a series of LLMs through various APIs.
 Such as Azure (Microsoft), Dashscope (Aliyun), Volces (ByteDance), etc., each of them provides many LLM services.
@@ -38,8 +38,8 @@ finally, set a const field as the unique instance of this class in interface `io
 ### Step 2: ensure the model series
 
 Like step 1;
-define a class implementing interface `io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries` in package `io.github.sinri.AiOnHttpMix.utils.series`.
-finally, set a const field as the unique instance of this class in interface `io.github.sinri.AiOnHttpMix.utils.series.ChatModelSeries`.
+define a class implementing interface `io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification` in package `io.github.sinri.AiOnHttpMix.utils.specification`.
+finally, set a const field as the unique instance of this class in interface `io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification`.
 
 ### Step 3: ensure the model
 
