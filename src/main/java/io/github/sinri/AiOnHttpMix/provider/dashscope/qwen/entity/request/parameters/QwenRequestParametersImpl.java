@@ -2,9 +2,13 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.param
 
 import io.github.sinri.keel.core.json.JsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+/**
+ * @since 2.0.0
+ */
 class QwenRequestParametersImpl extends JsonifiableEntityImpl<QwenRequestParameters> implements QwenRequestParameters {
     public QwenRequestParametersImpl() {
         this(new JsonObject());
@@ -16,7 +20,7 @@ class QwenRequestParametersImpl extends JsonifiableEntityImpl<QwenRequestParamet
     }
 
     @Override
-    public @NotNull QwenRequestParameters getImplementation() {
+    public @Nonnull QwenRequestParameters getImplementation() {
         return this;
     }
 
@@ -37,7 +41,7 @@ class QwenRequestParametersImpl extends JsonifiableEntityImpl<QwenRequestParamet
         }
 
         @Override
-        public @NotNull QwenRequestOcrOptions getImplementation() {
+        public @Nonnull QwenRequestOcrOptions getImplementation() {
             return this;
         }
     }
@@ -53,7 +57,7 @@ class QwenRequestParametersImpl extends JsonifiableEntityImpl<QwenRequestParamet
         }
 
         @Override
-        public @NotNull QwenRequestSearchOptions getImplementation() {
+        public @Nonnull QwenRequestSearchOptions getImplementation() {
             return this;
         }
     }

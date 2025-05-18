@@ -1,7 +1,9 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.parameters;
 
 import io.vertx.core.json.JsonObject;
-
+/**
+ * @since 2.0.0
+ */
 interface QwenRequestParametersSearchMixin<E> extends QwenRequestParametersCore<E> {
     /**
      * 模型在生成文本时是否使用互联网搜索结果进行参考。

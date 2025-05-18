@@ -2,8 +2,12 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request;
 
 import io.github.sinri.keel.core.json.JsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
+
+/**
+ * @since 2.0.0
+ */
 class QwenRequestImpl extends JsonifiableEntityImpl<QwenRequest> implements QwenRequest {
 
     public QwenRequestImpl(JsonObject jsonObject) {
@@ -15,7 +19,7 @@ class QwenRequestImpl extends JsonifiableEntityImpl<QwenRequest> implements Qwen
     }
 
     @Override
-    public @NotNull QwenRequest getImplementation() {
+    public @Nonnull QwenRequest getImplementation() {
         return this;
     }
 }

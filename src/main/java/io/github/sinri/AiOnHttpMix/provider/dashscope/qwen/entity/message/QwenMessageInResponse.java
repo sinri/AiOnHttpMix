@@ -7,6 +7,9 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @since 2.0.0
+ */
 public interface QwenMessageInResponse extends QwenMessage {
     static QwenMessageInResponse wrap(JsonObject jsonObject) {
         return new QwenMessageImpl(jsonObject);

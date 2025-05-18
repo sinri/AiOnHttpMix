@@ -3,6 +3,9 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.param
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
+/**
+ * @since 2.0.0
+ */
 public interface QwenRequestOcrOptions extends JsonifiableEntity<QwenRequestOcrOptions> {
     static QwenRequestOcrOptions create() {
         return new QwenRequestParametersImpl.QwenRequestOcrOptionsImpl();

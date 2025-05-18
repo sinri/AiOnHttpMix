@@ -4,7 +4,9 @@ import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
-
+/**
+ * @since 2.0.0
+ */
 public interface QwenResponseOutputSearchInfo extends UnmodifiableJsonifiableEntity {
     static QwenResponseOutputSearchInfo wrap(JsonObject jsonObject) {
         return new QwenResponseOutputSearchInfoImpl(jsonObject);

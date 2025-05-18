@@ -106,11 +106,11 @@ public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
      * 发起 ChatGPT 聊天补全请求。
      *
      * @param chatModel  聊天模型
-     * @param requestBody 请求体
+     * @param requestPayload 请求体
      * @param requestId   请求 ID
      */
     @Override
-    public Future<JsonObject> request(ChatModel chatModel, JsonObject requestBody, String requestId) {
+    public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
         if (!isChatModelSupported(chatModel)) {
             throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
         }
@@ -121,7 +121,7 @@ public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
                 .context(
                         j -> j
                                 .put("api", url)
-                                .put("input", requestBody)
+                                .put("input", requestPayload)
                                 .put("requestId", requestId)
                 )
         );
@@ -131,7 +131,7 @@ public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
                     .postAbs(url)
                     .putHeader("Content-Type", "application/json")
                     .putHeader("api-key", apiKey)
-                    .sendJsonObject(requestBody)
+                    .sendJsonObject(requestPayload)
                     .compose(bufferHttpResponse -> {
                         JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
                         if (bufferHttpResponse.statusCode() != 200 || entries == null) {
@@ -153,13 +153,13 @@ public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
      * 发起流式聊天补全请求。
      *
      * @param chatModel         聊天模型
-     * @param parameters        请求参数
+     * @param requestPayload        请求参数
      * @param cutterProcessFunc SSE 数据处理函数
      * @param cutterTimeout     超时时间（毫秒）
      * @param requestId         请求 ID
      */
     @Override
-    public Future<Void> requestStream(ChatModel chatModel, JsonObject parameters, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
+    public Future<Void> requestStream(ChatModel chatModel, JsonObject requestPayload, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
         if (!isChatModelSupported(chatModel)) {
             throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
         }
@@ -177,7 +177,7 @@ public class ChatGPTServiceAdapter implements ChatModelServiceAdapter {
                                             .putHeader("Content-Type", "application/json")
                                             .putHeader("api-key", apiKey);
                                     return httpClientRequest
-                                            .send(parameters.toString());
+                                            .send(requestPayload.toString());
                                 }),
                 chunk -> {
                     AigcMix.getVerboseLogger()

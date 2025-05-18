@@ -1,6 +1,8 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.parameters;
 
-
+/**
+ * @since 2.0.0
+ */
 interface QwenRequestParametersVLMixin<E> extends QwenRequestParametersCore<E> {
     /**
      * 是否提高输入图片的默认Token上限。输入图片的默认Token上限为1280，配置为true时输入图片的Token上限为16384。

@@ -1,7 +1,9 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.parameters;
 
 import io.vertx.core.json.JsonObject;
-
+/**
+ * @since 2.0.0
+ */
 public interface QwenRequestParameters
         extends QwenRequestParametersThinkMixin<QwenRequestParameters>,
         QwenRequestParametersVLMixin<QwenRequestParameters>,

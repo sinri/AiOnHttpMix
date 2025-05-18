@@ -1,6 +1,8 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.parameters;
 
-
+/**
+ * @since 2.0.0
+ */
 interface QwenRequestParametersThinkMixin<E> extends QwenRequestParametersCore<E> {
     /**
      * 是否开启思考模式，适用于 Qwen3 模型。

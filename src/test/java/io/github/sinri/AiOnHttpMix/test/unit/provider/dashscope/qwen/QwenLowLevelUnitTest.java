@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.dashscope;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.dashscope.qwen;
 
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.vertx.core.Future;

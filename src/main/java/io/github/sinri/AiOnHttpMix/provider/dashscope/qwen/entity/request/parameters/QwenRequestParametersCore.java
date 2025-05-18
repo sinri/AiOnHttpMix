@@ -3,7 +3,9 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.param
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-
+/**
+ * @since 2.0.0
+ */
 interface QwenRequestParametersCore<E> extends JsonifiableEntity<E> {
     /**
      * 是否流式输出回复。

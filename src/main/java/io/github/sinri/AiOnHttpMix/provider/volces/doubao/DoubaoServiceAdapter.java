@@ -18,7 +18,9 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
-
+/**
+ * @since 2.0.0
+ */
 public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
     private static final Set<ChatModelSeries> supportedChatModelSeriesSet = new HashSet<>();
 
@@ -45,21 +47,21 @@ public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
     }
 
     @Override
-    public Future<JsonObject> request(ChatModel chatModel, JsonObject requestBody, String requestId) {
+    public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
         if (!isChatModelSupported(chatModel)) {
             throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
         }
 
         String url = "https://" + DoubaoModelService.hostOfV3ChatCompletions + DoubaoModelService.pathOfV3ChatCompletions;
 
-        requestBody.put("model", this.modelDeploymentMap.get(chatModel.getName()));
+        requestPayload.put("model", this.modelDeploymentMap.get(chatModel.getName()));
 
         AigcMix.getVerboseLogger().info(x -> x
                 .message("Start VolcesServiceMeta.request")
                 .context(j -> j
                         .put("api", url)
                         .put("requestId", requestId)
-                        .put("input", requestBody)
+                        .put("input", requestPayload)
                 )
         );
 
@@ -67,7 +69,7 @@ public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
             return webClient
                     .postAbs(url)
                     .bearerTokenAuthentication(apiKey)
-                    .sendJsonObject(requestBody)
+                    .sendJsonObject(requestPayload)
                     .compose(bufferHttpResponse -> {
                         if (bufferHttpResponse.statusCode() != 200) {
                             throw new AbnormalResponse(bufferHttpResponse);
@@ -86,12 +88,12 @@ public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
     }
 
     @Override
-    public Future<Void> requestStream(ChatModel chatModel, JsonObject parameters, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
+    public Future<Void> requestStream(ChatModel chatModel, JsonObject requestPayload, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
         if (!isChatModelSupported(chatModel)) {
             throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
         }
 
-        parameters.put("model", this.modelDeploymentMap.get(chatModel.getName()));
+        requestPayload.put("model", this.modelDeploymentMap.get(chatModel.getName()));
         return ChatModelServiceAdapter.callStreamWithCutter(
                 new HttpClientOptions()
                         .setKeepAlive(true)
@@ -105,7 +107,7 @@ public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
                                              .putHeader("Content-Type", "application/json")
                                              .putHeader("Authorization", "Bearer " + apiKey);
                                      return httpClientRequest
-                                             .send(parameters.toString());
+                                             .send(requestPayload.toString());
                                  });
                 },
                 chunk -> {

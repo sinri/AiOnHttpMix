@@ -1,11 +1,15 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync;
 
+import javax.annotation.Nonnull;
+
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 
+/**
+ * @since 2.0.0
+ */
 class QwenResponseOutputImpl extends UnmodifiableJsonifiableEntityImpl implements QwenResponseOutput {
-    public QwenResponseOutputImpl(@NotNull JsonObject jsonObject) {
+    public QwenResponseOutputImpl(@Nonnull JsonObject jsonObject) {
         super(jsonObject);
     }
 }

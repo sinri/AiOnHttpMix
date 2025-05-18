@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.dashscope;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.dashscope.qwen;
 
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenKit;
 import org.junit.Before;

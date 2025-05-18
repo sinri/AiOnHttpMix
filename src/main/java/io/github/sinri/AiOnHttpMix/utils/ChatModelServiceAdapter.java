@@ -52,13 +52,13 @@ public interface ChatModelServiceAdapter {
 
     Future<JsonObject> request(
             ChatModel chatModel,
-            JsonObject requestBody,
+            JsonObject requestPayload,
             String requestId
     );
 
     Future<Void> requestStream(
             ChatModel chatModel,
-            JsonObject parameters,
+            JsonObject requestPayload,
             Function<String, Future<Void>> cutterProcessFunc,
             long cutterTimeout,
             String requestId

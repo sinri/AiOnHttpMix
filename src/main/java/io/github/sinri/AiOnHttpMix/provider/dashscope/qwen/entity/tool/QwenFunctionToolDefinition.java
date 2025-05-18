@@ -3,8 +3,12 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.tool;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolDefinition;
 import io.github.sinri.keel.core.json.JsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
+
+/**
+ * @since 2.0.0
+ */
 public class QwenFunctionToolDefinition extends JsonifiableEntityImpl<FunctionToolDefinition> implements FunctionToolDefinition {
     public QwenFunctionToolDefinition(JsonObject jsonObject) {
         super(jsonObject);
@@ -15,7 +19,7 @@ public class QwenFunctionToolDefinition extends JsonifiableEntityImpl<FunctionTo
     }
 
     @Override
-    public @NotNull QwenFunctionToolDefinition getImplementation() {
+    public @Nonnull QwenFunctionToolDefinition getImplementation() {
         return this;
     }
 }

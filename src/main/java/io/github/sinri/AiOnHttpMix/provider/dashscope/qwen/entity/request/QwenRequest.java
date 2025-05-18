@@ -9,8 +9,8 @@ import io.vertx.core.json.JsonObject;
 /**
  * 以 DashScope 的方式调用通义千问API的请求体。
  *
- * @see <a href=
- *         "https://help.aliyun.com/zh/model-studio/use-qwen-by-calling-api">通义千问API参考</a>
+ * @see <a href="https://help.aliyun.com/zh/model-studio/use-qwen-by-calling-api">通义千问API参考</a>
+ * @since 2.0.0
  */
 public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
     static QwenRequest create() {
@@ -34,13 +34,17 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
     }
 
     default QwenRequest input(Handler<QwenRequestInput> inputHandler) {
-        QwenRequestInput x = QwenRequestInput.create();
+        QwenRequestInput x = input();
         inputHandler.handle(x);
         return input(x);
     }
 
     default QwenRequestInput input() {
-        return QwenRequestInput.wrap(readJsonObject("input"));
+        JsonObject x = readJsonObject("input");
+        if (x == null) {
+            x = new JsonObject();
+        }
+        return QwenRequestInput.wrap(x);
     }
 
     default QwenRequest parameters(QwenRequestParameters parameters) {
@@ -48,12 +52,16 @@ public interface QwenRequest extends JsonifiableEntity<QwenRequest> {
     }
 
     default QwenRequest parameters(Handler<QwenRequestParameters> parametersHandler) {
-        QwenRequestParameters x = QwenRequestParameters.create();
+        QwenRequestParameters x = parameters();
         parametersHandler.handle(x);
         return parameters(x);
     }
 
     default QwenRequestParameters parameters() {
-        return QwenRequestParameters.wrap(readJsonObject("parameters"));
+        JsonObject x = readJsonObject("parameters");
+        if (x == null) {
+            x = new JsonObject();
+        }
+        return QwenRequestParameters.wrap(x);
     }
 }

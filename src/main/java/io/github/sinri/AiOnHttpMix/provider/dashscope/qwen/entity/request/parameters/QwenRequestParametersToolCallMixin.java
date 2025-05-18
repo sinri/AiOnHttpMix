@@ -6,7 +6,9 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+/**
+ * @since 2.0.0
+ */
 interface QwenRequestParametersToolCallMixin<E> extends QwenRequestParametersCore<E> {
     /**
      * 可供模型调用的工具数组，可以包含一个或多个工具对象。

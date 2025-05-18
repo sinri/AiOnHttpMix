@@ -18,6 +18,9 @@ import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
+/**
+ * @since 2.0.0
+ */
 public class QwenServiceAdapter implements ChatModelServiceAdapter {
     private static final Set<ChatModelSeries> supportedChatModelSeriesSet = new HashSet<>();
 
@@ -42,19 +45,19 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
     }
 
     @Override
-    public Future<JsonObject> request(ChatModel chatModel, JsonObject requestBody, String requestId) {
+    public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
         if (!isChatModelSupported(chatModel)) {
             throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
         }
 
-        requestBody.put("model", chatModel.getName());
+        requestPayload.put("model", chatModel.getName());
 
         AigcMix.getVerboseLogger().info(x -> x
                 .message("Start DashscopeServiceMeta.request")
                 .context(j -> j
                         .put("api", DashscopeServiceProvider.endpointOfDashscopeQwenTextGenerate)
                         .put("requestId", requestId)
-                        .put("input", requestBody)
+                        .put("input", requestPayload)
                 )
         );
 
@@ -63,7 +66,7 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
                     .postAbs(DashscopeServiceProvider.endpointOfDashscopeQwenTextGenerate)
                     .putHeader("Content-Type", "application/json")
                     .putHeader("Authorization", "Bearer " + apiKey)
-                    .sendJsonObject(requestBody)
+                    .sendJsonObject(requestPayload)
                     .compose(bufferHttpResponse -> {
                         int statusCode = bufferHttpResponse.statusCode();
                         if (statusCode != 200) {
@@ -82,12 +85,17 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
     }
 
     @Override
-    public Future<Void> requestStream(ChatModel chatModel, JsonObject parameters, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
+    public Future<Void> requestStream(ChatModel chatModel, JsonObject requestPayload, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
         if (!isChatModelSupported(chatModel)) {
             throw new IllegalArgumentException("ChatModel is not supported by this ChatModelServiceAdapter.");
         }
 
-        parameters.put("model", chatModel.getName());
+        requestPayload.put("model", chatModel.getName());
+
+        AigcMix.getVerboseLogger()
+               .info("Start DashscopeServiceMeta.requestStream", j -> j
+                       .put("payload", requestPayload)
+                       .put("requestId", requestId));
 
         return ChatModelServiceAdapter.callStreamWithCutter(
                 new HttpClientOptions()
@@ -95,18 +103,18 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
                         .setSsl(true)
                         .setDefaultHost(DashscopeServiceProvider.hostOfDashscope)
                         .setDefaultPort(443),
-                client -> client.request(HttpMethod.POST, DashscopeServiceProvider.pathOfDashscopeQwenTextGenerate)
-                                .compose(httpClientRequest -> {
-                                    httpClientRequest
-                                            .putHeader("Content-Type", "application/json")
-                                            .putHeader("Authorization", "Bearer " + apiKey)
-                                            .putHeader("X-DashScope-SSE", "enable");
-                                    return httpClientRequest
-                                            .send(parameters.toString());
-                                }),
+                client -> client
+                        .request(HttpMethod.POST, DashscopeServiceProvider.pathOfDashscopeQwenTextGenerate)
+                        .compose(httpClientRequest -> {
+                            httpClientRequest
+                                    .putHeader("Content-Type", "application/json")
+                                    .putHeader("Authorization", "Bearer " + apiKey)
+                                    .putHeader("X-DashScope-SSE", "enable");
+                            return httpClientRequest
+                                    .send(requestPayload.toString());
+                        }),
                 chunk -> {
-                    AigcMix.getVerboseLogger()
-                           .info("sse chunk", c -> c.put("chunk", chunk).put("request_id", requestId));
+                    AigcMix.getVerboseLogger().info("sse chunk:\n" + chunk, c -> c.put("request_id", requestId));
                     return cutterProcessFunc.apply(chunk);
                 },
                 cutterTimeout

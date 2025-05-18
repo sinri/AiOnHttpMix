@@ -3,10 +3,14 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.tool;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
+
+/**
+ * @since 2.0.0
+ */
 public class QwenFunctionToolCall extends UnmodifiableJsonifiableEntityImpl implements FunctionToolCall {
-    public QwenFunctionToolCall(@NotNull JsonObject jsonObject) {
+    public QwenFunctionToolCall(@Nonnull JsonObject jsonObject) {
         super(jsonObject);
     }
 

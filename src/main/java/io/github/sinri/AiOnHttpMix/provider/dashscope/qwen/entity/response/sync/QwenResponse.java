@@ -2,7 +2,9 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync
 
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
-
+/**
+ * @since 2.0.0
+ */
 public interface QwenResponse extends UnmodifiableJsonifiableEntity {
     static QwenResponse wrap(JsonObject rawResponse) {
         return new QwenResponseImpl(rawResponse);

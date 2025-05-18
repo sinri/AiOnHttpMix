@@ -73,7 +73,8 @@ public interface QwenMessageInRequest extends QwenMessage {
     static QwenMessage createAsToolOutputInRequest(String content, String tool_call_id) {
         return create()
                 .write("content", content)
-                .write("tool_call_id", tool_call_id)
+                .write("tool_call_id", tool_call_id) // 非流式输出用这个
+                .write("id",tool_call_id) // 流式输出用这个
                 .write("role", "tool");
     }
 }
