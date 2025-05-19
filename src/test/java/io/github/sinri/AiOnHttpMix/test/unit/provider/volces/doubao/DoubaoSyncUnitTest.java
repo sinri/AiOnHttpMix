@@ -1,12 +1,23 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.json.schema.common.dsl.Schemas;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DoubaoSyncUnitTest extends AbstractDoubaoKitUnitTest {
     @Test
@@ -24,6 +35,94 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoKitUnitTest {
                            )
                            .compose(resp -> {
                                getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+
+                               List<DoubaoResponseChoice> choices = resp.getChoices();
+                               DoubaoResponseChoice choice = choices.get(0);
+                               DoubaoMessageInResponse message = choice.getMessage();
+                               getUnitTestLogger().info("role: " + message.getRole());
+                               getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
+                               getUnitTestLogger().info("content: " + message.getContent());
+
+                               return Future.succeededFuture();
+                           });
+        });
+    }
+
+    @Test
+    public void test2() {
+        async(() -> {
+            DoubaoRequest request = DoubaoRequest.create()
+                                                 .addSystemMessage("你是一个王心凌铁粉")
+                                                 .addUserMessage("王心凌在2024年8月开过演唱会吗")
+                                                 .addTool(new DoubaoToolDefinition(f -> f
+                                                         .name("query_event_schedule")
+                                                         .description("查询演艺活动日程")
+                                                         .parameters(Schemas.objectSchema()
+                                                                            .property("name", Schemas.stringSchema()
+                                                                            )
+                                                                            .property("date_range_start", Schemas.stringSchema())
+                                                                            .property("date_range_end", Schemas.stringSchema())
+                                                                            .toJson()
+                                                         )));
+
+            AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
+
+            return getKit().chat(
+                                   getServiceAdapter(),
+                                   ChatModel.doubaoPro32k,
+                                   request,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+
+                               List<DoubaoResponseChoice> choices = resp.getChoices();
+                               DoubaoResponseChoice choice = choices.get(0);
+                               DoubaoMessageInResponse message = choice.getMessage();
+                               getUnitTestLogger().info("role: " + message.getRole());
+                               getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
+                               getUnitTestLogger().info("content: " + message.getContent());
+
+                               List<DoubaoToolCall> toolCalls = message.getToolCalls();
+                               var tc = toolCalls.get(0);
+                               FunctionToolCall function = tc.getFunction();
+                               getUnitTestLogger().info("function " + function.getName() + "(" + function.getArguments() + ")");
+
+                               toolCallMessageRef.set(message);
+
+                               Assert.assertEquals("query_event_schedule", function.getName());
+
+                               return Future.succeededFuture(new JsonArray()
+                                       .add(new JsonObject()
+                                               .put("date", "2024-08-12")
+                                               .put("name", "王心凌")
+                                               .put("place", "青岛市新城艺术中心")
+                                               .put("event", "王心凌“低糖理念”巡回演唱会青岛站")
+                                       )
+                                       .toString()
+                               );
+                           })
+                           .compose(toolCallOutputContent -> {
+                               DoubaoMessageInResponse msg = toolCallMessageRef.get();
+                               request.addToolCallMessage(msg.getContent(), msg.getToolCalls());
+                               request.addToolOutputMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
+
+                               return getKit().chat(
+                                       getServiceAdapter(),
+                                       ChatModel.doubaoPro32k,
+                                       request,
+                                       UUID.randomUUID().toString()
+                               );
+                           })
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+
+                               List<DoubaoResponseChoice> choices = resp.getChoices();
+                               DoubaoResponseChoice choice = choices.get(0);
+                               DoubaoMessageInResponse message = choice.getMessage();
+                               getUnitTestLogger().info("role: " + message.getRole());
+                               getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
+                               getUnitTestLogger().info("content: " + message.getContent());
 
                                return Future.succeededFuture();
                            });

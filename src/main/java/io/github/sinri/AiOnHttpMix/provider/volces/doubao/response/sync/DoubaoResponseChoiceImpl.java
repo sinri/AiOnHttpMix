@@ -5,11 +5,8 @@ import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 
-
-class DoubaoResponseImpl extends UnmodifiableJsonifiableEntityImpl implements DoubaoResponse {
-
-    public DoubaoResponseImpl(JsonObject jsonObject) {
+class DoubaoResponseChoiceImpl extends UnmodifiableJsonifiableEntityImpl implements DoubaoResponseChoice {
+    public DoubaoResponseChoiceImpl(@Nonnull JsonObject jsonObject) {
         super(jsonObject);
     }
-
 }

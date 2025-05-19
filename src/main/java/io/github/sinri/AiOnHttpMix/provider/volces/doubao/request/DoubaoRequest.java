@@ -2,11 +2,14 @@ package io.github.sinri.AiOnHttpMix.provider.volces.doubao.request;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessage;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +27,7 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
      * @param model 指定需要调用的模型，以模型ID或自定义推理接入点ID
      * @see <a href="https://www.volcengine.com/docs/82379/1330310">模型列表</a>
      * @see <a href="https://www.volcengine.com/docs/82379/1099522">获取 Endpoint
-     *      ID（创建自定义推理接入点）</a>
+     *         ID（创建自定义推理接入点）</a>
      */
     default DoubaoRequest model(String model) {
         return write("model", model);
@@ -39,8 +42,28 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
 
     default DoubaoRequest addMessage(DoubaoMessage message) {
         this.ensureJsonArray("messages")
-                .add(message.toJsonObject());
+            .add(message.toJsonObject());
         return this;
+    }
+
+    default DoubaoRequest addSystemMessage(String content) {
+        return addMessage(DoubaoMessageInRequest.createAsSystemMessage(content));
+    }
+
+    default DoubaoRequest addUserMessage(String content) {
+        return addMessage(DoubaoMessageInRequest.createAsUserMessage(content));
+    }
+
+    default DoubaoRequest addAssistantMessage(String content) {
+        return addMessage(DoubaoMessageInRequest.createAsAssistantMessage(content));
+    }
+
+    default DoubaoRequest addToolCallMessage(@Nullable String content, @Nonnull List<DoubaoToolCall> toolCalls) {
+        return addMessage(DoubaoMessageInRequest.createAsToolCallMessage(content, toolCalls));
+    }
+
+    default DoubaoRequest addToolOutputMessage(String content, String tool_call_id) {
+        return addMessage(DoubaoMessageInRequest.createAsToolOutputMessage(content, tool_call_id));
     }
 
     /**
@@ -263,9 +286,9 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
      * 目前仅函数作为工具被支持。用这个来提供模型可能为其生成 JSON 输入的函数列表。
      *
      * @see <a href=
-     *      "https://www.volcengine.com/docs/82379/1262342#8c325d45">拥有Function
-     *      Calling能力的模型列表</a>
-     *      支持该字段的模型请参见文档。
+     *         "https://www.volcengine.com/docs/82379/1262342#8c325d45">拥有Function
+     *         Calling能力的模型列表</a>
+     *         支持该字段的模型请参见文档。
      */
     default DoubaoRequest addTool(DoubaoToolDefinition toolDefinition) {
         ensureJsonArray("tools")
