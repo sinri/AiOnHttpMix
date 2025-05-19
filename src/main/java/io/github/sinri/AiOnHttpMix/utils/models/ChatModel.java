@@ -13,7 +13,9 @@ public interface ChatModel {
     QwenPlusLatestModel qwenPlusLatest = new QwenPlusLatestModel();
     ChatGPT4OModel chatgpt4o = new ChatGPT4OModel();
     DoubaoPro32kModel doubaoPro32k = new DoubaoPro32kModel();
+    Doubao1dot5ThinkingPro250415Model doubao1dot5ThinkingPro250415 = new Doubao1dot5ThinkingPro250415Model();
 
     String getModelName();
+
     ModelSpecification getSpecification();
 }

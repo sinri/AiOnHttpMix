@@ -9,4 +9,6 @@ public abstract class DoubaoModelSeries implements ChatModel {
     final public ModelSpecification getSpecification() {
         return ModelSpecification.doubao;
     }
+
+
 }

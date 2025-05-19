@@ -57,13 +57,21 @@ public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
         return ModelSpecification.doubao;
     }
 
+    public String toModelMappedDeploymentId(ChatModel chatModel) {
+        String deploymentId = this.modelDeploymentMap.get(chatModel.getModelName());
+        if (deploymentId == null) {
+            return chatModel.getModelName();
+        }
+        return deploymentId;
+    }
+
     @Override
     public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
         getSpecification().assertChatModelCompatible(chatModel);
 
         String url = "https://" + DoubaoModelSpecification.hostOfV3ChatCompletions + DoubaoModelSpecification.pathOfV3ChatCompletions;
 
-        requestPayload.put("model", this.modelDeploymentMap.get(chatModel.getModelName()));
+        requestPayload.put("model", toModelMappedDeploymentId(chatModel));
 
         AigcMix.getVerboseLogger().info(x -> x
                 .message("Start VolcesServiceMeta.request")
@@ -100,7 +108,7 @@ public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
     public Future<Void> requestStream(ChatModel chatModel, JsonObject requestPayload, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
         getSpecification().assertChatModelCompatible(chatModel);
 
-        requestPayload.put("model", this.modelDeploymentMap.get(chatModel.getModelName()));
+        requestPayload.put("model", toModelMappedDeploymentId(chatModel));
         return ChatModelServiceAdapter.callStreamWithCutter(
                 new HttpClientOptions()
                         .setKeepAlive(true)
@@ -117,10 +125,9 @@ public class DoubaoServiceAdapter implements ChatModelServiceAdapter {
                                              .send(requestPayload.toString());
                                  });
                 },
-                chunk -> {
-                    AigcMix.getVerboseLogger()
-                           .info("sse chunk", c -> c.put("chunk", chunk).put("request_id", requestId));
-                    return cutterProcessFunc.apply(chunk);
+                fragment -> {
+                    AigcMix.getVerboseLogger().info("[" + requestId + "] sse fragment: \n" + fragment);
+                    return cutterProcessFunc.apply(fragment);
                 },
                 cutterTimeout
         );
