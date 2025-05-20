@@ -2,7 +2,8 @@ package io.github.sinri.AiOnHttpMix.utils.providers;
 
 
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIConfigElement;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.GPTServiceAdapter;
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.o.OServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.specification.GPTModelSpecification;
 import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
@@ -35,9 +36,12 @@ public final class AzureOpenAIServiceProvider implements ServiceProvider {
                                                                  Map.Entry::getKey,
                                                                  entry -> new OpenAIConfigElement(entry.getValue())
                                                          ));
-            return new OpenAIServiceAdapter(map);
-        } else {
-            throw new RuntimeException("modelSpecification is not supported");
+            if (modelSpecification instanceof GPTModelSpecification) {
+                return new GPTServiceAdapter(map);
+            } else {
+                return new OServiceAdapter(map);
+            }
         }
+        throw new RuntimeException("modelSpecification is not supported");
     }
 }

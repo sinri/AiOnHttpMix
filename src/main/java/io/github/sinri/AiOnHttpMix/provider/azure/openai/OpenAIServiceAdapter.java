@@ -5,7 +5,6 @@ import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
-import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
@@ -28,7 +27,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @author sinri
  * @since 2.0.0
  */
-public class OpenAIServiceAdapter implements ChatModelServiceAdapter {
+public abstract class OpenAIServiceAdapter implements ChatModelServiceAdapter {
 
     private final Map<String, OpenAIConfigElement> deploymentConfigMap;
 
@@ -44,11 +43,6 @@ public class OpenAIServiceAdapter implements ChatModelServiceAdapter {
     @Override
     public ServiceProvider getServiceProvider() {
         return ServiceProvider.azureOpenAI;
-    }
-
-    @Override
-    public ModelSpecification getSpecification() {
-        return ModelSpecification.chatgpt;
     }
 
     @Nonnull
