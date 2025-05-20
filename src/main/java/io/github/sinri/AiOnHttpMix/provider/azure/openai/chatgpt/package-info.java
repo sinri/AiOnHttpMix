@@ -1,1 +1,0 @@
-package io.github.sinri.AiOnHttpMix.provider.azure.openai.chatgpt;

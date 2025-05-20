@@ -11,7 +11,8 @@ import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 public interface ChatModel {
     QwenPlusModel qwenPlus = new QwenPlusModel();
     QwenPlusLatestModel qwenPlusLatest = new QwenPlusLatestModel();
-    ChatGPT4OModel chatgpt4o = new ChatGPT4OModel();
+    OpenAIGPT4OModel chatgpt4o = new OpenAIGPT4OModel();
+    OpenAIO1Model chatgptO1 = new OpenAIO1Model();
     DoubaoPro32kModel doubaoPro32k = new DoubaoPro32kModel();
     Doubao1dot5ThinkingPro250415Model doubao1dot5ThinkingPro250415 = new Doubao1dot5ThinkingPro250415Model();
 

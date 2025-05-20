@@ -3,15 +3,15 @@ package io.github.sinri.AiOnHttpMix.utils.specification;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
 
 /**
- * 表示ChatGPT模型系列的实现。
+ * For Azure OpenAI o-series models.
  */
-public class GPTModelSpecification implements ModelSpecification {
+public class OModelSpecification implements ModelSpecification {
     /**
      * 模型系列名称常量。
      */
-    public static final String SPECIFICATION_NAME = "ChatGPT";
+    public static final String SPECIFICATION_NAME = "O";
 
-    GPTModelSpecification() {
+    OModelSpecification() {
     }
 
     /**

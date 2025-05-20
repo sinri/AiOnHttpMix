@@ -12,6 +12,7 @@ import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
 public interface ModelSpecification {
     QwenModelSpecification qwen = new QwenModelSpecification();
     GPTModelSpecification chatgpt = new GPTModelSpecification();
+    OModelSpecification o = new OModelSpecification();
     DoubaoModelSpecification doubao = new DoubaoModelSpecification();
 
     ServiceProvider getServiceProvider();

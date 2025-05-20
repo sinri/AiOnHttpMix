@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.utils.models;
 
-public class Doubao1dot5ThinkingPro250415Model extends Doubao1dot5ThinkingProModelSeries {
+public final class Doubao1dot5ThinkingPro250415Model extends Doubao1dot5ThinkingProModelSeries {
     public final static String MODEL_NAME = "doubao-1.5-thinking-pro-250415";
 
     @Override
