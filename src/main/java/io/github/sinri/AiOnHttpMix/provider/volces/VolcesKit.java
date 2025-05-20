@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.provider.volces.doubao;
+package io.github.sinri.AiOnHttpMix.provider.volces;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
@@ -6,20 +6,20 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.Doubao
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseFragment;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponse;
-import io.github.sinri.AiOnHttpMix.utils.models.DoubaoModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.VolcesModelSeries;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
 import java.util.function.Function;
 
-public class DoubaoKit {
-    public DoubaoKit() {
+public class VolcesKit {
+    public VolcesKit() {
 
     }
 
     public Future<JsonObject> chat(
-            DoubaoServiceAdapter serviceAdapter,
-            DoubaoModelSeries chatModel,
+            VolcesServiceAdapter serviceAdapter,
+            VolcesModelSeries chatModel,
             JsonObject rawRequest,
             String requestId
     ) {
@@ -27,8 +27,8 @@ public class DoubaoKit {
     }
 
     public Future<DoubaoResponse> chat(
-            DoubaoServiceAdapter serviceAdapter,
-            DoubaoModelSeries chatModel,
+            VolcesServiceAdapter serviceAdapter,
+            VolcesModelSeries chatModel,
             DoubaoRequest request,
             String requestId
     ) {
@@ -39,8 +39,8 @@ public class DoubaoKit {
     }
 
     public Future<Void> chatStream(
-            DoubaoServiceAdapter serviceAdapter,
-            DoubaoModelSeries chatModel,
+            VolcesServiceAdapter serviceAdapter,
+            VolcesModelSeries chatModel,
             JsonObject rawRequest,
             Function<String, Future<Void>> fragmentProcessor,
             long cutterTimeout,
@@ -51,8 +51,8 @@ public class DoubaoKit {
     }
 
     public Future<Void> chatStream(
-            DoubaoServiceAdapter serviceAdapter,
-            DoubaoModelSeries chatModel,
+            VolcesServiceAdapter serviceAdapter,
+            VolcesModelSeries chatModel,
             DoubaoRequest request,
             Function<DoubaoResponseChunk, Future<Void>> chunkProcessor,
             long cutterTimeout,
@@ -78,8 +78,8 @@ public class DoubaoKit {
     }
 
     public Future<DoubaoResponse> chatStream(
-            DoubaoServiceAdapter serviceAdapter,
-            DoubaoModelSeries chatModel,
+            VolcesServiceAdapter serviceAdapter,
+            VolcesModelSeries chatModel,
             DoubaoRequest request,
             long cutterTimeout,
             String requestId

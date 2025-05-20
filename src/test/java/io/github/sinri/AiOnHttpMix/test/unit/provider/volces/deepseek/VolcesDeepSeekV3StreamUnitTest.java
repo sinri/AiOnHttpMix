@@ -1,0 +1,214 @@
+package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek;
+
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.ThinkingOptions;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoice;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoiceDelta;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
+import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.AbstractDoubaoKitUnitTest;
+import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.json.schema.common.dsl.Schemas;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+public class VolcesDeepSeekV3StreamUnitTest extends AbstractDoubaoKitUnitTest {
+    @Test
+    public void test1() {
+        async(() -> {
+            DoubaoRequest request = DoubaoRequest.create()
+                                                 .addMessage(DoubaoMessageInRequest.createAsSystemMessage("你是一个王心凌铁粉"))
+                                                 .addMessage(DoubaoMessageInRequest.createAsUserMessage("王心凌主要萌点是什么"))
+                                                 .thinking(ThinkingOptions.create()
+                                                                          .type("enabled"))
+                                                 .stream(true);
+            return getKit().chatStream(getServiceAdapter(),
+                                   ChatModel.volcesDeepSeekV3on241226,
+                                   request.toJsonObject(),
+                                   fragment -> {
+                                       getUnitTestLogger().info("fragment:\n" + fragment);
+                                       return Future.succeededFuture();
+                                   },
+                                   180_000L,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(v -> {
+                               getUnitTestLogger().info("fin");
+                               return Future.succeededFuture();
+                           });
+        });
+    }
+
+    @Test
+    public void test2() {
+        //        AigcMix.enableVerboseLogger();
+        async(() -> {
+            DoubaoRequest request = DoubaoRequest.create()
+                                                 .addMessage(DoubaoMessageInRequest.createAsSystemMessage("你是一个王心凌铁粉"))
+                                                 .addMessage(DoubaoMessageInRequest.createAsUserMessage("王心凌主要萌点是什么"))
+                                                 .maxTokens(256)
+                                                 .thinking(ThinkingOptions.create()
+                                                                          .type("enabled"))
+                                                 .stream(true);
+            return getKit().chatStream(getServiceAdapter(),
+                                   ChatModel.volcesDeepSeekV3on241226,
+                                   request,
+                                   chunk -> {
+                                       getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
+
+                                       List<DoubaoResponseChunkChoice> choices = chunk.getChoices();
+                                       DoubaoResponseChunkChoice choice = choices.get(0);
+
+                                       //                                       getUnitTestLogger().info("chunk choice first: ",choice.cloneAsJsonObject());
+
+                                       DoubaoResponseChunkChoiceDelta delta = choice.getDelta();
+                                       String role = delta.getRole();
+                                       String reasoningContent = delta.getReasoningContent();
+                                       String content = delta.getContent();
+                                       getUnitTestLogger().info("delta role: " + role);
+                                       getUnitTestLogger().info("delta reasoningContent: " + reasoningContent);
+                                       getUnitTestLogger().info("delta content: " + content);
+
+                                       return Future.succeededFuture();
+                                   },
+                                   180_000L,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(v -> {
+                               getUnitTestLogger().info("fin");
+                               return Future.succeededFuture();
+                           });
+        });
+    }
+
+    @Test
+    public void test3() {
+        //        AigcMix.enableVerboseLogger();
+        async(() -> {
+            DoubaoRequest request = DoubaoRequest.create()
+                                                 .addSystemMessage("你是一个王心凌铁粉")
+                                                 .addUserMessage("王心凌在2024年8月开过演唱会吗")
+                                                 .addTool(new DoubaoToolDefinition(f -> f
+                                                         .name("query_event_schedule")
+                                                         .description("查询演艺活动日程")
+                                                         .parameters(Schemas.objectSchema()
+                                                                            .property("name", Schemas.stringSchema()
+                                                                            )
+                                                                            .property("date_range_start", Schemas.stringSchema())
+                                                                            .property("date_range_end", Schemas.stringSchema())
+                                                                            .toJson()
+                                                         )));
+
+            AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
+
+            return getKit().chatStream(
+                                   getServiceAdapter(),
+                                   ChatModel.volcesDeepSeekV3on241226,
+                                   request,
+                                   chunk -> {
+                                       getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
+                                       return Future.succeededFuture();
+                                   },
+                                   180_000L,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(v -> {
+                               getUnitTestLogger().info("fin");
+                               return Future.succeededFuture();
+                           });
+        });
+    }
+
+    @Test
+    public void test4() {
+        async(() -> {
+            DoubaoRequest request = DoubaoRequest.create()
+                                                 .addSystemMessage("你是一个王心凌铁粉")
+                                                 .addUserMessage("王心凌在2024年8月开过演唱会吗")
+                                                 .addTool(new DoubaoToolDefinition(f -> f
+                                                         .name("query_event_schedule")
+                                                         .description("查询演艺活动日程")
+                                                         .parameters(Schemas.objectSchema()
+                                                                            .property("name", Schemas.stringSchema())
+                                                                            .property("date_range_start", Schemas.stringSchema())
+                                                                            .property("date_range_end", Schemas.stringSchema())
+                                                                            .toJson()
+                                                         )));
+
+            AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
+
+            return getKit().chatStream(
+                                   getServiceAdapter(),
+                                   ChatModel.volcesDeepSeekV3on241226,
+                                   request,
+                                   180_000L,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+
+                               List<DoubaoResponseChoice> choices = resp.getChoices();
+                               DoubaoResponseChoice choice = choices.get(0);
+                               DoubaoMessageInResponse message = choice.getMessage();
+                               getUnitTestLogger().info("role: " + message.getRole());
+                               getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
+                               getUnitTestLogger().info("content: " + message.getContent());
+
+                               List<DoubaoToolCall> toolCalls = message.getToolCalls();
+                               var tc = toolCalls.get(0);
+                               FunctionToolCall function = tc.getFunction();
+                               getUnitTestLogger().info("function " + function.getName() + "(" + function.getArguments() + ")");
+
+                               toolCallMessageRef.set(message);
+
+                               Assert.assertEquals("query_event_schedule", function.getName());
+
+                               return Future.succeededFuture(new JsonArray()
+                                       .add(new JsonObject()
+                                               .put("date", "2024-08-12")
+                                               .put("name", "王心凌")
+                                               .put("place", "青岛市新城艺术中心")
+                                               .put("event", "王心凌“低糖理念”巡回演唱会青岛站")
+                                       )
+                                       .toString()
+                               );
+                           })
+                           .compose(toolCallOutputContent -> {
+                               DoubaoMessageInResponse msg = toolCallMessageRef.get();
+                               request.addToolCallMessage(msg.getContent(), msg.getToolCalls());
+                               request.addToolOutputMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
+
+                               return getKit().chatStream(
+                                       getServiceAdapter(),
+                                       ChatModel.volcesDeepSeekV3on241226,
+                                       request,
+                                       180_000L,
+                                       UUID.randomUUID().toString()
+                               );
+                           })
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+
+                               List<DoubaoResponseChoice> choices = resp.getChoices();
+                               DoubaoResponseChoice choice = choices.get(0);
+                               DoubaoMessageInResponse message = choice.getMessage();
+                               getUnitTestLogger().info("role: " + message.getRole());
+                               getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
+                               getUnitTestLogger().info("content: " + message.getContent());
+
+                               return Future.succeededFuture();
+                           });
+        });
+    }
+}

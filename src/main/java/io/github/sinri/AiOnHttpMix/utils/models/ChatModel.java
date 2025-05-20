@@ -15,6 +15,7 @@ public interface ChatModel {
     OpenAIO1Model chatgptO1 = new OpenAIO1Model();
     DoubaoPro32kModel doubaoPro32k = new DoubaoPro32kModel();
     Doubao1dot5ThinkingPro250415Model doubao1dot5ThinkingPro250415 = new Doubao1dot5ThinkingPro250415Model();
+    VolcesDeepSeekV3on241226 volcesDeepSeekV3on241226 = new VolcesDeepSeekV3on241226();
 
     String getModelName();
 

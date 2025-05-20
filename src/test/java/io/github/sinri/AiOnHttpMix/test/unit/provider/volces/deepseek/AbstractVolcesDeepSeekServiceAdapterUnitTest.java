@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.VolcesServiceAdapter;
 import io.github.sinri.AiOnHttpMix.test.unit.provider.AbstractServiceAdapterUnitTest;
@@ -9,7 +9,7 @@ import org.junit.Assert;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-public class AbstractDoubaoServiceAdapterUnitTest extends AbstractServiceAdapterUnitTest<VolcesModelSpecification, VolcesServiceAdapter> {
+public class AbstractVolcesDeepSeekServiceAdapterUnitTest extends AbstractServiceAdapterUnitTest<VolcesModelSpecification, VolcesServiceAdapter> {
     @Override
     protected VolcesModelSpecification getModelSeries() {
         return ModelSpecification.volces;
@@ -22,6 +22,6 @@ public class AbstractDoubaoServiceAdapterUnitTest extends AbstractServiceAdapter
         Assert.assertNotNull(doubaoConfig);
 
         return (VolcesServiceAdapter) getModelSeries().getServiceProvider()
-                                                      .buildServiceAdapter(getModelSeries(), doubaoConfig);
+                                                              .buildServiceAdapter(getModelSeries(), doubaoConfig);
     }
 }

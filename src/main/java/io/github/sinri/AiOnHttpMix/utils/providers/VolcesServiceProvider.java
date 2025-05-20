@@ -1,8 +1,8 @@
 package io.github.sinri.AiOnHttpMix.utils.providers;
 
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.DoubaoServiceAdapter;
+import io.github.sinri.AiOnHttpMix.provider.volces.VolcesServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.specification.DoubaoModelSpecification;
+import io.github.sinri.AiOnHttpMix.utils.specification.VolcesModelSpecification;
 import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 
@@ -24,7 +24,7 @@ public class VolcesServiceProvider implements ServiceProvider {
 
     @Override
     public ChatModelServiceAdapter buildServiceAdapter(ModelSpecification modelSpecification, KeelConfigElement config) {
-        if (modelSpecification instanceof DoubaoModelSpecification) {
+        if (modelSpecification instanceof VolcesModelSpecification) {
             String apiKey = config.readString(List.of("apiKey"));
             Map<String, String> modelDeploymentMap = new HashMap<>();
             KeelConfigElement models = config.extract("model");
@@ -33,7 +33,7 @@ public class VolcesServiceProvider implements ServiceProvider {
                     modelDeploymentMap.put(k, v.getValueAsString());
                 });
             }
-            return new DoubaoServiceAdapter(apiKey, modelDeploymentMap);
+            return new VolcesServiceAdapter(apiKey, modelDeploymentMap);
         } else {
             throw new RuntimeException("modelSpecification is not supported");
         }

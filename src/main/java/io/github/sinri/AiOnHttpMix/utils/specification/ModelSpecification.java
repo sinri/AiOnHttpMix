@@ -13,7 +13,7 @@ public interface ModelSpecification {
     QwenModelSpecification qwen = new QwenModelSpecification();
     GPTModelSpecification chatgpt = new GPTModelSpecification();
     OModelSpecification o = new OModelSpecification();
-    DoubaoModelSpecification doubao = new DoubaoModelSpecification();
+    VolcesModelSpecification volces = new VolcesModelSpecification();
 
     ServiceProvider getServiceProvider();
 
