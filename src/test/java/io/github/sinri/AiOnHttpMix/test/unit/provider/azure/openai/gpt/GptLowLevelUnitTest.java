@@ -30,7 +30,7 @@ public class GptLowLevelUnitTest extends AbstractGptServiceAdapterUnitTest {
         async(() -> {
             return getServiceAdapter()
                     .request(
-                            ChatModel.chatgpt4o,
+                            gpt4o,
                             generateRequest(false),
                             UUID.randomUUID().toString()
                     )
@@ -46,7 +46,7 @@ public class GptLowLevelUnitTest extends AbstractGptServiceAdapterUnitTest {
         async(() -> {
             return getServiceAdapter()
                     .requestStream(
-                            ChatModel.chatgpt4o,
+                            gpt4o,
                             generateRequest(true),
                             chunk -> {
                                 getUnitTestLogger().info("chunk: " + chunk);

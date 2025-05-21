@@ -38,7 +38,7 @@ public class DoubaoLowLevelUnitTest extends AbstractDoubaoServiceAdapterUnitTest
         async(() -> {
             return buildServiceAdapter()
                     .request(
-                            ChatModel.doubaoPro32k,
+                            doubaoPro32k,
                             generateRequest(false),
                             UUID.randomUUID().toString()
                     )
@@ -54,7 +54,7 @@ public class DoubaoLowLevelUnitTest extends AbstractDoubaoServiceAdapterUnitTest
         async(() -> {
             return buildServiceAdapter()
                     .requestStream(
-                            ChatModel.doubaoPro32k,
+                            doubaoPro32k,
                             generateRequest(true),
                             chunk -> {
                                 getUnitTestLogger().info("chunk: " + chunk);

@@ -1,5 +1,6 @@
-package io.github.sinri.AiOnHttpMix.utils.models;
+package io.github.sinri.AiOnHttpMix.utils.models.volces;
 
+import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 
 public abstract class VolcesModelSeries implements ChatModel {
@@ -7,5 +8,4 @@ public abstract class VolcesModelSeries implements ChatModel {
     final public ModelSpecification getSpecification() {
         return ModelSpecification.volces;
     }
-
 }

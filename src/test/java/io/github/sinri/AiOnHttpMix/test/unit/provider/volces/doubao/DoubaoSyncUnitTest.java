@@ -9,12 +9,14 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoRe
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.models.volces.doubao.DoubaoModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.json.schema.common.dsl.Schemas;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DoubaoSyncUnitTest extends AbstractDoubaoKitUnitTest {
+
     @Test
     public void test1() {
         AigcMix.enableVerboseLogger();
@@ -34,7 +37,7 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoKitUnitTest {
 
             return getKit().chat(
                                    getServiceAdapter(),
-                                   ChatModel.doubao1dot5ThinkingPro250415,
+                                   doubaoThinking,
                                    request,
                                    UUID.randomUUID().toString()
                            )
@@ -74,7 +77,7 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoKitUnitTest {
 
             return getKit().chat(
                                    getServiceAdapter(),
-                                   ChatModel.doubao1dot5ThinkingPro250415,
+                                   doubaoThinking,
                                    request,
                                    UUID.randomUUID().toString()
                            )
@@ -114,7 +117,7 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoKitUnitTest {
 
                                return getKit().chat(
                                        getServiceAdapter(),
-                                       ChatModel.doubaoPro32k,
+                                       doubaoPro32k,
                                        request,
                                        UUID.randomUUID().toString()
                                );

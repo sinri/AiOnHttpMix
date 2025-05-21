@@ -11,7 +11,7 @@ import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
  */
 public interface ModelSpecification {
     QwenModelSpecification qwen = new QwenModelSpecification();
-    GPTModelSpecification chatgpt = new GPTModelSpecification();
+    GPTModelSpecification gpt = new GPTModelSpecification();
     OModelSpecification o = new OModelSpecification();
     VolcesModelSpecification volces = new VolcesModelSpecification();
 

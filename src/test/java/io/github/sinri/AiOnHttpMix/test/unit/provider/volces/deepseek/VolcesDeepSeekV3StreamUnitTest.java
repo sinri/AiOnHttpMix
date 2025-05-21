@@ -9,8 +9,6 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.Doubao
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
-import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.AbstractDoubaoKitUnitTest;
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -23,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class VolcesDeepSeekV3StreamUnitTest extends AbstractDoubaoKitUnitTest {
+public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekKitUnitTest {
     @Test
     public void test1() {
         async(() -> {
@@ -34,7 +32,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractDoubaoKitUnitTest {
                                                                           .type("enabled"))
                                                  .stream(true);
             return getKit().chatStream(getServiceAdapter(),
-                                   ChatModel.volcesDeepSeekV3on241226,
+                                   deepSeekV3,
                                    request.toJsonObject(),
                                    fragment -> {
                                        getUnitTestLogger().info("fragment:\n" + fragment);
@@ -62,7 +60,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractDoubaoKitUnitTest {
                                                                           .type("enabled"))
                                                  .stream(true);
             return getKit().chatStream(getServiceAdapter(),
-                                   ChatModel.volcesDeepSeekV3on241226,
+                                   deepSeekV3,
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -114,7 +112,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractDoubaoKitUnitTest {
 
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   ChatModel.volcesDeepSeekV3on241226,
+                                   deepSeekV3,
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -150,7 +148,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractDoubaoKitUnitTest {
 
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   ChatModel.volcesDeepSeekV3on241226,
+                                   deepSeekV3,
                                    request,
                                    180_000L,
                                    UUID.randomUUID().toString()
@@ -191,7 +189,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractDoubaoKitUnitTest {
 
                                return getKit().chatStream(
                                        getServiceAdapter(),
-                                       ChatModel.volcesDeepSeekV3on241226,
+                                       deepSeekV3,
                                        request,
                                        180_000L,
                                        UUID.randomUUID().toString()

@@ -6,7 +6,7 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.strea
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.stream.QwenResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.stream.QwenResponseFragment;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.QwenResponse;
-import io.github.sinri.AiOnHttpMix.utils.models.QwenModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenModelSeries;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 

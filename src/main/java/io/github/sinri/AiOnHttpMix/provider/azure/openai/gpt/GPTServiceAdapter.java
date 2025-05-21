@@ -13,6 +13,6 @@ public class GPTServiceAdapter extends OpenAIServiceAdapter {
 
     @Override
     public ModelSpecification getSpecification() {
-        return ModelSpecification.chatgpt;
+        return ModelSpecification.gpt;
     }
 }

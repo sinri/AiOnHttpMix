@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class VolcesDeepSeekSyncUnitTest extends AbstractDoubaoKitUnitTest {
+public class VolcesDeepSeekSyncUnitTest extends AbstractVolcesDeepSeekKitUnitTest {
     @Test
     public void test1() {
         AigcMix.enableVerboseLogger();
@@ -35,7 +35,7 @@ public class VolcesDeepSeekSyncUnitTest extends AbstractDoubaoKitUnitTest {
 
             return getKit().chat(
                                    getServiceAdapter(),
-                                   ChatModel.volcesDeepSeekV3on241226,
+                                   deepSeekV3,
                                    request,
                                    UUID.randomUUID().toString()
                            )
@@ -75,7 +75,7 @@ public class VolcesDeepSeekSyncUnitTest extends AbstractDoubaoKitUnitTest {
 
             return getKit().chat(
                                    getServiceAdapter(),
-                                   ChatModel.volcesDeepSeekV3on241226,
+                                   deepSeekV3,
                                    request,
                                    UUID.randomUUID().toString()
                            )
@@ -115,7 +115,7 @@ public class VolcesDeepSeekSyncUnitTest extends AbstractDoubaoKitUnitTest {
 
                                return getKit().chat(
                                        getServiceAdapter(),
-                                       ChatModel.volcesDeepSeekV3on241226,
+                                       deepSeekV3,
                                        request,
                                        UUID.randomUUID().toString()
                                );

@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.azure.openai;
 
-import io.github.sinri.AiOnHttpMix.utils.models.OpenAIOModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.OModelSeries;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 
 import javax.annotation.Nonnull;
@@ -12,7 +12,7 @@ import java.util.List;
 public class OpenAIConfigElement extends KeelConfigElement {
 
     public OpenAIConfigElement(
-            OpenAIOModelSeries model,
+            OModelSeries model,
             String apiKey,
             String resourceName,
             String deployment,

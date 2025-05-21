@@ -1,9 +1,10 @@
-package io.github.sinri.AiOnHttpMix.utils.models;
+package io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen;
 
 /**
  * 表示Qwen-Plus-Latest聊天模型的实现。
  * 该类为单例，名称为"qwen-plus-latest"。
  */
+@Deprecated(forRemoval = true)
 public final class QwenPlusLatestModel extends QwenModelSeries {
     /**
      * 模型名称常量。

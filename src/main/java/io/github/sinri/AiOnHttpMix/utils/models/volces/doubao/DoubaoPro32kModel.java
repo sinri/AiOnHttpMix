@@ -1,9 +1,10 @@
-package io.github.sinri.AiOnHttpMix.utils.models;
+package io.github.sinri.AiOnHttpMix.utils.models.volces.doubao;
 
 /**
  * 表示豆包Pro-32k聊天模型的实现。
  * 该类为单例，名称为"doubao-pro-32k"。
  */
+@Deprecated(forRemoval = true)
 public final class DoubaoPro32kModel extends DoubaoModelSeries {
     /**
      * 模型名称常量。

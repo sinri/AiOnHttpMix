@@ -7,13 +7,14 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.QwenRe
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.QwenResponseOutput;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.QwenResponseOutputChoice;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.tool.QwenToolDefinition;
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.json.schema.common.dsl.Schemas;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -23,9 +24,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
+
     @Test
     public void test1() {
         async(() -> {
+
             QwenRequest request = QwenRequest.create()
                                              .input(x -> x
                                                      .addMessage(QwenMessageInRequest.createAsSystemInRequest(
@@ -50,7 +53,7 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
             getUnitTestLogger().info("req", request.toJsonObject());
             return getQwenKit().chatStream(
                                        getServiceAdapter(),
-                                       ChatModel.qwenPlusLatest,
+                                       qwenPlusLatest,
                                        request.toJsonObject(),
                                        chunk -> {
                                            getUnitTestLogger().info("chunk: " + chunk);
@@ -85,7 +88,7 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
             getUnitTestLogger().info("req", request.toJsonObject());
             return getQwenKit().chatStream(
                                        getServiceAdapter(),
-                                       ChatModel.qwenPlusLatest,
+                                       qwenPlusLatest,
                                        request,
                                        chunk -> {
                                            AigcMix.getVerboseLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -141,7 +144,7 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
             getUnitTestLogger().info("req", request.toJsonObject());
             return getQwenKit().chatStream(
                                        getServiceAdapter(),
-                                       ChatModel.qwenPlusLatest,
+                                       qwenPlusLatest,
                                        request,
                                        180_000L,
                                        UUID.randomUUID().toString()
@@ -189,7 +192,7 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
             getUnitTestLogger().info("req", request.toJsonObject());
             return getQwenKit().chatStream(
                                        getServiceAdapter(),
-                                       ChatModel.qwenPlusLatest,
+                                       qwenPlusLatest,
                                        request,
                                        180_000L,
                                        UUID.randomUUID().toString()
@@ -247,7 +250,7 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
 
             return getQwenKit().chatStream(
                                        getServiceAdapter(),
-                                       ChatModel.qwenPlus,
+                                       qwenPlus,
                                        request,
                                        180_000L,
                                        UUID.randomUUID().toString()
@@ -297,7 +300,7 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
 
                                    return getQwenKit().chatStream(
                                            getServiceAdapter(),
-                                           ChatModel.qwenPlus,
+                                           qwenPlus,
                                            request,
                                            180_000L,
                                            UUID.randomUUID().toString()

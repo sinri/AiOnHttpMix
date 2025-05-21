@@ -30,7 +30,7 @@ public class GptSyncUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chat(
                             getServiceAdapter(),
-                            ChatModel.chatgpt4o,
+                            gpt4o,
                             request,
                             UUID.randomUUID().toString()
                     )
@@ -73,7 +73,7 @@ public class GptSyncUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chat(
                             getServiceAdapter(),
-                            ChatModel.chatgpt4o,
+                            gpt4o,
                             request,
                             UUID.randomUUID().toString()
                     )
@@ -122,7 +122,7 @@ public class GptSyncUnitTest extends AbstractGptKitUnitTest {
                         return getKit()
                                 .chat(
                                         getServiceAdapter(),
-                                        ChatModel.chatgpt4o,
+                                        gpt4o,
                                         request,
                                         UUID.randomUUID().toString()
                                 );

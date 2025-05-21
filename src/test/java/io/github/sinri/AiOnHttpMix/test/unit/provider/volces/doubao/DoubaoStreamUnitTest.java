@@ -9,7 +9,6 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.Doubao
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -33,7 +32,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
                                                                           .type("enabled"))
                                                  .stream(true);
             return getKit().chatStream(getServiceAdapter(),
-                                   ChatModel.doubao1dot5ThinkingPro250415,
+                                   doubaoThinking,
                                    request.toJsonObject(),
                                    fragment -> {
                                        getUnitTestLogger().info("fragment:\n" + fragment);
@@ -61,7 +60,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
                                                                           .type("enabled"))
                                                  .stream(true);
             return getKit().chatStream(getServiceAdapter(),
-                                   ChatModel.doubao1dot5ThinkingPro250415,
+                                   doubaoThinking,
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -113,7 +112,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
 
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   ChatModel.doubao1dot5ThinkingPro250415,
+                                   doubaoThinking,
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -149,7 +148,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
 
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   ChatModel.doubao1dot5ThinkingPro250415,
+                                   doubaoThinking,
                                    request,
                                    180_000L,
                                    UUID.randomUUID().toString()
@@ -190,7 +189,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
 
                                return getKit().chatStream(
                                        getServiceAdapter(),
-                                       ChatModel.doubaoPro32k,
+                                       doubaoPro32k,
                                        request,
                                        180_000L,
                                        UUID.randomUUID().toString()

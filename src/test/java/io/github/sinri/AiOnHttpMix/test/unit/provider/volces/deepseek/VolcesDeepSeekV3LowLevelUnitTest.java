@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-public class VolcesDeepSeekV3LowLevelUnitTest extends AbstractDoubaoServiceAdapterUnitTest {
+public class VolcesDeepSeekV3LowLevelUnitTest extends AbstractVolcesDeepSeekServiceAdapterUnitTest {
 
     private JsonObject generateRequest(boolean useStreamIncrement) {
         JsonObject request = new JsonObject();
@@ -39,7 +39,7 @@ public class VolcesDeepSeekV3LowLevelUnitTest extends AbstractDoubaoServiceAdapt
         async(() -> {
             return buildServiceAdapter()
                     .request(
-                            ChatModel.volcesDeepSeekV3on241226,
+                            deepSeekV3,
                             generateRequest(false),
                             UUID.randomUUID().toString()
                     )
@@ -55,7 +55,7 @@ public class VolcesDeepSeekV3LowLevelUnitTest extends AbstractDoubaoServiceAdapt
         async(() -> {
             return buildServiceAdapter()
                     .requestStream(
-                            ChatModel.volcesDeepSeekV3on241226,
+                            deepSeekV3,
                             generateRequest(true),
                             chunk -> {
                                 getUnitTestLogger().info("chunk: " + chunk);

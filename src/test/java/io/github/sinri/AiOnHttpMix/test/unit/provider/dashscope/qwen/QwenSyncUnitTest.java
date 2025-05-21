@@ -42,7 +42,7 @@ public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
             getUnitTestLogger().info("req", request.toJsonObject());
             return getQwenKit().chat(
                                        getServiceAdapter(),
-                                       ChatModel.qwenPlus,
+                                       qwenPlus,
                                        request,
                                        UUID.randomUUID().toString()
                                )
@@ -94,7 +94,7 @@ public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
 
             return getQwenKit().chat(
                                        getServiceAdapter(),
-                                       ChatModel.qwenPlus,
+                                       qwenPlus,
                                        request,
                                        UUID.randomUUID().toString()
                                )
@@ -141,7 +141,7 @@ public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
 
                                    return getQwenKit().chat(
                                            getServiceAdapter(),
-                                           ChatModel.qwenPlus,
+                                           qwenPlus,
                                            request,
                                            UUID.randomUUID().toString()
                                    );
@@ -185,7 +185,7 @@ public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
             getUnitTestLogger().info("req", request.toJsonObject());
             return getQwenKit().chat(
                                        getServiceAdapter(),
-                                       ChatModel.qwenPlus,
+                                       qwenPlus,
                                        request,
                                        UUID.randomUUID().toString()
                                )
@@ -226,7 +226,7 @@ public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
             getUnitTestLogger().info("req", request.toJsonObject());
             return getQwenKit().chat(
                                        getServiceAdapter(),
-                                       ChatModel.qwenPlusLatest,
+                                       qwenPlusLatest,
                                        request,
                                        UUID.randomUUID().toString()
                                )

@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.utils.models;
+package io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt;
 
 /**
  * 表示OpenAI GPT-4o聊天模型的实现。
@@ -6,13 +6,14 @@ package io.github.sinri.AiOnHttpMix.utils.models;
  *
  * @since 2.0.0
  */
-public final class OpenAIGPT4OModel extends OpenAIGPTModelSeries {
+@Deprecated(forRemoval = true)
+public final class GPT4OModel extends GPTModelSeries {
     /**
      * 模型名称常量。
      */
     public final static String MODEL_NAME = "gpt-4o";
 
-    OpenAIGPT4OModel() {
+    GPT4OModel() {
     }
 
     @Override

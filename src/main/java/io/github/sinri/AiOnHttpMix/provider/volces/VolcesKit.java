@@ -6,7 +6,7 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.Doubao
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseFragment;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponse;
-import io.github.sinri.AiOnHttpMix.utils.models.VolcesModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.volces.VolcesModelSeries;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 

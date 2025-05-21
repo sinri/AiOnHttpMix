@@ -31,7 +31,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chatStream(
                             getServiceAdapter(),
-                            ChatModel.chatgpt4o,
+                            gpt4o,
                             request.toJsonObject(),
                             fragment -> {
                                 getUnitTestLogger().info("fragment: " + fragment);
@@ -57,7 +57,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chatStream(
                             getServiceAdapter(),
-                            ChatModel.chatgpt4o,
+                            gpt4o,
                             request,
                             chunk -> {
                                 getUnitTestLogger().info("chunnk", chunk.cloneAsJsonObject());
@@ -94,7 +94,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
 
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   ChatModel.chatgpt4o,
+                                   gpt4o,
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -134,7 +134,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chatStream(
                             getServiceAdapter(),
-                            ChatModel.chatgpt4o,
+                            gpt4o,
                             request,
                             180_000L,
                             UUID.randomUUID().toString()
@@ -184,7 +184,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
                         return getKit()
                                 .chatStream(
                                         getServiceAdapter(),
-                                        ChatModel.chatgpt4o,
+                                        gpt4o,
                                         request,
                                         180_000L,
                                         UUID.randomUUID().toString()

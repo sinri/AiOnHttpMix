@@ -1,6 +1,5 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.dashscope.qwen;
 
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -39,7 +38,7 @@ public class QwenLowLevelUnitTest extends AbstractQwenServiceAdapterUnitTest {
     public void test1() {
         async(() -> {
             return getServiceAdapter().request(
-                    ChatModel.qwenPlus,
+                    qwenPlus,
                     generateRequest(false),
                     UUID.randomUUID().toString()).compose(resp -> {
                 getUnitTestLogger().info("resp", resp);
@@ -52,7 +51,7 @@ public class QwenLowLevelUnitTest extends AbstractQwenServiceAdapterUnitTest {
     public void test2() {
         async(() -> {
             return getServiceAdapter().requestStream(
-                    ChatModel.qwenPlus,
+                    qwenPlus,
                     generateRequest(true),
                     chunk -> {
                         getUnitTestLogger().info("chunk: " + chunk);
