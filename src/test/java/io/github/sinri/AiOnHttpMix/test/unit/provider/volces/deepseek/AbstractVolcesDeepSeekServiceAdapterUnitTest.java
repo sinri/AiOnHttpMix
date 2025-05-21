@@ -12,10 +12,12 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class AbstractVolcesDeepSeekServiceAdapterUnitTest extends AbstractServiceAdapterUnitTest<VolcesModelSpecification, VolcesServiceAdapter> {
     protected final VolcesDeepSeekModelSeries deepSeekV3;
+    protected final VolcesDeepSeekModelSeries deepSeekR1;
 
     public AbstractVolcesDeepSeekServiceAdapterUnitTest() {
         super();
         deepSeekV3 = new VolcesDeepSeekModelSeries.Builder().build(VolcesDeepSeekModelSeries.MODEL_NAME_OF_DEEPSEEK_V3_241226);
+        deepSeekR1 = new VolcesDeepSeekModelSeries.Builder().build(VolcesDeepSeekModelSeries.MODEL_NAME_OF_DEEPSEEK_R1_250120);
     }
 
     @Override
