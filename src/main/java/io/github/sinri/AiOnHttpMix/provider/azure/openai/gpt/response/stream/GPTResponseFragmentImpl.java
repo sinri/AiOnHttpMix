@@ -10,7 +10,7 @@ class GPTResponseFragmentImpl implements GPTResponseFragment {
     public GPTResponseFragmentImpl(String s) {
         var lines = s.split("[\r\n]+");
         for (var line : lines) {
-            var pair = line.split(":\s*", 2);
+            var pair = line.split(":\\s*", 2);
             if (pair.length == 2) {
                 if (Objects.equals(pair[0], "data")) {
                     this.data = pair[1];

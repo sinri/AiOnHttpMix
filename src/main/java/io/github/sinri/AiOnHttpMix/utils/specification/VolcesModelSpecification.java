@@ -9,7 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * 火山引擎定义的大语言模型接口规格。
+ * 通用于火山引擎上提供的豆包、DeepSeek、Moonshot系列模型服务。
+ *
+ * @since 2.0.0
+ */
 public abstract class VolcesModelSpecification implements ModelSpecification {
     public static final String SPECIFICATION_NAME = "Volces";
     public static final String pathOfV3ChatCompletions = "/api/v3/chat/completions";

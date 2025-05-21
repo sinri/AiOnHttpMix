@@ -1,8 +1,12 @@
 package io.github.sinri.AiOnHttpMix.utils.models.volces.deepseek;
 
-import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.models.volces.VolcesModelSeries;
 
+/**
+ * 火山引擎提供的DeepSeek系列模型，部分支持推理。
+ *
+ * @since 2.0.0
+ */
 public abstract class VolcesDeepSeekModelSeries extends VolcesModelSeries {
     public static final String MODEL_NAME_OF_DEEPSEEK_V3_241226 = "deepseek-v3-241226";
     public static final String MODEL_NAME_OF_DEEPSEEK_V3_250324 = "deepseek-v3-250324";

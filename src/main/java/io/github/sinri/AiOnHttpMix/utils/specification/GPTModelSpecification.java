@@ -10,29 +10,22 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 表示ChatGPT模型系列的实现。
+ * Open AI定义的大语言模型接口规格。
+ * 通用于GPT系列模型服务。
+ *
+ * @since 2.0.0
  */
 public abstract class GPTModelSpecification implements ModelSpecification {
-    /**
-     * 模型系列名称常量。
-     */
+
     public static final String SPECIFICATION_NAME = "ChatGPT";
 
-    /**
-     * 获取服务提供方。
-     *
-     * @return Azure OpenAI服务提供方
-     */
+
     @Override
     public ServiceProvider getServiceProvider() {
         return ServiceProvider.azureOpenAI;
     }
 
-    /**
-     * 获取模型系列名称。
-     *
-     * @return 模型系列名称
-     */
+
     @Override
     public String getSpecificationName() {
         return SPECIFICATION_NAME;

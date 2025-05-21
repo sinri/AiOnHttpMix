@@ -1,14 +1,16 @@
 package io.github.sinri.AiOnHttpMix.utils;
 
-import javax.annotation.Nullable;
-
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpResponse;
 
+import javax.annotation.Nullable;
+
 /**
- * 表示HTTP请求异常响应的运行时异常。
+ * 大语言模型服务适配器运作过程中出现的回复报文异常。
  * 封装了状态码和响应体内容，支持JSON解析。
+ *
+ * @since 2.0.0
  */
 public class AbnormalResponse extends RuntimeException {
     /**
@@ -22,6 +24,7 @@ public class AbnormalResponse extends RuntimeException {
 
     /**
      * 通过HttpResponse构造异常。
+     *
      * @param httpResponse Vert.x HTTP响应
      */
     public AbnormalResponse(HttpResponse<Buffer> httpResponse) {
@@ -30,7 +33,8 @@ public class AbnormalResponse extends RuntimeException {
 
     /**
      * 通过状态码和响应体构造异常。
-     * @param statusCode HTTP状态码
+     *
+     * @param statusCode   HTTP状态码
      * @param responseBody 响应体内容
      */
     private AbnormalResponse(int statusCode, String responseBody) {
@@ -41,6 +45,7 @@ public class AbnormalResponse extends RuntimeException {
 
     /**
      * 获取HTTP状态码。
+     *
      * @return 状态码
      */
     public int getStatusCode() {
@@ -49,6 +54,7 @@ public class AbnormalResponse extends RuntimeException {
 
     /**
      * 获取响应体内容。
+     *
      * @return 响应体
      */
     public String getResponseBody() {
@@ -57,6 +63,7 @@ public class AbnormalResponse extends RuntimeException {
 
     /**
      * 获取响应体的JSON对象表示。
+     *
      * @return JSON对象，若解析失败则为null
      */
     @Nullable

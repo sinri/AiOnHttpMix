@@ -1,52 +1,79 @@
 # Contribution Guide for LLM
 
-This document would guide you how to contribute for LLM related codes.
+This document guides you on how to contribute LLM-related code to this project.
 
 ## Concept
 
-This project, as an SDK, is to provide an encapsulation of certain LLM abilities through the APIs provided by the service providers.
+This project, as an SDK, encapsulates certain LLM capabilities via APIs provided by service providers.
 
-When we use LLM, we have to determine which **model** to use. 
-Here, the **model** would be `gpt-4o` (of OpenAI ChatGPT series) or `QwenPlus` (of Dashscope Qwen series). 
-Commonly, different models are with different ability and style, along with different pricing, which affects the decision.
-The models are defined as interface `io.github.sinri.AiOnHttpMix.utils.models.ChatModel`.
+When using LLMs, you must determine which **model** to use. For example, a **model** could be
+`gpt-4o` (from the OpenAI ChatGPT series) or
+`qwen-plus` (from the Dashscope Qwen series). Different models have different abilities, styles, and pricing, which affect your choice. Models are defined by the interface
+`io.github.sinri.AiOnHttpMix.utils.models.ChatModel`.
 
-In this project, we use HTTP API to use the models.
-Some of the models are designed with same API format, that means they can share one Request-and-Response implementation; 
-meanwhile, others are not shareable.
-For the models share one API format, even one endpoint, we defined a **model series** to group them.
-The model series are defined as `io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification`.
+All LLMs in this project are accessed via HTTP APIs. Some models share the same API format and can use the same request/response implementation; others cannot. Models sharing the same API format (and often the same endpoint) are grouped into a
+**model series**, defined by `io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification`.
 
-A service provider would provide service for a series of LLMs through various APIs.
-Such as Azure (Microsoft), Dashscope (Aliyun), Volces (ByteDance), etc., each of them provides many LLM services.
-The service providers are defined as interface `io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider`. 
+A service provider (e.g., Azure, Dashscope, Volces) offers a set of LLMs via various APIs. Service providers are defined by the interface
+`io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider`.
 
-The above is the mapping entities defined for the LLM services in the real world.
-When we use APIs to reach a certain LLM service, we need to follow the direction of each provider for its model series.
-To implement that, we abstract out a **Model Service** entity,
-and the interface `io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter` for executing.
+To abstract the real-world LLM service mapping, this project introduces the concept of a **Model Service
+** and the interface `io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter` for execution.
 
-## Implement a certain LLM service
+## How to Implement a New LLM Service
 
-### Step 1: ensure the service provider
+### Step 1: Ensure the Service Provider
 
-Define a class implementing interface `io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider` in package `io.github.sinri.AiOnHttpMix.utils.providers`;
-this class should be public, and its constructor should be package-protected;
-this class should define a static final String field named as `NAME` for the service provider name, and return it in method `getName`;
-finally, set a const field as the unique instance of this class in interface `io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider`.
+- Implement the `ServiceProvider` interface in the package `io.github.sinri.AiOnHttpMix.utils.providers` (e.g.,
+  `AzureOpenAIServiceProvider`, `DashscopeServiceProvider`, `VolcesServiceProvider`).
+- The constructor should be package-protected (no modifier).
+- The singleton instance should be exposed as a static field in the `ServiceProvider` interface (e.g.,
+  `ServiceProvider.azureOpenAI`).
+- Implement the `getProviderName()` method to return the unique provider name.
 
-### Step 2: ensure the model series
+### Step 2: Ensure the Model Series
 
-Like step 1;
-define a class implementing interface `io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification` in package `io.github.sinri.AiOnHttpMix.utils.specification`.
-finally, set a const field as the unique instance of this class in interface `io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification`.
+- Implement the `ModelSpecification` interface as an abstract class in the package
+  `io.github.sinri.AiOnHttpMix.utils.specification` (e.g., `DashscopeModelSpecification`, `GPTModelSpecification`).
+- Provide a static name field (e.g., `SPECIFICATION_NAME`).
+- Implement the `buildServiceAdapter(KeelConfigElement config)` method to return the corresponding
+  `ChatModelServiceAdapter`.
 
-### Step 3: ensure the model
+### Step 3: Ensure the Model
 
-Like step 1:
-define a class implementing interface `io.github.sinri.AiOnHttpMix.utils.models.ChatModel` in package `io.github.sinri.AiOnHttpMix.utils.models`.
-finally, set a const field as the unique instance of this class in interface `io.github.sinri.AiOnHttpMix.utils.models.ChatModel`.
+- Implement the `ChatModel` interface as an abstract class in the package
+  `io.github.sinri.AiOnHttpMix.utils.models` or its subpackages (e.g., `QwenModelSeries`, `GPTModelSeries`).
+- Provide a static factory method (e.g., `model(String modelName)`) to obtain a concrete model instance.
+- Implement the `getModelName()` method to return the model name.
 
-### Step 4: build the model service 
+### Step 4: Build the Model Service
 
-As a model service is for one model series, it would be implemented in package `io.github.sinri.AiOnHttpMix.provider.SERVICE_PROVIDER.MODEL_SERVICE`, where `SERVICE_PROVIDER` and `MODEL_SERVICE` should be replaced.
+- For each model series, implement a service adapter (e.g., `QwenServiceAdapter`,
+  `OpenAIServiceAdapter`) that implements the `ChatModelServiceAdapter` interface. Place it in the package
+  `io.github.sinri.AiOnHttpMix.provider.SERVICE_PROVIDER.MODEL_SERVICE`, replacing `SERVICE_PROVIDER` and
+  `MODEL_SERVICE` accordingly.
+- The service adapter should be obtained via the model series'
+  `buildServiceAdapter` method, using configuration parameters as needed.
+
+---
+
+#### Example: Dashscope Qwen
+
+- **Service Provider**: `io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider.dashscope`
+- **Model Series**: `io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenModelSeries`
+- **Model**: `QwenModelSeries.model("qwen-plus")`
+- **Service Adapter**: `io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenServiceAdapter`
+
+---
+
+#### Key Points
+
+1. **Singleton Access
+   **: Service providers and model series are exposed as static fields in their respective interfaces, not as public static final fields in the implementation class.
+2. **Model Instantiation**: Models are obtained via static factory methods (e.g.,
+   `model(String modelName)`) in the abstract class, not as separate classes for each model.
+3. **Service Adapter Construction**: Use the model series'
+   `buildServiceAdapter` method with configuration parameters to obtain the adapter, rather than direct instantiation.
+
+For further code examples or documentation updates, please refer to the actual implementation in the
+`io.github.sinri.AiOnHttpMix.utils` package and its subpackages.

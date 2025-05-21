@@ -10,7 +10,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * For Azure OpenAI o-series models.
+ * Open AI定义的大语言模型接口规格。
+ * 通用于O系列模型服务。
+ *
+ * @since 2.0.0
  */
 public abstract class OModelSpecification implements ModelSpecification {
     /**

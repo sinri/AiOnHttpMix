@@ -1,18 +1,10 @@
 package io.github.sinri.AiOnHttpMix.utils.providers;
 
-
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIConfigElement;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.GPTServiceAdapter;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.o.OServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.specification.GPTModelSpecification;
-import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
-import io.github.sinri.AiOnHttpMix.utils.specification.OModelSpecification;
-import io.github.sinri.keel.facade.configuration.KeelConfigElement;
-
-import java.util.Map;
-import java.util.stream.Collectors;
-
+/**
+ * 大语言模型在线服务提供商：微软旗下的OpenAI服务（Azure OpenAI）
+ *
+ * @since 2.0.0
+ */
 public final class AzureOpenAIServiceProvider implements ServiceProvider {
     public static final String PROVIDER_NAME = "AzureOpenAI";
 

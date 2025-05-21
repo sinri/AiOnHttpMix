@@ -1,8 +1,11 @@
 package io.github.sinri.AiOnHttpMix.utils.tools;
 
+/**
+ * 工具调用的发起请求。
+ */
 public interface ToolCall {
     /**
-     * 工具类型，固定为function。
+     * 工具类型，固定为{@code function}。
      */
     String getType();
 
@@ -12,12 +15,13 @@ public interface ToolCall {
     String getId();
 
     /**
-     * 当前tool_calls对象在tool_calls数组中的索引。
+     * 当前工具调用对象在回复报文里工具调用数组中的索引。
      */
     Integer getIndex();
 
     /**
-     * 调用工具的名称，以及输入参数。
+     * 以函数调用的形式发起的工具调用，所调用工具的名称，以及输入参数。
+     * 当{@link ToolCall#getType()}返回非{@code function}时，本方法返回{@code null}，但这目前应该不可能发生。
      */
     FunctionToolCall getFunction();
 }
