@@ -1,11 +1,8 @@
 package io.github.sinri.AiOnHttpMix.utils.models.volces;
 
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
-import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
+import io.github.sinri.AiOnHttpMix.utils.specification.VolcesModelSpecification;
 
-public abstract class VolcesModelSeries implements ChatModel {
-    @Override
-    final public ModelSpecification getSpecification() {
-        return ModelSpecification.volces;
-    }
+public abstract class VolcesModelSeries extends VolcesModelSpecification implements ChatModel {
+
 }

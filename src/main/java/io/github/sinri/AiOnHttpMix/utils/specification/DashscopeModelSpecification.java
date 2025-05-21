@@ -8,20 +8,17 @@ import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import java.util.List;
 
 /**
- * 表示Qwen模型系列的实现。
- * 该类为单例，名称为"Qwen"。
+ * 表示Dashscope模型系列的实现。
+ * 该类为单例，名称为"Dashscope"。
  *
  * @since 2.0.0
  */
-public class QwenModelSpecification implements ModelSpecification {
+public abstract class DashscopeModelSpecification implements ModelSpecification {
     /**
      * 模型系列名称常量。
      */
-    public static final String SPECIFICATION_NAME = "Qwen";
+    public static final String SPECIFICATION_NAME = "Dashscope";
 
-    QwenModelSpecification() {
-
-    }
 
     /**
      * 获取服务提供方。
@@ -43,5 +40,9 @@ public class QwenModelSpecification implements ModelSpecification {
         return SPECIFICATION_NAME;
     }
 
-
+    @Override
+    public ChatModelServiceAdapter buildServiceAdapter(KeelConfigElement config) {
+        String apiKey = config.readString(List.of("apiKey"));
+        return new QwenServiceAdapter(apiKey);
+    }
 }

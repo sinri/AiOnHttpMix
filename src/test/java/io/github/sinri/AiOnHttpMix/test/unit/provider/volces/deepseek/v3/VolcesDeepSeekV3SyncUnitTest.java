@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek.v3;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInRequest;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class VolcesDeepSeekR1SyncUnitTest extends AbstractVolcesDeepSeekKitUnitTest {
+public class VolcesDeepSeekV3SyncUnitTest extends AbstractVolcesDeepSeekV3ModelUnitTest {
     @Test
     public void test1() {
         AigcMix.enableVerboseLogger();
@@ -33,7 +33,7 @@ public class VolcesDeepSeekR1SyncUnitTest extends AbstractVolcesDeepSeekKitUnitT
 
             return getKit().chat(
                                    getServiceAdapter(),
-                                   deepSeekR1,
+                                   getModel(),
                                    request,
                                    UUID.randomUUID().toString()
                            )
@@ -73,7 +73,7 @@ public class VolcesDeepSeekR1SyncUnitTest extends AbstractVolcesDeepSeekKitUnitT
 
             return getKit().chat(
                                    getServiceAdapter(),
-                                   deepSeekR1,
+                                   getModel(),
                                    request,
                                    UUID.randomUUID().toString()
                            )
@@ -113,7 +113,7 @@ public class VolcesDeepSeekR1SyncUnitTest extends AbstractVolcesDeepSeekKitUnitT
 
                                return getKit().chat(
                                        getServiceAdapter(),
-                                       deepSeekR1,
+                                       getModel(),
                                        request,
                                        UUID.randomUUID().toString()
                                );

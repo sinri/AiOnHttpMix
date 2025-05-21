@@ -1,12 +1,12 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.azure.openai.gpt;
 
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.request.GPTRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.sync.GPTResponseChoice;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTFunctionToolDefinition;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTToolCall;
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class GptStreamUnitTest extends AbstractGptKitUnitTest {
+public class GptStreamUnitTest extends AbstractGptUnitTest {
     @Test
     public void test1() {
         async(() -> {
@@ -31,7 +31,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chatStream(
                             getServiceAdapter(),
-                            gpt4o,
+                            getModel(),
                             request.toJsonObject(),
                             fragment -> {
                                 getUnitTestLogger().info("fragment: " + fragment);
@@ -57,7 +57,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chatStream(
                             getServiceAdapter(),
-                            gpt4o,
+                            getModel(),
                             request,
                             chunk -> {
                                 getUnitTestLogger().info("chunnk", chunk.cloneAsJsonObject());
@@ -94,7 +94,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
 
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   gpt4o,
+                                   getModel(),
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -134,7 +134,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chatStream(
                             getServiceAdapter(),
-                            gpt4o,
+                            getModel(),
                             request,
                             180_000L,
                             UUID.randomUUID().toString()
@@ -184,7 +184,7 @@ public class GptStreamUnitTest extends AbstractGptKitUnitTest {
                         return getKit()
                                 .chatStream(
                                         getServiceAdapter(),
-                                        gpt4o,
+                                        getModel(),
                                         request,
                                         180_000L,
                                         UUID.randomUUID().toString()

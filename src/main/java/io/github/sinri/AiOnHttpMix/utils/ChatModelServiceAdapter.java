@@ -1,7 +1,6 @@
 package io.github.sinri.AiOnHttpMix.utils;
 
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
-import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
 import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 import io.github.sinri.keel.core.cutter.IntravenouslyCutterOnString;
 import io.vertx.core.Future;
@@ -15,7 +14,7 @@ import java.util.function.Function;
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 
-public interface ChatModelServiceAdapter{
+public interface ChatModelServiceAdapter {
 
     static Future<Void> callStreamWithCutter(
             HttpClientOptions httpClientOptions,
@@ -37,11 +36,15 @@ public interface ChatModelServiceAdapter{
                                 }));
     }
 
-    default ServiceProvider getServiceProvider() {
-        return getSpecification().getServiceProvider();
-    }
+    boolean isModelCompatible(ChatModel chatModel);
 
-    ModelSpecification getSpecification();
+    boolean isModelCompatible(ModelSpecification modelSpecification);
+
+    default void assertModelCompatible(ChatModel chatModel) {
+        if (!isModelCompatible(chatModel)) {
+            throw new IllegalArgumentException("Model " + chatModel.getModelName() + " is not compatible with this service adapter.");
+        }
+    }
 
     Future<JsonObject> request(
             ChatModel chatModel,

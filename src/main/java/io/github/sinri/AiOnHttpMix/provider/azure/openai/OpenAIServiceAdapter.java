@@ -4,7 +4,6 @@ import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
-import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
@@ -33,16 +32,6 @@ public abstract class OpenAIServiceAdapter implements ChatModelServiceAdapter {
 
     public OpenAIServiceAdapter(Map<String, OpenAIConfigElement> deploymentConfigMap) {
         this.deploymentConfigMap = deploymentConfigMap;
-    }
-
-    /**
-     * 获取服务提供方。
-     *
-     * @return ServiceProvider.azureOpenAI
-     */
-    @Override
-    public ServiceProvider getServiceProvider() {
-        return ServiceProvider.azureOpenAI;
     }
 
     @Nonnull
@@ -90,7 +79,7 @@ public abstract class OpenAIServiceAdapter implements ChatModelServiceAdapter {
      */
     @Override
     public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
-        getSpecification().assertChatModelCompatible(chatModel);
+        assertModelCompatible(chatModel);
 
         OpenAIConfigElement configElement = this.getConfig(chatModel);
 
@@ -139,7 +128,7 @@ public abstract class OpenAIServiceAdapter implements ChatModelServiceAdapter {
      */
     @Override
     public Future<Void> requestStream(ChatModel chatModel, JsonObject requestPayload, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
-        getSpecification().assertChatModelCompatible(chatModel);
+        assertModelCompatible(chatModel);
         OpenAIConfigElement configElement = this.getConfig(chatModel);
         var uri = generateUri(configElement, "/chat/completions");
         return ChatModelServiceAdapter.callStreamWithCutter(

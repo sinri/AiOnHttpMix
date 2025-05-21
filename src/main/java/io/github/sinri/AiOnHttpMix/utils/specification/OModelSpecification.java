@@ -1,18 +1,23 @@
 package io.github.sinri.AiOnHttpMix.utils.specification;
 
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIConfigElement;
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.o.OServiceAdapter;
+import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
+import io.github.sinri.keel.facade.configuration.KeelConfigElement;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * For Azure OpenAI o-series models.
  */
-public class OModelSpecification implements ModelSpecification {
+public abstract class OModelSpecification implements ModelSpecification {
     /**
      * 模型系列名称常量。
      */
     public static final String SPECIFICATION_NAME = "O";
 
-    OModelSpecification() {
-    }
 
     /**
      * 获取服务提供方。
@@ -34,5 +39,18 @@ public class OModelSpecification implements ModelSpecification {
         return SPECIFICATION_NAME;
     }
 
-
+    /**
+     * This method is not tested yet.
+     */
+    @Override
+    public ChatModelServiceAdapter buildServiceAdapter(KeelConfigElement config) {
+        Map<String, OpenAIConfigElement> map = config.getChildren()
+                                                     .entrySet()
+                                                     .stream()
+                                                     .collect(Collectors.toMap(
+                                                             Map.Entry::getKey,
+                                                             entry -> new OpenAIConfigElement(entry.getValue())
+                                                     ));
+        return new OServiceAdapter(map);
+    }
 }

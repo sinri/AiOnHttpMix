@@ -16,9 +16,4 @@ public interface ServiceProvider {
     VolcesServiceProvider volces = new VolcesServiceProvider();
 
     String getProviderName();
-
-    ChatModelServiceAdapter buildServiceAdapter(
-            ModelSpecification modelSpecification,
-            KeelConfigElement config
-    );
 }

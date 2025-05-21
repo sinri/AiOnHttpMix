@@ -1,7 +1,6 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.common;
 
-import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.AbstractDoubaoServiceAdapterUnitTest;
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.thinking.AbstractDoubaoThinkingModelUnitTest;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -9,7 +8,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-public class VolcesDeepSeekV3LowLevelUnitTest extends AbstractVolcesDeepSeekServiceAdapterUnitTest {
+public class DoubaoLowLevelUnitTest extends AbstractDoubaoNormalModelUnitTest {
 
     private JsonObject generateRequest(boolean useStreamIncrement) {
         JsonObject request = new JsonObject();
@@ -39,7 +38,7 @@ public class VolcesDeepSeekV3LowLevelUnitTest extends AbstractVolcesDeepSeekServ
         async(() -> {
             return buildServiceAdapter()
                     .request(
-                            deepSeekV3,
+                            getModel(),
                             generateRequest(false),
                             UUID.randomUUID().toString()
                     )
@@ -55,7 +54,7 @@ public class VolcesDeepSeekV3LowLevelUnitTest extends AbstractVolcesDeepSeekServ
         async(() -> {
             return buildServiceAdapter()
                     .requestStream(
-                            deepSeekV3,
+                            getModel(),
                             generateRequest(true),
                             chunk -> {
                                 getUnitTestLogger().info("chunk: " + chunk);

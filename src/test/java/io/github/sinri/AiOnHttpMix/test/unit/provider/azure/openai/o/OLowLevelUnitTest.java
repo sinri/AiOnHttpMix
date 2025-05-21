@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-public class OLowLevelUnitTest extends AbstractOServiceAdapterUnitTest {
+public class OLowLevelUnitTest extends AbstractOModelUnitTest {
 
     @Test
     public void test1() {
@@ -18,7 +18,7 @@ public class OLowLevelUnitTest extends AbstractOServiceAdapterUnitTest {
                         .put("content", "chatgpt、claude和gemini的关系是什么")));
         async(() -> {
             return getServiceAdapter().request(
-                                              o1,
+                                              getModel(),
                                               request,
                                               UUID.randomUUID().toString()
                                       )

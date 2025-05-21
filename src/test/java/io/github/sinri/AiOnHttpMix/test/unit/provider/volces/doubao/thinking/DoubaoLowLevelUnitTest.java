@@ -1,6 +1,6 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.thinking;
 
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.common.AbstractDoubaoNormalModelUnitTest;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-public class DoubaoLowLevelUnitTest extends AbstractDoubaoServiceAdapterUnitTest {
+public class DoubaoLowLevelUnitTest extends AbstractDoubaoThinkingModelUnitTest {
 
     private JsonObject generateRequest(boolean useStreamIncrement) {
         JsonObject request = new JsonObject();
@@ -38,7 +38,7 @@ public class DoubaoLowLevelUnitTest extends AbstractDoubaoServiceAdapterUnitTest
         async(() -> {
             return buildServiceAdapter()
                     .request(
-                            doubaoPro32k,
+                            getModel(),
                             generateRequest(false),
                             UUID.randomUUID().toString()
                     )
@@ -54,7 +54,7 @@ public class DoubaoLowLevelUnitTest extends AbstractDoubaoServiceAdapterUnitTest
         async(() -> {
             return buildServiceAdapter()
                     .requestStream(
-                            doubaoPro32k,
+                            getModel(),
                             generateRequest(true),
                             chunk -> {
                                 getUnitTestLogger().info("chunk: " + chunk);

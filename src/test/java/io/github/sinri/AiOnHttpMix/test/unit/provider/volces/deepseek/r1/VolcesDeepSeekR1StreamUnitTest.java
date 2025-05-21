@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek.r1;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
+public class VolcesDeepSeekR1StreamUnitTest extends AbstractVolcesDeepSeekR1ModelUnitTest {
     @Test
     public void test1() {
         async(() -> {
@@ -31,8 +31,9 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
                                                  .thinking(ThinkingOptions.create()
                                                                           .type("enabled"))
                                                  .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
-                                   doubaoThinking,
+            return getKit().chatStream(
+                    getServiceAdapter(),
+                                   getModel(),
                                    request.toJsonObject(),
                                    fragment -> {
                                        getUnitTestLogger().info("fragment:\n" + fragment);
@@ -60,7 +61,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
                                                                           .type("enabled"))
                                                  .stream(true);
             return getKit().chatStream(getServiceAdapter(),
-                                   doubaoThinking,
+                                   getModel(),
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -108,11 +109,9 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
                                                                             .toJson()
                                                          )));
 
-            AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
-
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   doubaoThinking,
+                                   getModel(),
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -148,7 +147,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
 
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   doubaoThinking,
+                                   getModel(),
                                    request,
                                    180_000L,
                                    UUID.randomUUID().toString()
@@ -189,7 +188,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoKitUnitTest {
 
                                return getKit().chatStream(
                                        getServiceAdapter(),
-                                       doubaoPro32k,
+                                       getModel(),
                                        request,
                                        180_000L,
                                        UUID.randomUUID().toString()

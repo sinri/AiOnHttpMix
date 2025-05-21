@@ -5,9 +5,8 @@ import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.providers.DashscopeServiceProvider;
-import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
+import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecification;
 import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
-import io.github.sinri.AiOnHttpMix.utils.specification.QwenModelSpecification;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
@@ -28,18 +27,8 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
     }
 
     @Override
-    public ServiceProvider getServiceProvider() {
-        return ServiceProvider.dashscope;
-    }
-
-    @Override
-    public ModelSpecification getSpecification() {
-        return ModelSpecification.qwen;
-    }
-
-    @Override
     public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
-        getSpecification().assertChatModelCompatible(chatModel);
+        assertModelCompatible(chatModel);
 
         requestPayload.put("model", chatModel.getModelName());
 
@@ -77,7 +66,7 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
 
     @Override
     public Future<Void> requestStream(ChatModel chatModel, JsonObject requestPayload, Function<String, Future<Void>> cutterProcessFunc, long cutterTimeout, String requestId) {
-        getSpecification().assertChatModelCompatible(chatModel);
+        assertModelCompatible(chatModel);
 
         requestPayload.put("model", chatModel.getModelName());
 
@@ -108,5 +97,16 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
                 },
                 cutterTimeout
         );
+    }
+
+    @Override
+    public boolean isModelCompatible(ChatModel chatModel) {
+        return isModelCompatible((ModelSpecification) chatModel);
+    }
+
+    @Override
+    public boolean isModelCompatible(ModelSpecification modelSpecification) {
+        return Keel.reflectionHelper()
+                   .isClassAssignable(DashscopeModelSpecification.class, modelSpecification.getClass());
     }
 }

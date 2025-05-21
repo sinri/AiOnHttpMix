@@ -9,7 +9,6 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.QwenResponseOutputChoice;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.QwenResponseOutputSearchInfo;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.tool.QwenToolDefinition;
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
 import io.vertx.core.Future;
@@ -25,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * 基于{@link QwenKit}，测试同步LLM调用。
  */
-public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
+public class QwenSyncUnitTest extends AbstractQwenModelUnitTest {
     /**
      * 测试常规单轮对话。
      */
@@ -40,24 +39,24 @@ public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
                                              .parameters(x -> x
                                                      .maxTokens(1024));
             getUnitTestLogger().info("req", request.toJsonObject());
-            return getQwenKit().chat(
-                                       getServiceAdapter(),
-                                       qwenPlus,
-                                       request,
-                                       UUID.randomUUID().toString()
-                               )
-                               .compose(resp -> {
-                                   getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+            return getKit().chat(
+                                   getServiceAdapter(),
+                                   getModel(),
+                                   request,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
 
-                                   QwenResponseOutput output = resp.getOutput();
-                                   List<QwenResponseOutputChoice> choices = output.getChoices();
-                                   QwenResponseOutputChoice choice = choices.get(0);
-                                   QwenMessageInResponse message = choice.getMessage();
-                                   String content = message.getContent();
-                                   getUnitTestLogger().info("content: " + content);
+                               QwenResponseOutput output = resp.getOutput();
+                               List<QwenResponseOutputChoice> choices = output.getChoices();
+                               QwenResponseOutputChoice choice = choices.get(0);
+                               QwenMessageInResponse message = choice.getMessage();
+                               String content = message.getContent();
+                               getUnitTestLogger().info("content: " + content);
 
-                                   return Future.succeededFuture();
-                               });
+                               return Future.succeededFuture();
+                           });
         });
     }
 
@@ -92,73 +91,73 @@ public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
             AtomicReference<QwenMessageInResponse> toolCallMessageRef = new AtomicReference<>();
             AtomicReference<String> toolCallIdRef = new AtomicReference<>();
 
-            return getQwenKit().chat(
+            return getKit().chat(
+                                   getServiceAdapter(),
+                                   getModel(),
+                                   request,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+
+                               QwenResponseOutput output = resp.getOutput();
+                               List<QwenResponseOutputChoice> choices = output.getChoices();
+                               QwenResponseOutputChoice choice = choices.get(0);
+                               QwenMessageInResponse message = choice.getMessage();
+
+                               // for later
+                               toolCallMessageRef.set(message);
+
+                               String content = message.getContent();
+                               getUnitTestLogger().info("content: " + content);
+
+                               List<ToolCall> toolCalls = message.getToolCalls();
+                               Assert.assertFalse(toolCalls.isEmpty());
+                               ToolCall toolCall = toolCalls.get(0);
+
+                               String toolCallId = toolCall.getId();
+                               toolCallIdRef.set(toolCallId);
+
+                               FunctionToolCall function = toolCall.getFunction();
+
+                               Assert.assertEquals("query_weather", function.getName());
+                               var arg = new JsonObject(function.getArguments());
+                               getUnitTestLogger().info("to call function " + function.getName() + "(" + arg + ")...");
+                               return Future.succeededFuture(arg);
+                           })
+                           .compose(arg -> {
+                               String date = arg.getString("date");
+                               String place = arg.getString("place");
+                               return Future.succeededFuture(place + "在" + date + "的天气为晴天，偶有西风，温度30到34摄氏度。");
+                           })
+                           .compose(answer -> {
+                               request.input(x -> x
+                                       .addMessage(toolCallMessageRef.get())
+                                       .addMessage(QwenMessageInRequest.createAsToolOutputInRequest(
+                                               answer, toolCallIdRef.get()
+                                       ))
+                               );
+
+                               return getKit().chat(
                                        getServiceAdapter(),
-                                       qwenPlus,
+                                       getModel(),
                                        request,
                                        UUID.randomUUID().toString()
-                               )
-                               .compose(resp -> {
-                                   getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+                               );
+                           })
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
 
-                                   QwenResponseOutput output = resp.getOutput();
-                                   List<QwenResponseOutputChoice> choices = output.getChoices();
-                                   QwenResponseOutputChoice choice = choices.get(0);
-                                   QwenMessageInResponse message = choice.getMessage();
+                               QwenResponseOutput output = resp.getOutput();
+                               List<QwenResponseOutputChoice> choices = output.getChoices();
+                               QwenResponseOutputChoice choice = choices.get(0);
+                               QwenMessageInResponse message = choice.getMessage();
 
-                                   // for later
-                                   toolCallMessageRef.set(message);
+                               String content = message.getContent();
+                               getUnitTestLogger().info("content: " + content);
 
-                                   String content = message.getContent();
-                                   getUnitTestLogger().info("content: " + content);
-
-                                   List<ToolCall> toolCalls = message.getToolCalls();
-                                   Assert.assertFalse(toolCalls.isEmpty());
-                                   ToolCall toolCall = toolCalls.get(0);
-
-                                   String toolCallId = toolCall.getId();
-                                   toolCallIdRef.set(toolCallId);
-
-                                   FunctionToolCall function = toolCall.getFunction();
-
-                                   Assert.assertEquals("query_weather", function.getName());
-                                   var arg = new JsonObject(function.getArguments());
-                                   getUnitTestLogger().info("to call function " + function.getName() + "(" + arg + ")...");
-                                   return Future.succeededFuture(arg);
-                               })
-                               .compose(arg -> {
-                                   String date = arg.getString("date");
-                                   String place = arg.getString("place");
-                                   return Future.succeededFuture(place + "在" + date + "的天气为晴天，偶有西风，温度30到34摄氏度。");
-                               })
-                               .compose(answer -> {
-                                   request.input(x -> x
-                                           .addMessage(toolCallMessageRef.get())
-                                           .addMessage(QwenMessageInRequest.createAsToolOutputInRequest(
-                                                   answer, toolCallIdRef.get()
-                                           ))
-                                   );
-
-                                   return getQwenKit().chat(
-                                           getServiceAdapter(),
-                                           qwenPlus,
-                                           request,
-                                           UUID.randomUUID().toString()
-                                   );
-                               })
-                               .compose(resp -> {
-                                   getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
-
-                                   QwenResponseOutput output = resp.getOutput();
-                                   List<QwenResponseOutputChoice> choices = output.getChoices();
-                                   QwenResponseOutputChoice choice = choices.get(0);
-                                   QwenMessageInResponse message = choice.getMessage();
-
-                                   String content = message.getContent();
-                                   getUnitTestLogger().info("content: " + content);
-
-                                   return Future.succeededFuture();
-                               });
+                               return Future.succeededFuture();
+                           });
         });
     }
 
@@ -183,30 +182,30 @@ public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
                                                      )
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
-            return getQwenKit().chat(
-                                       getServiceAdapter(),
-                                       qwenPlus,
-                                       request,
-                                       UUID.randomUUID().toString()
-                               )
-                               .compose(resp -> {
-                                   getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+            return getKit().chat(
+                                   getServiceAdapter(),
+                                   getModel(),
+                                   request,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
 
-                                   QwenResponseOutput output = resp.getOutput();
-                                   List<QwenResponseOutputChoice> choices = output.getChoices();
-                                   QwenResponseOutputChoice choice = choices.get(0);
-                                   QwenMessageInResponse message = choice.getMessage();
-                                   String content = message.getContent();
-                                   getUnitTestLogger().info("content: " + content);
+                               QwenResponseOutput output = resp.getOutput();
+                               List<QwenResponseOutputChoice> choices = output.getChoices();
+                               QwenResponseOutputChoice choice = choices.get(0);
+                               QwenMessageInResponse message = choice.getMessage();
+                               String content = message.getContent();
+                               getUnitTestLogger().info("content: " + content);
 
-                                   QwenResponseOutputSearchInfo searchInfo = output.getSearchInfo();
-                                   List<QwenResponseOutputSearchInfo.SearchResult> searchResults = searchInfo.getSearchResults();
-                                   searchResults.forEach(searchResult -> {
-                                       getUnitTestLogger().info("search result " + searchResult.getIndex() + " from " + searchResult.getSiteName() + ": " + searchResult.getTitle());
-                                   });
-
-                                   return Future.succeededFuture();
+                               QwenResponseOutputSearchInfo searchInfo = output.getSearchInfo();
+                               List<QwenResponseOutputSearchInfo.SearchResult> searchResults = searchInfo.getSearchResults();
+                               searchResults.forEach(searchResult -> {
+                                   getUnitTestLogger().info("search result " + searchResult.getIndex() + " from " + searchResult.getSiteName() + ": " + searchResult.getTitle());
                                });
+
+                               return Future.succeededFuture();
+                           });
         });
     }
 
@@ -224,24 +223,24 @@ public class QwenSyncUnitTest extends AbstractQwenKitUnitTest {
                                                      .enableThinking(true)
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
-            return getQwenKit().chat(
-                                       getServiceAdapter(),
-                                       qwenPlusLatest,
-                                       request,
-                                       UUID.randomUUID().toString()
-                               )
-                               .compose(resp -> {
-                                   getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+            return getKit().chat(
+                                   getServiceAdapter(),
+                                   getModel(),
+                                   request,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
 
-                                   QwenResponseOutput output = resp.getOutput();
-                                   List<QwenResponseOutputChoice> choices = output.getChoices();
-                                   QwenResponseOutputChoice choice = choices.get(0);
-                                   QwenMessageInResponse message = choice.getMessage();
-                                   String content = message.getContent();
-                                   getUnitTestLogger().info("content: " + content);
+                               QwenResponseOutput output = resp.getOutput();
+                               List<QwenResponseOutputChoice> choices = output.getChoices();
+                               QwenResponseOutputChoice choice = choices.get(0);
+                               QwenMessageInResponse message = choice.getMessage();
+                               String content = message.getContent();
+                               getUnitTestLogger().info("content: " + content);
 
-                                   return Future.succeededFuture();
-                               });
+                               return Future.succeededFuture();
+                           });
         });
     }
 }

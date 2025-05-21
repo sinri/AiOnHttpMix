@@ -23,25 +23,4 @@ public final class AzureOpenAIServiceProvider implements ServiceProvider {
     public String getProviderName() {
         return PROVIDER_NAME;
     }
-
-    @Override
-    public ChatModelServiceAdapter buildServiceAdapter(ModelSpecification modelSpecification, KeelConfigElement config) {
-        if (modelSpecification instanceof GPTModelSpecification
-                || modelSpecification instanceof OModelSpecification
-        ) {
-            Map<String, OpenAIConfigElement> map = config.getChildren()
-                                                         .entrySet()
-                                                         .stream()
-                                                         .collect(Collectors.toMap(
-                                                                 Map.Entry::getKey,
-                                                                 entry -> new OpenAIConfigElement(entry.getValue())
-                                                         ));
-            if (modelSpecification instanceof GPTModelSpecification) {
-                return new GPTServiceAdapter(map);
-            } else {
-                return new OServiceAdapter(map);
-            }
-        }
-        throw new RuntimeException("modelSpecification is not supported");
-    }
 }

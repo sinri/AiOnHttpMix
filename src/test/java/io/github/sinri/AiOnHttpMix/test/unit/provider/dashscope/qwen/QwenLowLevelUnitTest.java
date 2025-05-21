@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * 对Qwen的底层服务进行单元测试。
  */
-public class QwenLowLevelUnitTest extends AbstractQwenServiceAdapterUnitTest {
+public class QwenLowLevelUnitTest extends AbstractQwenModelUnitTest {
     public QwenLowLevelUnitTest() {
     }
 
@@ -38,7 +38,7 @@ public class QwenLowLevelUnitTest extends AbstractQwenServiceAdapterUnitTest {
     public void test1() {
         async(() -> {
             return getServiceAdapter().request(
-                    qwenPlus,
+                    getModel(),
                     generateRequest(false),
                     UUID.randomUUID().toString()).compose(resp -> {
                 getUnitTestLogger().info("resp", resp);
@@ -51,7 +51,7 @@ public class QwenLowLevelUnitTest extends AbstractQwenServiceAdapterUnitTest {
     public void test2() {
         async(() -> {
             return getServiceAdapter().requestStream(
-                    qwenPlus,
+                    getModel(),
                     generateRequest(true),
                     chunk -> {
                         getUnitTestLogger().info("chunk: " + chunk);

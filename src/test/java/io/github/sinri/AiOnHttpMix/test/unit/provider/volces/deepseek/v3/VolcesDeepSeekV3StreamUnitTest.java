@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek.v3;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekKitUnitTest {
+public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekV3ModelUnitTest {
     @Test
     public void test1() {
         async(() -> {
@@ -32,7 +32,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekKitUni
                                                                           .type("enabled"))
                                                  .stream(true);
             return getKit().chatStream(getServiceAdapter(),
-                                   deepSeekV3,
+                                   getModel(),
                                    request.toJsonObject(),
                                    fragment -> {
                                        getUnitTestLogger().info("fragment:\n" + fragment);
@@ -60,7 +60,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekKitUni
                                                                           .type("enabled"))
                                                  .stream(true);
             return getKit().chatStream(getServiceAdapter(),
-                                   deepSeekV3,
+                                   getModel(),
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -107,12 +107,9 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekKitUni
                                                                             .property("date_range_end", Schemas.stringSchema())
                                                                             .toJson()
                                                          )));
-
-            AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
-
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   deepSeekV3,
+                                   getModel(),
                                    request,
                                    chunk -> {
                                        getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
@@ -148,7 +145,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekKitUni
 
             return getKit().chatStream(
                                    getServiceAdapter(),
-                                   deepSeekV3,
+                                   getModel(),
                                    request,
                                    180_000L,
                                    UUID.randomUUID().toString()
@@ -189,7 +186,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekKitUni
 
                                return getKit().chatStream(
                                        getServiceAdapter(),
-                                       deepSeekV3,
+                                       getModel(),
                                        request,
                                        180_000L,
                                        UUID.randomUUID().toString()

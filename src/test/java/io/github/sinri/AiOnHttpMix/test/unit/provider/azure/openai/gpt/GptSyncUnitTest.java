@@ -6,7 +6,6 @@ import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.request.GPTRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.sync.GPTResponseChoice;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTFunctionToolDefinition;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTToolCall;
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -19,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class GptSyncUnitTest extends AbstractGptKitUnitTest {
+public class GptSyncUnitTest extends AbstractGptUnitTest {
     @Test
     public void test1() {
         async(() -> {
@@ -30,7 +29,7 @@ public class GptSyncUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chat(
                             getServiceAdapter(),
-                            gpt4o,
+                            getModel(),
                             request,
                             UUID.randomUUID().toString()
                     )
@@ -73,7 +72,7 @@ public class GptSyncUnitTest extends AbstractGptKitUnitTest {
             return getKit()
                     .chat(
                             getServiceAdapter(),
-                            gpt4o,
+                            getModel(),
                             request,
                             UUID.randomUUID().toString()
                     )
@@ -122,7 +121,7 @@ public class GptSyncUnitTest extends AbstractGptKitUnitTest {
                         return getKit()
                                 .chat(
                                         getServiceAdapter(),
-                                        gpt4o,
+                                        getModel(),
                                         request,
                                         UUID.randomUUID().toString()
                                 );

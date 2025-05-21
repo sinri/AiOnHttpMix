@@ -7,14 +7,12 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.QwenRe
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.QwenResponseOutput;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.QwenResponseOutputChoice;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.tool.QwenToolDefinition;
-import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.json.schema.common.dsl.Schemas;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
+public class QwenStreamUnitTest extends AbstractQwenModelUnitTest {
 
     @Test
     public void test1() {
@@ -51,21 +49,21 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
                                                      ))
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
-            return getQwenKit().chatStream(
-                                       getServiceAdapter(),
-                                       qwenPlusLatest,
-                                       request.toJsonObject(),
-                                       chunk -> {
-                                           getUnitTestLogger().info("chunk: " + chunk);
-                                           return Future.succeededFuture();
-                                       },
-                                       180_000L,
-                                       UUID.randomUUID().toString()
-                               )
-                               .compose(v -> {
-                                   getUnitTestLogger().info("fin");
-                                   return Future.succeededFuture();
-                               });
+            return getKit().chatStream(
+                                   getServiceAdapter(),
+                                   getModel(),
+                                   request.toJsonObject(),
+                                   chunk -> {
+                                       getUnitTestLogger().info("chunk: " + chunk);
+                                       return Future.succeededFuture();
+                                   },
+                                   180_000L,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(v -> {
+                               getUnitTestLogger().info("fin");
+                               return Future.succeededFuture();
+                           });
         });
     }
 
@@ -86,42 +84,42 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
                                                      .enableSearch(true)
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
-            return getQwenKit().chatStream(
-                                       getServiceAdapter(),
-                                       qwenPlusLatest,
-                                       request,
-                                       chunk -> {
-                                           AigcMix.getVerboseLogger().info("chunk", chunk.cloneAsJsonObject());
-                                           try {
-                                               QwenResponseOutput output = chunk.getOutput();
-                                               List<QwenResponseOutputChoice> choices = output.getChoices();
-                                               QwenResponseOutputChoice choice = choices.get(0);
-                                               QwenMessageInResponse message = choice.getMessage();
+            return getKit().chatStream(
+                                   getServiceAdapter(),
+                                   getModel(),
+                                   request,
+                                   chunk -> {
+                                       AigcMix.getVerboseLogger().info("chunk", chunk.cloneAsJsonObject());
+                                       try {
+                                           QwenResponseOutput output = chunk.getOutput();
+                                           List<QwenResponseOutputChoice> choices = output.getChoices();
+                                           QwenResponseOutputChoice choice = choices.get(0);
+                                           QwenMessageInResponse message = choice.getMessage();
 
-                                               String reasoningContent = message.getReasoningContent();
-                                               if (!Keel.stringHelper().isNullOrBlank(reasoningContent)) {
-                                                   System.err.print(reasoningContent);
-                                               }
-
-                                               String content = message.getContent();
-                                               if (!Keel.stringHelper().isNullOrBlank(content)) {
-                                                   System.out.print(content);
-                                               }
-
-                                               return Future.succeededFuture();
-                                           } catch (Throwable throwable) {
-                                               getUnitTestLogger().exception(throwable);
-                                               return Future.failedFuture(throwable);
+                                           String reasoningContent = message.getReasoningContent();
+                                           if (!Keel.stringHelper().isNullOrBlank(reasoningContent)) {
+                                               System.err.print(reasoningContent);
                                            }
-                                       },
-                                       180_000L,
-                                       UUID.randomUUID().toString()
-                               )
-                               .compose(v -> {
-                                   System.out.println();
-                                   getUnitTestLogger().info("fin");
-                                   return Future.succeededFuture();
-                               });
+
+                                           String content = message.getContent();
+                                           if (!Keel.stringHelper().isNullOrBlank(content)) {
+                                               System.out.print(content);
+                                           }
+
+                                           return Future.succeededFuture();
+                                       } catch (Throwable throwable) {
+                                           getUnitTestLogger().exception(throwable);
+                                           return Future.failedFuture(throwable);
+                                       }
+                                   },
+                                   180_000L,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(v -> {
+                               System.out.println();
+                               getUnitTestLogger().info("fin");
+                               return Future.succeededFuture();
+                           });
         });
     }
 
@@ -142,26 +140,26 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
                                                      .enableSearch(true)
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
-            return getQwenKit().chatStream(
-                                       getServiceAdapter(),
-                                       qwenPlusLatest,
-                                       request,
-                                       180_000L,
-                                       UUID.randomUUID().toString()
-                               )
-                               .compose(qwenResponse -> {
-                                   getUnitTestLogger().info("buffered response", qwenResponse.cloneAsJsonObject());
+            return getKit().chatStream(
+                                   getServiceAdapter(),
+                                   getModel(),
+                                   request,
+                                   180_000L,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(qwenResponse -> {
+                               getUnitTestLogger().info("buffered response", qwenResponse.cloneAsJsonObject());
 
-                                   QwenResponseOutput output = qwenResponse.getOutput();
-                                   List<QwenResponseOutputChoice> choices = output.getChoices();
-                                   QwenResponseOutputChoice choice = choices.get(0);
-                                   QwenMessageInResponse message = choice.getMessage();
-                                   getUnitTestLogger().info("role: " + message.getRole());
-                                   getUnitTestLogger().info("reasoning_content: " + message.getReasoningContent());
-                                   getUnitTestLogger().info("content: " + message.getContent());
+                               QwenResponseOutput output = qwenResponse.getOutput();
+                               List<QwenResponseOutputChoice> choices = output.getChoices();
+                               QwenResponseOutputChoice choice = choices.get(0);
+                               QwenMessageInResponse message = choice.getMessage();
+                               getUnitTestLogger().info("role: " + message.getRole());
+                               getUnitTestLogger().info("reasoning_content: " + message.getReasoningContent());
+                               getUnitTestLogger().info("content: " + message.getContent());
 
-                                   return Future.succeededFuture();
-                               });
+                               return Future.succeededFuture();
+                           });
         });
     }
 
@@ -190,29 +188,29 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
                                                      ))
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
-            return getQwenKit().chatStream(
-                                       getServiceAdapter(),
-                                       qwenPlusLatest,
-                                       request,
-                                       180_000L,
-                                       UUID.randomUUID().toString()
-                               )
-                               .compose(response -> {
-                                   getUnitTestLogger().info("response", response.cloneAsJsonObject());
+            return getKit().chatStream(
+                                   getServiceAdapter(),
+                                   getModel(),
+                                   request,
+                                   180_000L,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(response -> {
+                               getUnitTestLogger().info("response", response.cloneAsJsonObject());
 
-                                   QwenMessageInResponse message = response.getOutput().getChoices().get(0)
-                                                                           .getMessage();
-                                   getUnitTestLogger().info("role: " + message.getRole());
-                                   getUnitTestLogger().info("reasoning_content: " + message.getReasoningContent());
-                                   getUnitTestLogger().info("content: " + message.getContent());
+                               QwenMessageInResponse message = response.getOutput().getChoices().get(0)
+                                                                       .getMessage();
+                               getUnitTestLogger().info("role: " + message.getRole());
+                               getUnitTestLogger().info("reasoning_content: " + message.getReasoningContent());
+                               getUnitTestLogger().info("content: " + message.getContent());
 
-                                   for (ToolCall toolCall : message.getToolCalls()) {
-                                       getUnitTestLogger().info("toolCall[" + toolCall.getIndex() + "][" + toolCall.getType() + "] "
-                                               + toolCall.getFunction().getName()
-                                               + "(" + toolCall.getFunction().getArguments() + ")");
-                                   }
-                                   return Future.succeededFuture();
-                               });
+                               for (ToolCall toolCall : message.getToolCalls()) {
+                                   getUnitTestLogger().info("toolCall[" + toolCall.getIndex() + "][" + toolCall.getType() + "] "
+                                           + toolCall.getFunction().getName()
+                                           + "(" + toolCall.getFunction().getArguments() + ")");
+                               }
+                               return Future.succeededFuture();
+                           });
         });
     }
 
@@ -248,77 +246,77 @@ public class QwenStreamUnitTest extends AbstractQwenKitUnitTest {
             AtomicReference<QwenMessageInResponse> toolCallMessageRef = new AtomicReference<>();
             AtomicReference<String> toolCallIdRef = new AtomicReference<>();
 
-            return getQwenKit().chatStream(
+            return getKit().chatStream(
+                                   getServiceAdapter(),
+                                   getModel(),
+                                   request,
+                                   180_000L,
+                                   UUID.randomUUID().toString()
+                           )
+                           .compose(resp -> {
+                               getUnitTestLogger().info("round-1-resp", resp.cloneAsJsonObject());
+
+                               QwenResponseOutput output = resp.getOutput();
+                               List<QwenResponseOutputChoice> choices = output.getChoices();
+                               QwenResponseOutputChoice choice = choices.get(0);
+                               QwenMessageInResponse message = choice.getMessage();
+
+                               // for later
+                               toolCallMessageRef.set(message);
+
+                               String content = message.getContent();
+                               getUnitTestLogger().info("content: " + content);
+
+                               List<ToolCall> toolCalls = message.getToolCalls();
+                               Assert.assertFalse(toolCalls.isEmpty());
+                               ToolCall toolCall = toolCalls.get(0);
+
+                               String toolCallId = toolCall.getId();
+                               toolCallIdRef.set(toolCallId);
+
+                               FunctionToolCall function = toolCall.getFunction();
+
+                               Assert.assertEquals("query_weather", function.getName());
+                               var arg = new JsonObject(function.getArguments());
+                               getUnitTestLogger().info("to call function " + function.getName() + "(" + arg + ")...");
+                               return Future.succeededFuture(arg);
+                           })
+                           .compose(arg -> {
+                               String date = arg.getString("date");
+                               String place = arg.getString("place");
+                               return Future.succeededFuture(place + "在" + date + "的天气为晴天，偶有西风，温度30到34摄氏度。");
+                           })
+                           .compose(answer -> {
+                               request.input(x -> x
+                                       .addMessage(toolCallMessageRef.get())
+                                       .addMessage(QwenMessageInRequest.createAsToolOutputInRequest(
+                                               answer, toolCallIdRef.get()
+                                       ))
+                               );
+
+                               getUnitTestLogger().info("round-2-req", request.toJsonObject());
+
+                               return getKit().chatStream(
                                        getServiceAdapter(),
-                                       qwenPlus,
+                                       getModel(),
                                        request,
                                        180_000L,
                                        UUID.randomUUID().toString()
-                               )
-                               .compose(resp -> {
-                                   getUnitTestLogger().info("round-1-resp", resp.cloneAsJsonObject());
+                               );
+                           })
+                           .compose(resp -> {
+                               getUnitTestLogger().info("round-2-resp", resp.cloneAsJsonObject());
 
-                                   QwenResponseOutput output = resp.getOutput();
-                                   List<QwenResponseOutputChoice> choices = output.getChoices();
-                                   QwenResponseOutputChoice choice = choices.get(0);
-                                   QwenMessageInResponse message = choice.getMessage();
+                               QwenResponseOutput output = resp.getOutput();
+                               List<QwenResponseOutputChoice> choices = output.getChoices();
+                               QwenResponseOutputChoice choice = choices.get(0);
+                               QwenMessageInResponse message = choice.getMessage();
 
-                                   // for later
-                                   toolCallMessageRef.set(message);
+                               String content = message.getContent();
+                               getUnitTestLogger().info("content: " + content);
 
-                                   String content = message.getContent();
-                                   getUnitTestLogger().info("content: " + content);
-
-                                   List<ToolCall> toolCalls = message.getToolCalls();
-                                   Assert.assertFalse(toolCalls.isEmpty());
-                                   ToolCall toolCall = toolCalls.get(0);
-
-                                   String toolCallId = toolCall.getId();
-                                   toolCallIdRef.set(toolCallId);
-
-                                   FunctionToolCall function = toolCall.getFunction();
-
-                                   Assert.assertEquals("query_weather", function.getName());
-                                   var arg = new JsonObject(function.getArguments());
-                                   getUnitTestLogger().info("to call function " + function.getName() + "(" + arg + ")...");
-                                   return Future.succeededFuture(arg);
-                               })
-                               .compose(arg -> {
-                                   String date = arg.getString("date");
-                                   String place = arg.getString("place");
-                                   return Future.succeededFuture(place + "在" + date + "的天气为晴天，偶有西风，温度30到34摄氏度。");
-                               })
-                               .compose(answer -> {
-                                   request.input(x -> x
-                                           .addMessage(toolCallMessageRef.get())
-                                           .addMessage(QwenMessageInRequest.createAsToolOutputInRequest(
-                                                   answer, toolCallIdRef.get()
-                                           ))
-                                   );
-
-                                   getUnitTestLogger().info("round-2-req", request.toJsonObject());
-
-                                   return getQwenKit().chatStream(
-                                           getServiceAdapter(),
-                                           qwenPlus,
-                                           request,
-                                           180_000L,
-                                           UUID.randomUUID().toString()
-                                   );
-                               })
-                               .compose(resp -> {
-                                   getUnitTestLogger().info("round-2-resp", resp.cloneAsJsonObject());
-
-                                   QwenResponseOutput output = resp.getOutput();
-                                   List<QwenResponseOutputChoice> choices = output.getChoices();
-                                   QwenResponseOutputChoice choice = choices.get(0);
-                                   QwenMessageInResponse message = choice.getMessage();
-
-                                   String content = message.getContent();
-                                   getUnitTestLogger().info("content: " + content);
-
-                                   return Future.succeededFuture();
-                               });
+                               return Future.succeededFuture();
+                           });
         });
     }
 }

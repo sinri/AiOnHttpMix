@@ -1,15 +1,13 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.moonshot;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek.r1;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.ThinkingOptions;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoice;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoiceDelta;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
-import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.AbstractDoubaoKitUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -22,28 +20,33 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUnitTest {
+public class VolcesDeepSeekR1SyncUnitTest extends AbstractVolcesDeepSeekR1ModelUnitTest {
     @Test
     public void test1() {
+        AigcMix.enableVerboseLogger();
         async(() -> {
             DoubaoRequest request = DoubaoRequest.create()
                                                  .addMessage(DoubaoMessageInRequest.createAsSystemMessage("你是一个王心凌铁粉"))
-                                                 .addMessage(DoubaoMessageInRequest.createAsUserMessage("王心凌主要萌点是什么"))
+                                                 .addMessage(DoubaoMessageInRequest.createAsUserMessage("王心凌的教育经历是什么"))
                                                  .thinking(ThinkingOptions.create()
-                                                                          .type("enabled"))
-                                                 .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
+                                                                          .type("enabled"));
+
+            return getKit().chat(
+                                   getServiceAdapter(),
                                    getModel(),
-                                   request.toJsonObject(),
-                                   fragment -> {
-                                       getUnitTestLogger().info("fragment:\n" + fragment);
-                                       return Future.succeededFuture();
-                                   },
-                                   180_000L,
+                                   request,
                                    UUID.randomUUID().toString()
                            )
-                           .compose(v -> {
-                               getUnitTestLogger().info("fin");
+                           .compose(resp -> {
+                               getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
+
+                               List<DoubaoResponseChoice> choices = resp.getChoices();
+                               DoubaoResponseChoice choice = choices.get(0);
+                               DoubaoMessageInResponse message = choice.getMessage();
+                               getUnitTestLogger().info("role: " + message.getRole());
+                               getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
+                               getUnitTestLogger().info("content: " + message.getContent());
+
                                return Future.succeededFuture();
                            });
         });
@@ -51,49 +54,6 @@ public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUni
 
     @Test
     public void test2() {
-        //        AigcMix.enableVerboseLogger();
-        async(() -> {
-            DoubaoRequest request = DoubaoRequest.create()
-                                                 .addMessage(DoubaoMessageInRequest.createAsSystemMessage("你是一个王心凌铁粉"))
-                                                 .addMessage(DoubaoMessageInRequest.createAsUserMessage("王心凌主要萌点是什么"))
-                                                 .maxTokens(256)
-                                                 .thinking(ThinkingOptions.create()
-                                                                          .type("enabled"))
-                                                 .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
-                                   getModel(),
-                                   request,
-                                   chunk -> {
-                                       getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
-
-                                       List<DoubaoResponseChunkChoice> choices = chunk.getChoices();
-                                       DoubaoResponseChunkChoice choice = choices.get(0);
-
-                                       //                                       getUnitTestLogger().info("chunk choice first: ",choice.cloneAsJsonObject());
-
-                                       DoubaoResponseChunkChoiceDelta delta = choice.getDelta();
-                                       String role = delta.getRole();
-                                       String reasoningContent = delta.getReasoningContent();
-                                       String content = delta.getContent();
-                                       getUnitTestLogger().info("delta role: " + role);
-                                       getUnitTestLogger().info("delta reasoningContent: " + reasoningContent);
-                                       getUnitTestLogger().info("delta content: " + content);
-
-                                       return Future.succeededFuture();
-                                   },
-                                   180_000L,
-                                   UUID.randomUUID().toString()
-                           )
-                           .compose(v -> {
-                               getUnitTestLogger().info("fin");
-                               return Future.succeededFuture();
-                           });
-        });
-    }
-
-    @Test
-    public void test3() {
-        //        AigcMix.enableVerboseLogger();
         async(() -> {
             DoubaoRequest request = DoubaoRequest.create()
                                                  .addSystemMessage("你是一个王心凌铁粉")
@@ -111,47 +71,10 @@ public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUni
 
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
-            return getKit().chatStream(
+            return getKit().chat(
                                    getServiceAdapter(),
                                    getModel(),
                                    request,
-                                   chunk -> {
-                                       getUnitTestLogger().info("chunk", chunk.cloneAsJsonObject());
-                                       return Future.succeededFuture();
-                                   },
-                                   180_000L,
-                                   UUID.randomUUID().toString()
-                           )
-                           .compose(v -> {
-                               getUnitTestLogger().info("fin");
-                               return Future.succeededFuture();
-                           });
-        });
-    }
-
-    @Test
-    public void test4() {
-        async(() -> {
-            DoubaoRequest request = DoubaoRequest.create()
-                                                 .addSystemMessage("你是一个王心凌铁粉")
-                                                 .addUserMessage("王心凌在2024年8月开过演唱会吗")
-                                                 .addTool(new DoubaoToolDefinition(f -> f
-                                                         .name("query_event_schedule")
-                                                         .description("查询演艺活动日程")
-                                                         .parameters(Schemas.objectSchema()
-                                                                            .property("name", Schemas.stringSchema())
-                                                                            .property("date_range_start", Schemas.stringSchema())
-                                                                            .property("date_range_end", Schemas.stringSchema())
-                                                                            .toJson()
-                                                         )));
-
-            AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
-
-            return getKit().chatStream(
-                                   getServiceAdapter(),
-                                   getModel(),
-                                   request,
-                                   180_000L,
                                    UUID.randomUUID().toString()
                            )
                            .compose(resp -> {
@@ -188,11 +111,10 @@ public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUni
                                request.addToolCallMessage(msg.getContent(), msg.getToolCalls());
                                request.addToolOutputMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
 
-                               return getKit().chatStream(
+                               return getKit().chat(
                                        getServiceAdapter(),
                                        getModel(),
                                        request,
-                                       180_000L,
                                        UUID.randomUUID().toString()
                                );
                            })
