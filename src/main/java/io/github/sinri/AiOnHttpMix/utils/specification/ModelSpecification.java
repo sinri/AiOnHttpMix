@@ -25,5 +25,7 @@ public interface ModelSpecification {
         }
     }
 
-    // <S extends ModelSpecification> ChatModelServiceAdapter<S> buildServiceAdapter(KeelConfigElement config);
+    default ChatModel model(String modelName) {
+        return ChatModel.factory(this, modelName);
+    }
 }
