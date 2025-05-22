@@ -1,6 +1,5 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.azure.openai.gpt;
 
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.request.GPTRequest;

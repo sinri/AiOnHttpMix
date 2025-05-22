@@ -6,7 +6,6 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenR
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseFragment;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponse;
-import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenChatModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenModelSeries;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -25,8 +24,7 @@ public class QwenKit {
             QwenServiceAdapter qwenServiceAdapter,
             QwenModelSeries chatModel,
             JsonObject rawRequest,
-            String requestId
-    ) {
+            String requestId) {
         return qwenServiceAdapter.request(chatModel, rawRequest, requestId);
     }
 
@@ -34,12 +32,11 @@ public class QwenKit {
             QwenServiceAdapter qwenServiceAdapter,
             QwenModelSeries chatModel,
             QwenRequest request,
-            String requestId
-    ) {
+            String requestId) {
         return qwenServiceAdapter.request(chatModel, request.toJsonObject(), requestId)
-                                 .compose(rawResponse -> {
-                                     return Future.succeededFuture(QwenResponse.wrap(rawResponse));
-                                 });
+                .compose(rawResponse -> {
+                    return Future.succeededFuture(QwenResponse.wrap(rawResponse));
+                });
     }
 
     public Future<Void> chatStream(
@@ -48,8 +45,7 @@ public class QwenKit {
             JsonObject rawRequest,
             Function<String, Future<Void>> chunkProcessFunc,
             long cutterTimeout,
-            String requestId
-    ) {
+            String requestId) {
         return qwenServiceAdapter.requestStream(chatModel, rawRequest, chunkProcessFunc, cutterTimeout, requestId);
     }
 
@@ -59,8 +55,7 @@ public class QwenKit {
             QwenRequest request,
             Function<QwenResponseChunk, Future<Void>> chunkProcessFunc,
             long cutterTimeout,
-            String requestId
-    ) {
+            String requestId) {
         request.parameters(p -> p.stream(true).incrementalOutput(true));
         return chatStream(qwenServiceAdapter, chatModel, request.toJsonObject(), s -> {
             try {
@@ -79,8 +74,7 @@ public class QwenKit {
             QwenModelSeries chatModel,
             QwenRequest request,
             long cutterTimeout,
-            String requestId
-    ) {
+            String requestId) {
         request.parameters(p -> p.stream(true).incrementalOutput(true));
 
         QwenResponseBuffer qwenResponseBuffer = new QwenResponseBuffer();
