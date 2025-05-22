@@ -10,6 +10,8 @@ public final class DashscopeServiceProvider implements ServiceProvider {
     public final static String hostOfDashscope = "dashscope.aliyuncs.com";
     public final static String pathOfDashscopeQwenTextGenerate = "/api/v1/services/aigc/text-generation/generation";
     public final static String endpointOfDashscopeQwenTextGenerate = "https://" + hostOfDashscope + pathOfDashscopeQwenTextGenerate;
+    public final static String pathOfDashscopeQwenMultimodalGenerate = "/api/v1/services/aigc/multimodal-generation/generation";
+    public final static String endpointOfDashscopeQwenMultimodalGenerate = "https://" + hostOfDashscope + pathOfDashscopeQwenMultimodalGenerate;
 
     DashscopeServiceProvider() {
     }

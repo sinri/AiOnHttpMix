@@ -1,14 +1,11 @@
 package io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen;
 
-import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
-import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecification;
-
 /**
  * Dashscope下的通义千问（Qwen）系列模型，部分支持推理。
  *
  * @since 2.0.0
  */
-public abstract class QwenChatModelSeries extends DashscopeModelSpecification implements ChatModel {
+public abstract non-sealed class QwenChatModelSeries extends QwenModelSeries {
     public final static String MODEL_NAME_OF_QWEN_PLUS = "qwen-plus";
     public final static String MODEL_NAME_OF_QWEN_PLUS_LATEST = "qwen-plus-latest";
     public final static String MODEL_NAME_OF_QWEN_MAX = "qwen-max";

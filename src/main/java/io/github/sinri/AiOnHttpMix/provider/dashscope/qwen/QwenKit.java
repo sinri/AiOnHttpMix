@@ -1,12 +1,13 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.request.QwenRequest;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.stream.QwenResponseBuffer;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.stream.QwenResponseChunk;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.stream.QwenResponseFragment;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.entity.response.sync.QwenResponse;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.request.QwenRequest;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseBuffer;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseChunk;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseFragment;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponse;
 import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenModelSeries;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
@@ -22,7 +23,7 @@ public class QwenKit {
 
     public Future<JsonObject> chat(
             QwenServiceAdapter qwenServiceAdapter,
-            QwenChatModelSeries chatModel,
+            QwenModelSeries chatModel,
             JsonObject rawRequest,
             String requestId
     ) {
@@ -31,7 +32,7 @@ public class QwenKit {
 
     public Future<QwenResponse> chat(
             QwenServiceAdapter qwenServiceAdapter,
-            QwenChatModelSeries chatModel,
+            QwenModelSeries chatModel,
             QwenRequest request,
             String requestId
     ) {
@@ -43,7 +44,7 @@ public class QwenKit {
 
     public Future<Void> chatStream(
             QwenServiceAdapter qwenServiceAdapter,
-            QwenChatModelSeries chatModel,
+            QwenModelSeries chatModel,
             JsonObject rawRequest,
             Function<String, Future<Void>> chunkProcessFunc,
             long cutterTimeout,
@@ -54,7 +55,7 @@ public class QwenKit {
 
     public Future<Void> chatStream(
             QwenServiceAdapter qwenServiceAdapter,
-            QwenChatModelSeries chatModel,
+            QwenModelSeries chatModel,
             QwenRequest request,
             Function<QwenResponseChunk, Future<Void>> chunkProcessFunc,
             long cutterTimeout,
@@ -75,7 +76,7 @@ public class QwenKit {
 
     public Future<QwenResponse> chatStream(
             QwenServiceAdapter qwenServiceAdapter,
-            QwenChatModelSeries chatModel,
+            QwenModelSeries chatModel,
             QwenRequest request,
             long cutterTimeout,
             String requestId

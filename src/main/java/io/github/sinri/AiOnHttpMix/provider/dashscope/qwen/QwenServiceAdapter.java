@@ -4,6 +4,8 @@ import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenVisionModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.providers.DashscopeServiceProvider;
 import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecification;
 import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
@@ -32,10 +34,19 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
 
         requestPayload.put("model", chatModel.getModelName());
 
+        String endpoint;
+        if (chatModel instanceof QwenChatModelSeries) {
+            endpoint = DashscopeServiceProvider.endpointOfDashscopeQwenTextGenerate;
+        } else if (chatModel instanceof QwenVisionModelSeries) {
+            endpoint = DashscopeServiceProvider.endpointOfDashscopeQwenMultimodalGenerate;
+        } else {
+            throw new RuntimeException("endpoint mistake");
+        }
+
         AigcMix.getVerboseLogger().info(x -> x
                 .message("Start DashscopeServiceMeta.request")
                 .context(j -> j
-                        .put("api", DashscopeServiceProvider.endpointOfDashscopeQwenTextGenerate)
+                        .put("api", endpoint)
                         .put("requestId", requestId)
                         .put("input", requestPayload)
                 )
@@ -43,7 +54,7 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
 
         return Keel.useWebClient(webClient -> {
             return webClient
-                    .postAbs(DashscopeServiceProvider.endpointOfDashscopeQwenTextGenerate)
+                    .postAbs(endpoint)
                     .putHeader("Content-Type", "application/json")
                     .putHeader("Authorization", "Bearer " + apiKey)
                     .sendJsonObject(requestPayload)
@@ -70,6 +81,15 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
 
         requestPayload.put("model", chatModel.getModelName());
 
+        String path;
+        if (chatModel instanceof QwenChatModelSeries) {
+            path = DashscopeServiceProvider.pathOfDashscopeQwenTextGenerate;
+        } else if (chatModel instanceof QwenVisionModelSeries) {
+            path = DashscopeServiceProvider.pathOfDashscopeQwenMultimodalGenerate;
+        } else {
+            throw new RuntimeException("path mistake");
+        }
+
         AigcMix.getVerboseLogger()
                .info("Start DashscopeServiceMeta.requestStream", j -> j
                        .put("payload", requestPayload)
@@ -82,7 +102,7 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
                         .setDefaultHost(DashscopeServiceProvider.hostOfDashscope)
                         .setDefaultPort(443),
                 client -> client
-                        .request(HttpMethod.POST, DashscopeServiceProvider.pathOfDashscopeQwenTextGenerate)
+                        .request(HttpMethod.POST, path)
                         .compose(httpClientRequest -> {
                             httpClientRequest
                                     .putHeader("Content-Type", "application/json")
