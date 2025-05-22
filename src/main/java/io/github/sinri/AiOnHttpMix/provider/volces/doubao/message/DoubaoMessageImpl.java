@@ -6,7 +6,9 @@ import io.vertx.core.json.JsonObject;
 import javax.annotation.Nonnull;
 
 class DoubaoMessageImpl extends JsonifiableEntityImpl<DoubaoMessage>
-        implements DoubaoMessageInRequest, DoubaoMessageInResponse {
+        implements DoubaoMessageInChatRequest,
+        DoubaoMessageInResponse,
+        DoubaoMessageInVisionRequest {
     public DoubaoMessageImpl() {
         super();
     }

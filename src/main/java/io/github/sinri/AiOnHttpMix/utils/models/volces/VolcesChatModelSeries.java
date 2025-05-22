@@ -8,6 +8,6 @@ import io.github.sinri.AiOnHttpMix.utils.specification.VolcesModelSpecification;
  *
  * @since 2.0.0
  */
-public abstract class VolcesModelSeries extends VolcesModelSpecification implements ChatModel {
+public abstract class VolcesChatModelSeries extends VolcesModelSpecification implements ChatModel {
 
 }

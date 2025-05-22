@@ -6,7 +6,7 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.Doubao
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseFragment;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponse;
-import io.github.sinri.AiOnHttpMix.utils.models.volces.VolcesModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.volces.VolcesChatModelSeries;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
@@ -19,7 +19,7 @@ public class VolcesKit {
 
     public Future<JsonObject> chat(
             VolcesServiceAdapter serviceAdapter,
-            VolcesModelSeries chatModel,
+            VolcesChatModelSeries chatModel,
             JsonObject rawRequest,
             String requestId
     ) {
@@ -28,7 +28,7 @@ public class VolcesKit {
 
     public Future<DoubaoResponse> chat(
             VolcesServiceAdapter serviceAdapter,
-            VolcesModelSeries chatModel,
+            VolcesChatModelSeries chatModel,
             DoubaoRequest request,
             String requestId
     ) {
@@ -40,7 +40,7 @@ public class VolcesKit {
 
     public Future<Void> chatStream(
             VolcesServiceAdapter serviceAdapter,
-            VolcesModelSeries chatModel,
+            VolcesChatModelSeries chatModel,
             JsonObject rawRequest,
             Function<String, Future<Void>> fragmentProcessor,
             long cutterTimeout,
@@ -52,7 +52,7 @@ public class VolcesKit {
 
     public Future<Void> chatStream(
             VolcesServiceAdapter serviceAdapter,
-            VolcesModelSeries chatModel,
+            VolcesChatModelSeries chatModel,
             DoubaoRequest request,
             Function<DoubaoResponseChunk, Future<Void>> chunkProcessor,
             long cutterTimeout,
@@ -79,7 +79,7 @@ public class VolcesKit {
 
     public Future<DoubaoResponse> chatStream(
             VolcesServiceAdapter serviceAdapter,
-            VolcesModelSeries chatModel,
+            VolcesChatModelSeries chatModel,
             DoubaoRequest request,
             long cutterTimeout,
             String requestId

@@ -60,7 +60,7 @@ To abstract the real-world LLM service mapping, this project introduces the conc
 #### Example: Dashscope Qwen
 
 - **Service Provider**: `io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider.dashscope`
-- **Model Series**: `io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenModelSeries`
+- **Model Series**: `io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenChatModelSeries`
 - **Model**: `QwenModelSeries.model("qwen-plus")`
 - **Service Adapter**: `io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenServiceAdapter`
 

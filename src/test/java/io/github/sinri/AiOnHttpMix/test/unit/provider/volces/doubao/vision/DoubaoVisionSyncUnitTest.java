@@ -1,10 +1,11 @@
-package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.deepseek.v3;
+package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.vision;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInChatRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInVisionRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.ContentImageUrl;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.ThinkingOptions;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
@@ -14,27 +15,28 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.json.schema.common.dsl.Schemas;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class VolcesDeepSeekV3SyncUnitTest extends AbstractVolcesDeepSeekV3ModelUnitTest {
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
+
+public class DoubaoVisionSyncUnitTest extends AbstractDoubaoVisionModelUnitTest {
+
+
+
+
     @Test
     public void test1() {
         AigcMix.enableVerboseLogger();
         async(() -> {
-            DoubaoRequest request = DoubaoRequest.create()
-                                                 .addMessage(DoubaoMessageInChatRequest.createAsSystemMessage("你是一个王心凌铁粉"))
-                                                 .addMessage(DoubaoMessageInChatRequest.createAsUserMessage("王心凌的教育经历是什么"))
-                                                 .thinking(ThinkingOptions.create()
-                                                                          .type("enabled"));
-
             return getKit().chat(
                                    getServiceAdapter(),
                                    getModel(),
-                                   request,
+                                   requestWithoutToolCall,
                                    UUID.randomUUID().toString()
                            )
                            .compose(resp -> {
@@ -55,26 +57,12 @@ public class VolcesDeepSeekV3SyncUnitTest extends AbstractVolcesDeepSeekV3ModelU
     @Test
     public void test2() {
         async(() -> {
-            DoubaoRequest request = DoubaoRequest.create()
-                                                 .addSystemChatMessage("你是一个王心凌铁粉")
-                                                 .addUserChatMessage("王心凌在2024年8月开过演唱会吗")
-                                                 .addTool(new DoubaoToolDefinition(f -> f
-                                                         .name("query_event_schedule")
-                                                         .description("查询演艺活动日程")
-                                                         .parameters(Schemas.objectSchema()
-                                                                            .property("name", Schemas.stringSchema()
-                                                                            )
-                                                                            .property("date_range_start", Schemas.stringSchema())
-                                                                            .property("date_range_end", Schemas.stringSchema())
-                                                                            .toJson()
-                                                         )));
-
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chat(
                                    getServiceAdapter(),
                                    getModel(),
-                                   request,
+                                   requestWithToolCall,
                                    UUID.randomUUID().toString()
                            )
                            .compose(resp -> {
@@ -94,27 +82,31 @@ public class VolcesDeepSeekV3SyncUnitTest extends AbstractVolcesDeepSeekV3ModelU
 
                                toolCallMessageRef.set(message);
 
-                               Assert.assertEquals("query_event_schedule", function.getName());
+                               Assert.assertEquals("query_current_weather", function.getName());
+
+                               var a = new JsonObject(function.getArguments());
+                               var place = a.getString("place");
 
                                return Future.succeededFuture(new JsonArray()
                                        .add(new JsonObject()
-                                               .put("date", "2024-08-12")
-                                               .put("name", "王心凌")
-                                               .put("place", "青岛市新城艺术中心")
-                                               .put("event", "王心凌“低糖理念”巡回演唱会青岛站")
+                                               .put("date", Keel.datetimeHelper().getCurrentDate())
+                                               .put("place", place)
+                                               .put("weather", "目前有小雨，气温23摄氏度，无风。")
                                        )
                                        .toString()
                                );
                            })
                            .compose(toolCallOutputContent -> {
                                DoubaoMessageInResponse msg = toolCallMessageRef.get();
-                               request.addToolCallChatMessage(msg.getContent(), msg.getToolCalls());
-                               request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
+                               requestWithToolCall.addToolCallChatMessage(msg.getContent(), msg.getToolCalls());
+                               requestWithToolCall.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls()
+                                                                                                      .get(0)
+                                                                                                      .getId());
 
                                return getKit().chat(
                                        getServiceAdapter(),
                                        getModel(),
-                                       request,
+                                       requestWithToolCall,
                                        UUID.randomUUID().toString()
                                );
                            })

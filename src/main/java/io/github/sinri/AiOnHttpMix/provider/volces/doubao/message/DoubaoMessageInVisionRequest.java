@@ -1,6 +1,8 @@
 package io.github.sinri.AiOnHttpMix.provider.volces.doubao.message;
 
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
+import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -8,12 +10,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public interface DoubaoMessageInRequest extends DoubaoMessage {
-    static DoubaoMessageInRequest create() {
+public interface DoubaoMessageInVisionRequest extends DoubaoMessage {
+    static DoubaoMessageInVisionRequest create() {
         return new DoubaoMessageImpl();
     }
 
-    static DoubaoMessageInRequest wrap(JsonObject jsonObject) {
+    static DoubaoMessageInVisionRequest wrap(JsonObject jsonObject) {
         return new DoubaoMessageImpl(jsonObject);
     }
 
@@ -22,7 +24,7 @@ public interface DoubaoMessageInRequest extends DoubaoMessage {
      *
      * @param content 系统信息内容。
      */
-    static DoubaoMessageInRequest createAsSystemMessage(String content) {
+    static DoubaoMessageInVisionRequest createAsSystemMessage(String content) {
         return new DoubaoMessageImpl(new JsonObject()
                 .put("role", "system")
                 .put("content", content)
@@ -32,12 +34,13 @@ public interface DoubaoMessageInRequest extends DoubaoMessage {
     /**
      * 用户发送的消息，包含提示或附加上下文信息。不同模型支持的字段类型不同，最多支持文本、图片、视频（需要工单申请）形式的消息。
      *
-     * @param content 纯文本消息内容，大语言模型支持传入此类型。
+     * @param contentList 纯文本消息内容，大语言模型支持传入此类型。
      */
-    static DoubaoMessageInRequest createAsUserMessage(String content) {
+    static DoubaoMessageInVisionRequest createAsUserMessage(List<Content> contentList) {
         return new DoubaoMessageImpl(new JsonObject()
                 .put("role", "user")
-                .put("content", content)
+                .put("content", new JsonArray(contentList.stream().map(UnmodifiableJsonifiableEntity::cloneAsJsonObject)
+                                                         .toList()))
         );
     }
 
@@ -47,10 +50,16 @@ public interface DoubaoMessageInRequest extends DoubaoMessage {
      *
      * @param content 模型回复的消息。
      */
-    static DoubaoMessageInRequest createAsAssistantMessage(String content) {
+    static DoubaoMessageInVisionRequest createAsAssistantMessage(String content) {
         return new DoubaoMessageImpl(new JsonObject()
                 .put("role", "assistant")
-                .put("content", content)
+                .put("content", new JsonArray()
+                        .add(Content.create()
+                                    .setText("text")
+                                    .setText(content)
+                                    .toJsonObject()
+                        )
+                )
         );
     }
 
@@ -61,7 +70,7 @@ public interface DoubaoMessageInRequest extends DoubaoMessage {
      * @param content   模型回复的消息。
      * @param toolCalls 模型回复的工具调用信息。
      */
-    static DoubaoMessageInRequest createAsToolCallMessage(@Nullable String content, @Nonnull List<DoubaoToolCall> toolCalls) {
+    static DoubaoMessageInVisionRequest createAsToolCallMessage(@Nullable String content, @Nonnull List<DoubaoToolCall> toolCalls) {
         var a = new JsonArray();
         toolCalls.forEach(tc -> {
             a.add(tc.cloneAsJsonObject());
@@ -81,11 +90,12 @@ public interface DoubaoMessageInRequest extends DoubaoMessage {
      * @param content      工具返回的消息
      * @param tool_call_id 模型调用的工具的 ID。
      */
-    static DoubaoMessageInRequest createAsToolOutputMessage(String content, String tool_call_id) {
+    static DoubaoMessageInVisionRequest createAsToolOutputMessage(String content, String tool_call_id) {
         return new DoubaoMessageImpl(new JsonObject()
                 .put("role", "tool")
                 .put("content", content)
                 .put("tool_call_id", tool_call_id)
         );
     }
+
 }

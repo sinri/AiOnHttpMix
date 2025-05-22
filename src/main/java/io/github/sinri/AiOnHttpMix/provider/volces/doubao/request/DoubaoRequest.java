@@ -1,7 +1,9 @@
 package io.github.sinri.AiOnHttpMix.provider.volces.doubao.request;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessage;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInChatRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInVisionRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
@@ -46,24 +48,28 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
         return this;
     }
 
-    default DoubaoRequest addSystemMessage(String content) {
-        return addMessage(DoubaoMessageInRequest.createAsSystemMessage(content));
+    default DoubaoRequest addSystemChatMessage(String content) {
+        return addMessage(DoubaoMessageInChatRequest.createAsSystemMessage(content));
     }
 
-    default DoubaoRequest addUserMessage(String content) {
-        return addMessage(DoubaoMessageInRequest.createAsUserMessage(content));
+    default DoubaoRequest addUserChatMessage(String content) {
+        return addMessage(DoubaoMessageInChatRequest.createAsUserMessage(content));
     }
 
-    default DoubaoRequest addAssistantMessage(String content) {
-        return addMessage(DoubaoMessageInRequest.createAsAssistantMessage(content));
+    default DoubaoRequest addUserVisionMessage(List<Content> contentList) {
+        return addMessage(DoubaoMessageInVisionRequest.createAsUserMessage(contentList));
     }
 
-    default DoubaoRequest addToolCallMessage(@Nullable String content, @Nonnull List<DoubaoToolCall> toolCalls) {
-        return addMessage(DoubaoMessageInRequest.createAsToolCallMessage(content, toolCalls));
+    default DoubaoRequest addAssistantChatMessage(String content) {
+        return addMessage(DoubaoMessageInChatRequest.createAsAssistantMessage(content));
     }
 
-    default DoubaoRequest addToolOutputMessage(String content, String tool_call_id) {
-        return addMessage(DoubaoMessageInRequest.createAsToolOutputMessage(content, tool_call_id));
+    default DoubaoRequest addToolCallChatMessage(@Nullable String content, @Nonnull List<DoubaoToolCall> toolCalls) {
+        return addMessage(DoubaoMessageInChatRequest.createAsToolCallMessage(content, toolCalls));
+    }
+
+    default DoubaoRequest addToolOutputChatMessage(String content, String tool_call_id) {
+        return addMessage(DoubaoMessageInChatRequest.createAsToolOutputMessage(content, tool_call_id));
     }
 
     /**
@@ -71,11 +77,11 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
      *
      * @return 到目前为止的对话组成的消息列表。
      */
-    default List<DoubaoMessageInRequest> messages() {
+    default List<DoubaoMessageInChatRequest> messages() {
         List<JsonObject> l = readJsonObjectArray("messages");
         if (l == null)
             return List.of();
-        return l.stream().map(DoubaoMessageInRequest::wrap).toList();
+        return l.stream().map(DoubaoMessageInChatRequest::wrap).toList();
     }
 
     /**

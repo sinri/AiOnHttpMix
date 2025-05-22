@@ -8,12 +8,12 @@ import io.github.sinri.AiOnHttpMix.utils.specification.OModelSpecification;
  *
  * @since 2.0.0
  */
-public abstract class OModelSeries extends OModelSpecification implements ChatModel {
+public abstract class OChatModelSeries extends OModelSpecification implements ChatModel {
     public final static String MODEL_NAME_OF_O1 = "o1";
     public final static String MODEL_NAME_OF_O3_MINI = "o3-mini";
 
-    public static OModelSeries model(String modelName) {
-        return new OModelSeries() {
+    public static OChatModelSeries model(String modelName) {
+        return new OChatModelSeries() {
             @Override
             public String getModelName() {
                 return modelName;

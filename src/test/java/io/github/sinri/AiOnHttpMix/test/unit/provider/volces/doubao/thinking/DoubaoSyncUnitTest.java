@@ -1,14 +1,13 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.thinking;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInRequest;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInChatRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.ThinkingOptions;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
-import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.common.AbstractDoubaoNormalModelUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -28,8 +27,8 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoThinkingModelUnitTest {
         AigcMix.enableVerboseLogger();
         async(() -> {
             DoubaoRequest request = DoubaoRequest.create()
-                                                 .addMessage(DoubaoMessageInRequest.createAsSystemMessage("你是一个王心凌铁粉"))
-                                                 .addMessage(DoubaoMessageInRequest.createAsUserMessage("王心凌的教育经历是什么"))
+                                                 .addMessage(DoubaoMessageInChatRequest.createAsSystemMessage("你是一个王心凌铁粉"))
+                                                 .addMessage(DoubaoMessageInChatRequest.createAsUserMessage("王心凌的教育经历是什么"))
                                                  .thinking(ThinkingOptions.create()
                                                                           .type("enabled"));
 
@@ -58,8 +57,8 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoThinkingModelUnitTest {
     public void test2() {
         async(() -> {
             DoubaoRequest request = DoubaoRequest.create()
-                                                 .addSystemMessage("你是一个王心凌铁粉")
-                                                 .addUserMessage("王心凌在2024年8月开过演唱会吗")
+                                                 .addSystemChatMessage("你是一个王心凌铁粉")
+                                                 .addUserChatMessage("王心凌在2024年8月开过演唱会吗")
                                                  .addTool(new DoubaoToolDefinition(f -> f
                                                          .name("query_event_schedule")
                                                          .description("查询演艺活动日程")
@@ -110,8 +109,8 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoThinkingModelUnitTest {
                            })
                            .compose(toolCallOutputContent -> {
                                DoubaoMessageInResponse msg = toolCallMessageRef.get();
-                               request.addToolCallMessage(msg.getContent(), msg.getToolCalls());
-                               request.addToolOutputMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
+                               request.addToolCallChatMessage(msg.getContent(), msg.getToolCalls());
+                               request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
 
                                return getKit().chat(
                                        getServiceAdapter(),

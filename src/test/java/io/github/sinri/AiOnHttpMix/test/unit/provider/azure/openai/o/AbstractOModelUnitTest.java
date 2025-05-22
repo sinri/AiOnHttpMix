@@ -3,22 +3,22 @@ package io.github.sinri.AiOnHttpMix.test.unit.provider.azure.openai.o;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
 import io.github.sinri.AiOnHttpMix.test.unit.provider.AbstractModelUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.OModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.OChatModelSeries;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import org.junit.Assert;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-public abstract class AbstractOModelUnitTest extends AbstractModelUnitTest<OModelSeries> {
-    private final OModelSeries o1;
+public abstract class AbstractOModelUnitTest extends AbstractModelUnitTest<OChatModelSeries> {
+    private final OChatModelSeries o1;
 
     public AbstractOModelUnitTest() {
         super();
-        o1 = OModelSeries.model(OModelSeries.MODEL_NAME_OF_O1);
+        o1 = OChatModelSeries.model(OChatModelSeries.MODEL_NAME_OF_O1);
     }
 
     @Override
-    protected OModelSeries getModel() {
+    protected OChatModelSeries getModel() {
         return o1;
     }
 

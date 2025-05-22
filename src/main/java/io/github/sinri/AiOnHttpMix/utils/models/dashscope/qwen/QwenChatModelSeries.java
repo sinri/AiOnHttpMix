@@ -8,7 +8,7 @@ import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecificati
  *
  * @since 2.0.0
  */
-public abstract class QwenModelSeries extends DashscopeModelSpecification implements ChatModel {
+public abstract class QwenChatModelSeries extends DashscopeModelSpecification implements ChatModel {
     public final static String MODEL_NAME_OF_QWEN_PLUS = "qwen-plus";
     public final static String MODEL_NAME_OF_QWEN_PLUS_LATEST = "qwen-plus-latest";
     public final static String MODEL_NAME_OF_QWEN_MAX = "qwen-max";
@@ -26,8 +26,8 @@ public abstract class QwenModelSeries extends DashscopeModelSpecification implem
      */
     public final static String MODEL_NAME_OF_QWEN_MT_TURBO = "qwen-mt-turbo";
 
-    public static QwenModelSeries model(String modelName) {
-        return new QwenModelSeries() {
+    public static QwenChatModelSeries model(String modelName) {
+        return new QwenChatModelSeries() {
             @Override
             public String getModelName() {
                 return modelName;
