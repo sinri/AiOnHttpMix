@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.provider.volces;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
-import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 import io.github.sinri.AiOnHttpMix.utils.specification.VolcesModelSpecification;
@@ -22,7 +22,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 /**
  * @since 2.0.0
  */
-public class VolcesServiceAdapter implements ChatModelServiceAdapter {
+public class VolcesServiceAdapter implements ServiceAdapter {
 
     private final Map<String, String> modelDeploymentMap;
     private final String apiKey;
@@ -98,7 +98,7 @@ public class VolcesServiceAdapter implements ChatModelServiceAdapter {
         assertModelCompatible(chatModel);
 
         requestPayload.put("model", toModelMappedDeploymentId(chatModel));
-        return ChatModelServiceAdapter.callStreamWithCutter(
+        return ServiceAdapter.callStreamWithCutter(
                 new HttpClientOptions()
                         .setKeepAlive(true)
                         .setSsl(true)

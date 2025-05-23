@@ -9,6 +9,8 @@ import io.github.sinri.AiOnHttpMix.utils.specification.GPTModelSpecification;
  * @since 2.0.0
  */
 public abstract class GPTChatModelSeries extends GPTModelSpecification implements ChatModel {
+    public final static String NAME_OF_MODEL_SERIES = "GPTChatModelSeries";
+
     public final static String MODEL_NAME_OF_GPT_4O = "gpt-4o";
 
     public static GPTChatModelSeries model(String modelName) {

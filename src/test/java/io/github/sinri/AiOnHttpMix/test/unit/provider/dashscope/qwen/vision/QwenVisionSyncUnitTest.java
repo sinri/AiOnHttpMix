@@ -27,7 +27,6 @@ public class QwenVisionSyncUnitTest extends AbstractQwenVisionModelUnitTest {
     public void test1() {
         async(() -> {
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    requestWithoutToolCall,
                                    UUID.randomUUID().toString()
@@ -60,7 +59,6 @@ public class QwenVisionSyncUnitTest extends AbstractQwenVisionModelUnitTest {
             AtomicReference<String> toolCallIdRef = new AtomicReference<>();
 
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    requestWithToolCall,
                                    UUID.randomUUID().toString()
@@ -109,7 +107,6 @@ public class QwenVisionSyncUnitTest extends AbstractQwenVisionModelUnitTest {
                                );
 
                                return getKit().chat(
-                                       getServiceAdapter(),
                                        getModel(),
                                        requestWithToolCall,
                                        UUID.randomUUID().toString()

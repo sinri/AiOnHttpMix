@@ -18,7 +18,7 @@ A service provider (e.g., Azure, Dashscope, Volces) offers a set of LLMs via var
 `io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider`.
 
 To abstract the real-world LLM service mapping, this project introduces the concept of a **Model Service
-** and the interface `io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter` for execution.
+** and the interface `io.github.sinri.AiOnHttpMix.utils.ServiceAdapter` for execution.
 
 ## How to Implement a New LLM Service
 

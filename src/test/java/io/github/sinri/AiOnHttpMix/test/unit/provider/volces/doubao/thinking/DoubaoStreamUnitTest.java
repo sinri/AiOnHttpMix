@@ -31,7 +31,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoThinkingModelUnitTest {
                                                  .thinking(ThinkingOptions.create()
                                                                           .type("enabled"))
                                                  .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
+            return getKit().chatStream(
                                    getModel(),
                                    request.toJsonObject(),
                                    fragment -> {
@@ -59,7 +59,7 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoThinkingModelUnitTest {
                                                  .thinking(ThinkingOptions.create()
                                                                           .type("enabled"))
                                                  .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
+            return getKit().chatStream(
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -111,7 +111,6 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoThinkingModelUnitTest {
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -147,7 +146,6 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoThinkingModelUnitTest {
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    180_000L,
@@ -188,7 +186,6 @@ public class DoubaoStreamUnitTest extends AbstractDoubaoThinkingModelUnitTest {
                                request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
 
                                return getKit().chatStream(
-                                       getServiceAdapter(),
                                        getModel(),
                                        request,
                                        180_000L,

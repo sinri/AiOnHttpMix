@@ -1,13 +1,12 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.azure.openai.gpt;
 
-import io.vertx.core.Future;
+import io.github.sinri.AiOnHttpMix.test.unit.provider.core.AbstractModelRawUnitTest;
+import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.GPTChatModelSeries;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
 
-import java.util.UUID;
-
-public class GptLowLevelUnitTest extends AbstractGptUnitTest {
+public class GptLowLevelUnitTest extends AbstractGptUnitTest implements AbstractModelRawUnitTest<GPTChatModelSeries> {
     private JsonObject generateRequest(boolean useStreamIncrement) {
         JsonObject request = new JsonObject();
         request.put("messages", new JsonArray()
@@ -25,39 +24,16 @@ public class GptLowLevelUnitTest extends AbstractGptUnitTest {
     }
 
     @Test
-    public void test1() {
+    public void testSync() {
         async(() -> {
-            return getServiceAdapter()
-                    .request(
-                            getModel(),
-                            generateRequest(false),
-                            UUID.randomUUID().toString()
-                    )
-                    .compose(resp -> {
-                        getUnitTestLogger().info("resp", resp);
-                        return Future.succeededFuture();
-                    });
+            return toTestSync(generateRequest(false));
         });
     }
 
     @Test
     public void test2() {
         async(() -> {
-            return getServiceAdapter()
-                    .requestStream(
-                            getModel(),
-                            generateRequest(true),
-                            chunk -> {
-                                getUnitTestLogger().info("chunk: " + chunk);
-                                return Future.succeededFuture();
-                            },
-                            180_000L,
-                            UUID.randomUUID().toString()
-                    )
-                    .compose(resp -> {
-                        getUnitTestLogger().info("fin");
-                        return Future.succeededFuture();
-                    });
+            return toTestStream(generateRequest(true));
         });
     }
 }

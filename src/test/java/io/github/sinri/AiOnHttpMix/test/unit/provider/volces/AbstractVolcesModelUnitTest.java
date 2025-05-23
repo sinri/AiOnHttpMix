@@ -2,8 +2,8 @@ package io.github.sinri.AiOnHttpMix.test.unit.provider.volces;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.VolcesKit;
 import io.github.sinri.AiOnHttpMix.provider.volces.VolcesServiceAdapter;
-import io.github.sinri.AiOnHttpMix.test.unit.provider.AbstractModelUnitTest;
-import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
+import io.github.sinri.AiOnHttpMix.test.unit.provider.core.AbstractModelUnitTest;
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.volces.VolcesChatModelSeries;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import org.junit.Assert;
@@ -15,7 +15,7 @@ public abstract class AbstractVolcesModelUnitTest<M extends VolcesChatModelSerie
 
     public AbstractVolcesModelUnitTest() {
         super();
-        kit = new VolcesKit();
+        kit = new VolcesKit((VolcesServiceAdapter) getServiceAdapter());
     }
 
     protected VolcesKit getKit() {
@@ -23,15 +23,11 @@ public abstract class AbstractVolcesModelUnitTest<M extends VolcesChatModelSerie
     }
 
     @Override
-    protected final ChatModelServiceAdapter buildServiceAdapter() {
+    protected final ServiceAdapter buildServiceAdapter() {
         KeelConfigElement doubaoConfig = Keel.getConfiguration()
                                              .extract("provider", "volces");
         Assert.assertNotNull(doubaoConfig);
 
         return getModel().buildServiceAdapter(doubaoConfig);
-    }
-    @Override
-    protected VolcesServiceAdapter getServiceAdapter() {
-        return (VolcesServiceAdapter) super.getServiceAdapter();
     }
 }

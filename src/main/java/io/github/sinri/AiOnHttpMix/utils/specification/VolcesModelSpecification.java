@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.utils.specification;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.VolcesServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 
@@ -30,8 +30,14 @@ public abstract class VolcesModelSpecification implements ModelSpecification {
         return SPECIFICATION_NAME;
     }
 
+    /**
+     * According to the sample `sample.config.properties`, here `config` is extracted from
+     * {@code provider.volces}.
+     *
+     * @param config 针对提供服务的大语言模型在线服务提供商和相关大语言模型服务接口规格进行大语言模型服务适配器构建所需的配置
+     */
     @Override
-    public ChatModelServiceAdapter buildServiceAdapter(KeelConfigElement config) {
+    public ServiceAdapter buildServiceAdapter(KeelConfigElement config) {
         String apiKey = config.readString(List.of("apiKey"));
         Map<String, String> modelDeploymentMap = new HashMap<>();
         KeelConfigElement models = config.extract("model");

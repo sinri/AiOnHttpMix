@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
-import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenChatModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenVisionModelSeries;
@@ -21,7 +21,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 /**
  * @since 2.0.0
  */
-public class QwenServiceAdapter implements ChatModelServiceAdapter {
+public class QwenServiceAdapter implements ServiceAdapter {
     private final String apiKey;
 
     public QwenServiceAdapter(String apiKey) {
@@ -95,7 +95,7 @@ public class QwenServiceAdapter implements ChatModelServiceAdapter {
                        .put("payload", requestPayload)
                        .put("requestId", requestId));
 
-        return ChatModelServiceAdapter.callStreamWithCutter(
+        return ServiceAdapter.callStreamWithCutter(
                 new HttpClientOptions()
                         .setKeepAlive(true)
                         .setSsl(true)

@@ -6,6 +6,8 @@ package io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen;
  * @since 2.0.0
  */
 public abstract non-sealed class QwenChatModelSeries extends QwenModelSeries {
+    public final static String NAME_OF_MODEL_SERIES = "QwenChatModelSeries";
+
     public final static String MODEL_NAME_OF_QWEN_PLUS = "qwen-plus";
     public final static String MODEL_NAME_OF_QWEN_PLUS_LATEST = "qwen-plus-latest";
     public final static String MODEL_NAME_OF_QWEN_MAX = "qwen-max";

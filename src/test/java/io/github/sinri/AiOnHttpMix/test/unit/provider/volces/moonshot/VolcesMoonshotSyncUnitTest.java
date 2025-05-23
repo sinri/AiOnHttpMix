@@ -33,7 +33,6 @@ public class VolcesMoonshotSyncUnitTest extends AbstractVolcesMoonshotModelUnitT
                                                                           .type("enabled"));
 
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()
@@ -73,7 +72,6 @@ public class VolcesMoonshotSyncUnitTest extends AbstractVolcesMoonshotModelUnitT
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()
@@ -110,10 +108,10 @@ public class VolcesMoonshotSyncUnitTest extends AbstractVolcesMoonshotModelUnitT
                            .compose(toolCallOutputContent -> {
                                DoubaoMessageInResponse msg = toolCallMessageRef.get();
                                request.addToolCallChatMessage(msg.getContent(), msg.getToolCalls());
-                               request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
+                               request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0)
+                                                                                          .getId());
 
                                return getKit().chat(
-                                       getServiceAdapter(),
                                        getModel(),
                                        request,
                                        UUID.randomUUID().toString()

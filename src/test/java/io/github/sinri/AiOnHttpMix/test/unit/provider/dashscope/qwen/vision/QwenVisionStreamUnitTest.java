@@ -24,7 +24,6 @@ public class QwenVisionStreamUnitTest extends AbstractQwenVisionModelUnitTest {
     public void test1() {
         async(() -> {
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    requestWithoutToolCall,
                                    chunk -> {
@@ -46,7 +45,6 @@ public class QwenVisionStreamUnitTest extends AbstractQwenVisionModelUnitTest {
 //        AigcMix.enableVerboseLogger();
         async(() -> {
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    requestWithoutToolCall,
                                    chunk -> {
@@ -89,7 +87,6 @@ public class QwenVisionStreamUnitTest extends AbstractQwenVisionModelUnitTest {
         AigcMix.enableVerboseLogger();
         async(() -> {
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    requestWithoutToolCall,
                                    180_000L,
@@ -118,7 +115,6 @@ public class QwenVisionStreamUnitTest extends AbstractQwenVisionModelUnitTest {
     public void test4() {
         async(() -> {
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    requestWithToolCall,
                                    180_000L,
@@ -157,7 +153,6 @@ public class QwenVisionStreamUnitTest extends AbstractQwenVisionModelUnitTest {
             AtomicReference<String> toolCallIdRef = new AtomicReference<>();
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    requestWithToolCall,
                                    180_000L,
@@ -207,7 +202,6 @@ public class QwenVisionStreamUnitTest extends AbstractQwenVisionModelUnitTest {
                                );
 
                                return getKit().chatStream(
-                                       getServiceAdapter(),
                                        getModel(),
                                        requestWithToolCall,
                                        180_000L,

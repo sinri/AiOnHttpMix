@@ -31,7 +31,7 @@ public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUni
                                                  .thinking(ThinkingOptions.create()
                                                                           .type("enabled"))
                                                  .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
+            return getKit().chatStream(
                                    getModel(),
                                    request.toJsonObject(),
                                    fragment -> {
@@ -59,7 +59,7 @@ public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUni
                                                  .thinking(ThinkingOptions.create()
                                                                           .type("enabled"))
                                                  .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
+            return getKit().chatStream(
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -111,7 +111,6 @@ public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUni
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -147,7 +146,6 @@ public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUni
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    180_000L,
@@ -185,10 +183,10 @@ public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUni
                            .compose(toolCallOutputContent -> {
                                DoubaoMessageInResponse msg = toolCallMessageRef.get();
                                request.addToolCallChatMessage(msg.getContent(), msg.getToolCalls());
-                               request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
+                               request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0)
+                                                                                          .getId());
 
                                return getKit().chatStream(
-                                       getServiceAdapter(),
                                        getModel(),
                                        request,
                                        180_000L,

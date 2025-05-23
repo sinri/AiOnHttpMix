@@ -13,19 +13,17 @@ import org.junit.Before;
 import java.util.List;
 
 public class AbstractDoubaoVisionModelUnitTest extends AbstractVolcesModelUnitTest<DoubaoVisionModelSeries> {
-    private final DoubaoVisionModelSeries model;
 
     protected DoubaoRequest requestWithoutToolCall;
     protected DoubaoRequest requestWithToolCall;
 
     public AbstractDoubaoVisionModelUnitTest() {
         super();
-        model = DoubaoVisionModelSeries.model(DoubaoVisionModelSeries.MODEL_NAME_OF_DOUBAO_1d5_VISION_PRO_32K_250115);
     }
 
     @Override
-    protected DoubaoVisionModelSeries getModel() {
-        return model;
+    protected DoubaoVisionModelSeries buildModel() {
+        return DoubaoVisionModelSeries.model(DoubaoVisionModelSeries.MODEL_NAME_OF_DOUBAO_1d5_VISION_PRO_32K_250115);
     }
 
     @Before
@@ -33,7 +31,7 @@ public class AbstractDoubaoVisionModelUnitTest extends AbstractVolcesModelUnitTe
     public void setUp() {
         super.setUp();
 
-        getUnitTestLogger().info("Test with model " + model.getModelName());
+        getUnitTestLogger().info("Test with model " + getModel().getModelName());
 
         var imageUrl = "https://p9-arcosite.byteimg.com/tos-cn-i-goo7wpa0wc/f9a8b28c25ac4d86979de8f52e73def6~tplv-goo7wpa0wc-image.image";
         requestWithoutToolCall = DoubaoRequest.create()

@@ -33,7 +33,6 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoThinkingModelUnitTest {
                                                                           .type("enabled"));
 
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()
@@ -73,7 +72,6 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoThinkingModelUnitTest {
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()
@@ -113,7 +111,6 @@ public class DoubaoSyncUnitTest extends AbstractDoubaoThinkingModelUnitTest {
                                request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
 
                                return getKit().chat(
-                                       getServiceAdapter(),
                                        getModel(),
                                        request,
                                        UUID.randomUUID().toString()

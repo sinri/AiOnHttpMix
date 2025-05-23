@@ -32,7 +32,6 @@ public class VolcesDeepSeekV3SyncUnitTest extends AbstractVolcesDeepSeekV3ModelU
                                                                           .type("enabled"));
 
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()
@@ -72,7 +71,6 @@ public class VolcesDeepSeekV3SyncUnitTest extends AbstractVolcesDeepSeekV3ModelU
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()
@@ -112,7 +110,6 @@ public class VolcesDeepSeekV3SyncUnitTest extends AbstractVolcesDeepSeekV3ModelU
                                request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
 
                                return getKit().chat(
-                                       getServiceAdapter(),
                                        getModel(),
                                        request,
                                        UUID.randomUUID().toString()

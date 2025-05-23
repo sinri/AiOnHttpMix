@@ -29,7 +29,6 @@ public class GptStreamUnitTest extends AbstractGptUnitTest {
                     .stream(true);
             return getKit()
                     .chatStream(
-                            getServiceAdapter(),
                             getModel(),
                             request.toJsonObject(),
                             fragment -> {
@@ -55,7 +54,6 @@ public class GptStreamUnitTest extends AbstractGptUnitTest {
                     .stream(true);
             return getKit()
                     .chatStream(
-                            getServiceAdapter(),
                             getModel(),
                             request,
                             chunk -> {
@@ -92,7 +90,6 @@ public class GptStreamUnitTest extends AbstractGptUnitTest {
                     );
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -132,7 +129,6 @@ public class GptStreamUnitTest extends AbstractGptUnitTest {
             AtomicReference<String> toolCallIdRef = new AtomicReference<>();
             return getKit()
                     .chatStream(
-                            getServiceAdapter(),
                             getModel(),
                             request,
                             180_000L,
@@ -182,7 +178,6 @@ public class GptStreamUnitTest extends AbstractGptUnitTest {
 
                         return getKit()
                                 .chatStream(
-                                        getServiceAdapter(),
                                         getModel(),
                                         request,
                                         180_000L,

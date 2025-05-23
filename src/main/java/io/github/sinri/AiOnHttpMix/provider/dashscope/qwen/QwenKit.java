@@ -6,7 +6,8 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenR
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseFragment;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponse;
-import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.ServiceKit;
+import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
@@ -15,49 +16,57 @@ import java.util.function.Function;
 /**
  * @since 2.0.0
  */
-public class QwenKit {
-    public QwenKit() {
+public class QwenKit implements ServiceKit<QwenRequest, QwenResponse, QwenResponseChunk> {
+    private final QwenServiceAdapter serviceAdapter;
 
+    public QwenKit(QwenServiceAdapter serviceAdapter) {
+        this.serviceAdapter = serviceAdapter;
     }
 
+    @Override
+    public QwenServiceAdapter getServiceAdapter() {
+        return serviceAdapter;
+    }
+
+    @Override
     public Future<JsonObject> chat(
-            QwenServiceAdapter qwenServiceAdapter,
-            QwenModelSeries chatModel,
+            ChatModel chatModel,
             JsonObject rawRequest,
             String requestId) {
-        return qwenServiceAdapter.request(chatModel, rawRequest, requestId);
+        return getServiceAdapter().request(chatModel, rawRequest, requestId);
     }
 
+
+    @Override
     public Future<QwenResponse> chat(
-            QwenServiceAdapter qwenServiceAdapter,
-            QwenModelSeries chatModel,
+            ChatModel chatModel,
             QwenRequest request,
             String requestId) {
-        return qwenServiceAdapter.request(chatModel, request.toJsonObject(), requestId)
-                .compose(rawResponse -> {
-                    return Future.succeededFuture(QwenResponse.wrap(rawResponse));
-                });
+        return getServiceAdapter().request(chatModel, request.toJsonObject(), requestId)
+                                  .compose(rawResponse -> {
+                                      return Future.succeededFuture(QwenResponse.wrap(rawResponse));
+                                  });
     }
 
+    @Override
     public Future<Void> chatStream(
-            QwenServiceAdapter qwenServiceAdapter,
-            QwenModelSeries chatModel,
+            ChatModel chatModel,
             JsonObject rawRequest,
             Function<String, Future<Void>> chunkProcessFunc,
             long cutterTimeout,
             String requestId) {
-        return qwenServiceAdapter.requestStream(chatModel, rawRequest, chunkProcessFunc, cutterTimeout, requestId);
+        return getServiceAdapter().requestStream(chatModel, rawRequest, chunkProcessFunc, cutterTimeout, requestId);
     }
 
+    @Override
     public Future<Void> chatStream(
-            QwenServiceAdapter qwenServiceAdapter,
-            QwenModelSeries chatModel,
+            ChatModel chatModel,
             QwenRequest request,
             Function<QwenResponseChunk, Future<Void>> chunkProcessFunc,
             long cutterTimeout,
             String requestId) {
         request.parameters(p -> p.stream(true).incrementalOutput(true));
-        return chatStream(qwenServiceAdapter, chatModel, request.toJsonObject(), s -> {
+        return chatStream(chatModel, request.toJsonObject(), s -> {
             try {
                 QwenResponseFragment fragment = QwenResponseFragment.wrap(s);
                 JsonObject data = fragment.getData();
@@ -69,9 +78,9 @@ public class QwenKit {
         }, cutterTimeout, requestId);
     }
 
+    @Override
     public Future<QwenResponse> chatStream(
-            QwenServiceAdapter qwenServiceAdapter,
-            QwenModelSeries chatModel,
+            ChatModel chatModel,
             QwenRequest request,
             long cutterTimeout,
             String requestId) {
@@ -79,7 +88,7 @@ public class QwenKit {
 
         QwenResponseBuffer qwenResponseBuffer = new QwenResponseBuffer();
 
-        return chatStream(qwenServiceAdapter, chatModel, request.toJsonObject(), s -> {
+        return chatStream(chatModel, request.toJsonObject(), s -> {
             try {
                 QwenResponseFragment fragment = QwenResponseFragment.wrap(s);
                 JsonObject data = fragment.getData();

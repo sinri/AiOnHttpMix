@@ -7,26 +7,29 @@ import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPT
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPTResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPTResponseFragment;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.sync.GPTResponse;
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
+import io.github.sinri.AiOnHttpMix.utils.ServiceKit;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
 import java.util.function.Function;
 
-public class GPTKit {
-    public Future<JsonObject> chat(
-            OpenAIServiceAdapter serviceAdapter,
-            ChatModel chatModel,
-            JsonObject rawRequest,
-            String requestId) {
-        return serviceAdapter.request(
-                chatModel,
-                rawRequest,
-                requestId);
+public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseChunk> {
+
+    private final OpenAIServiceAdapter serviceAdapter;
+
+    public GPTKit(OpenAIServiceAdapter serviceAdapter) {
+        this.serviceAdapter = serviceAdapter;
     }
 
+    @Override
+    public ServiceAdapter getServiceAdapter() {
+        return serviceAdapter;
+    }
+
+    @Override
     public Future<GPTResponse> chat(
-            OpenAIServiceAdapter serviceAdapter,
             ChatModel chatModel,
             GPTRequest request,
             String requestId) {
@@ -39,8 +42,8 @@ public class GPTKit {
                              });
     }
 
+    @Override
     public Future<Void> chatStream(
-            OpenAIServiceAdapter serviceAdapter,
             ChatModel chatModel,
             JsonObject requestPayload,
             Function<String, Future<Void>> cutterProcessFunc,
@@ -55,8 +58,8 @@ public class GPTKit {
                 requestId);
     }
 
+    @Override
     public Future<Void> chatStream(
-            OpenAIServiceAdapter serviceAdapter,
             ChatModel chatModel,
             GPTRequest request,
             Function<GPTResponseChunk, Future<Void>> cutterProcessFunc,
@@ -64,7 +67,6 @@ public class GPTKit {
             String requestId) {
         request.stream(true);
         return chatStream(
-                serviceAdapter,
                 chatModel,
                 request.toJsonObject(),
                 fragment -> {
@@ -87,8 +89,8 @@ public class GPTKit {
                 requestId);
     }
 
+    @Override
     public Future<GPTResponse> chatStream(
-            OpenAIServiceAdapter serviceAdapter,
             ChatModel chatModel,
             GPTRequest request,
             long cutterTimeout,
@@ -96,7 +98,6 @@ public class GPTKit {
     ) {
         GPTResponseBuffer buffer = new GPTResponseBuffer();
         return chatStream(
-                serviceAdapter,
                 chatModel,
                 request,
                 chunk -> {

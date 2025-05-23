@@ -8,6 +8,8 @@ import io.github.sinri.AiOnHttpMix.utils.models.volces.VolcesChatModelSeries;
  * @since 2.0.0
  */
 public abstract class VolcesDeepSeekChatModelSeries extends VolcesChatModelSeries {
+    public final static String NAME_OF_MODEL_SERIES = "VolcesDeepSeekChatModelSeries";
+
     public static final String MODEL_NAME_OF_DEEPSEEK_V3_241226 = "deepseek-v3-241226";
     public static final String MODEL_NAME_OF_DEEPSEEK_V3_250324 = "deepseek-v3-250324";
 

@@ -32,7 +32,6 @@ public class VolcesDeepSeekR1StreamUnitTest extends AbstractVolcesDeepSeekR1Mode
                                                                           .type("enabled"))
                                                  .stream(true);
             return getKit().chatStream(
-                    getServiceAdapter(),
                                    getModel(),
                                    request.toJsonObject(),
                                    fragment -> {
@@ -60,7 +59,7 @@ public class VolcesDeepSeekR1StreamUnitTest extends AbstractVolcesDeepSeekR1Mode
                                                  .thinking(ThinkingOptions.create()
                                                                           .type("enabled"))
                                                  .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
+            return getKit().chatStream(
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -110,7 +109,6 @@ public class VolcesDeepSeekR1StreamUnitTest extends AbstractVolcesDeepSeekR1Mode
                                                          )));
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -146,7 +144,6 @@ public class VolcesDeepSeekR1StreamUnitTest extends AbstractVolcesDeepSeekR1Mode
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    180_000L,
@@ -184,10 +181,10 @@ public class VolcesDeepSeekR1StreamUnitTest extends AbstractVolcesDeepSeekR1Mode
                            .compose(toolCallOutputContent -> {
                                DoubaoMessageInResponse msg = toolCallMessageRef.get();
                                request.addToolCallChatMessage(msg.getContent(), msg.getToolCalls());
-                               request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
+                               request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0)
+                                                                                          .getId());
 
                                return getKit().chatStream(
-                                       getServiceAdapter(),
                                        getModel(),
                                        request,
                                        180_000L,

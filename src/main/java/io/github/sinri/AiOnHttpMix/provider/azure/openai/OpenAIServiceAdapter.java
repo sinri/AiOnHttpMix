@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.provider.azure.openai;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
-import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpClientOptions;
@@ -26,7 +26,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @author sinri
  * @since 2.0.0
  */
-public abstract class OpenAIServiceAdapter implements ChatModelServiceAdapter {
+public abstract class OpenAIServiceAdapter implements ServiceAdapter {
 
     private final Map<String, OpenAIConfigElement> deploymentConfigMap;
 
@@ -131,7 +131,7 @@ public abstract class OpenAIServiceAdapter implements ChatModelServiceAdapter {
         assertModelCompatible(chatModel);
         OpenAIConfigElement configElement = this.getConfig(chatModel);
         var uri = generateUri(configElement, "/chat/completions");
-        return ChatModelServiceAdapter.callStreamWithCutter(
+        return ServiceAdapter.callStreamWithCutter(
                 new HttpClientOptions()
                         .setKeepAlive(true)
                         .setSsl(true)

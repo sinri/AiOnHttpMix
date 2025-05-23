@@ -5,8 +5,8 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenServiceAdapter;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.Content;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.tool.QwenToolDefinition;
-import io.github.sinri.AiOnHttpMix.test.unit.provider.AbstractModelUnitTest;
-import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
+import io.github.sinri.AiOnHttpMix.test.unit.provider.core.AbstractModelUnitTest;
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenVisionModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecification;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
@@ -22,17 +22,14 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * 针对Qwen系列LLM（即{@link DashscopeModelSpecification}），基于{@link QwenServiceAdapter}的单元测试抽象类。
  */
 public abstract class AbstractQwenVisionModelUnitTest extends AbstractModelUnitTest<QwenVisionModelSeries> {
-    private final QwenVisionModelSeries model;
     private final QwenKit qwenKit;
     protected QwenRequest requestWithoutToolCall;
     protected QwenRequest requestWithToolCall;
 
 
     public AbstractQwenVisionModelUnitTest() {
-        model = QwenVisionModelSeries.model(QwenVisionModelSeries.MODEL_NAME_OF_QWEN_VL_PLUS);
-        qwenKit = new QwenKit();
+        qwenKit = new QwenKit((QwenServiceAdapter) getServiceAdapter());
     }
-
 
     @Before
     @Override
@@ -76,20 +73,17 @@ public abstract class AbstractQwenVisionModelUnitTest extends AbstractModelUnitT
         return qwenKit;
     }
 
+
     @Override
-    protected QwenVisionModelSeries getModel() {
-        return model;
+    protected QwenVisionModelSeries buildModel() {
+        return QwenVisionModelSeries.model(QwenVisionModelSeries.MODEL_NAME_OF_QWEN_VL_PLUS_LATEST);
     }
 
     @Override
-    protected final ChatModelServiceAdapter buildServiceAdapter() {
+    protected final ServiceAdapter buildServiceAdapter() {
         KeelConfigElement dashscopeConfig = Keel.getConfiguration().extract("provider", "dashscope", "qwen");
         Assert.assertNotNull(dashscopeConfig);
         return getModel().buildServiceAdapter(dashscopeConfig);
     }
 
-    @Override
-    protected QwenServiceAdapter getServiceAdapter() {
-        return (QwenServiceAdapter) super.getServiceAdapter();
-    }
 }

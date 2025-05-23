@@ -40,7 +40,6 @@ public class QwenChatSyncUnitTest extends AbstractQwenChatModelUnitTest {
                                                      .maxTokens(1024));
             getUnitTestLogger().info("req", request.toJsonObject());
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()
@@ -92,7 +91,6 @@ public class QwenChatSyncUnitTest extends AbstractQwenChatModelUnitTest {
             AtomicReference<String> toolCallIdRef = new AtomicReference<>();
 
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()
@@ -139,7 +137,6 @@ public class QwenChatSyncUnitTest extends AbstractQwenChatModelUnitTest {
                                );
 
                                return getKit().chat(
-                                       getServiceAdapter(),
                                        getModel(),
                                        request,
                                        UUID.randomUUID().toString()
@@ -183,7 +180,6 @@ public class QwenChatSyncUnitTest extends AbstractQwenChatModelUnitTest {
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()
@@ -224,7 +220,6 @@ public class QwenChatSyncUnitTest extends AbstractQwenChatModelUnitTest {
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
             return getKit().chat(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    UUID.randomUUID().toString()

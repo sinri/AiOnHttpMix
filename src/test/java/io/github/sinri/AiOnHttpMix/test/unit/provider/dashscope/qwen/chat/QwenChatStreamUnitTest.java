@@ -50,7 +50,6 @@ public class QwenChatStreamUnitTest extends AbstractQwenChatModelUnitTest {
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request.toJsonObject(),
                                    chunk -> {
@@ -85,7 +84,6 @@ public class QwenChatStreamUnitTest extends AbstractQwenChatModelUnitTest {
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -141,7 +139,6 @@ public class QwenChatStreamUnitTest extends AbstractQwenChatModelUnitTest {
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    180_000L,
@@ -189,7 +186,6 @@ public class QwenChatStreamUnitTest extends AbstractQwenChatModelUnitTest {
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    180_000L,
@@ -247,7 +243,6 @@ public class QwenChatStreamUnitTest extends AbstractQwenChatModelUnitTest {
             AtomicReference<String> toolCallIdRef = new AtomicReference<>();
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    180_000L,
@@ -297,7 +292,6 @@ public class QwenChatStreamUnitTest extends AbstractQwenChatModelUnitTest {
                                getUnitTestLogger().info("round-2-req", request.toJsonObject());
 
                                return getKit().chatStream(
-                                       getServiceAdapter(),
                                        getModel(),
                                        request,
                                        180_000L,

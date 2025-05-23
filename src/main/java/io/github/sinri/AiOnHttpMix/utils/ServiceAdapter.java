@@ -19,7 +19,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  *
  * @since 2.0.0
  */
-public interface ChatModelServiceAdapter {
+public interface ServiceAdapter {
 
     static Future<Void> callStreamWithCutter(
             HttpClientOptions httpClientOptions,

@@ -31,7 +31,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekV3Mode
                                                  .thinking(ThinkingOptions.create()
                                                                           .type("enabled"))
                                                  .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
+            return getKit().chatStream(
                                    getModel(),
                                    request.toJsonObject(),
                                    fragment -> {
@@ -59,7 +59,7 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekV3Mode
                                                  .thinking(ThinkingOptions.create()
                                                                           .type("enabled"))
                                                  .stream(true);
-            return getKit().chatStream(getServiceAdapter(),
+            return getKit().chatStream(
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -108,7 +108,6 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekV3Mode
                                                                             .toJson()
                                                          )));
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    chunk -> {
@@ -144,7 +143,6 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekV3Mode
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    request,
                                    180_000L,
@@ -185,7 +183,6 @@ public class VolcesDeepSeekV3StreamUnitTest extends AbstractVolcesDeepSeekV3Mode
                                request.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0).getId());
 
                                return getKit().chatStream(
-                                       getServiceAdapter(),
                                        getModel(),
                                        request,
                                        180_000L,

@@ -1,19 +1,14 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.vision;
 
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInChatRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.ThinkingOptions;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoice;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoiceDelta;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.json.schema.common.dsl.Schemas;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +22,7 @@ public class DoubaoVisionStreamUnitTest extends AbstractDoubaoVisionModelUnitTes
     @Test
     public void test1() {
         async(() -> {
-            return getKit().chatStream(getServiceAdapter(),
+            return getKit().chatStream(
                                    getModel(),
                                    requestWithoutToolCall.toJsonObject(),
                                    fragment -> {
@@ -48,7 +43,7 @@ public class DoubaoVisionStreamUnitTest extends AbstractDoubaoVisionModelUnitTes
     public void test2() {
         //        AigcMix.enableVerboseLogger();
         async(() -> {
-            return getKit().chatStream(getServiceAdapter(),
+            return getKit().chatStream(
                                    getModel(),
                                    requestWithoutToolCall,
                                    chunk -> {
@@ -84,7 +79,6 @@ public class DoubaoVisionStreamUnitTest extends AbstractDoubaoVisionModelUnitTes
         //        AigcMix.enableVerboseLogger();
         async(() -> {
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    requestWithToolCall,
                                    chunk -> {
@@ -107,7 +101,6 @@ public class DoubaoVisionStreamUnitTest extends AbstractDoubaoVisionModelUnitTes
             AtomicReference<DoubaoMessageInResponse> toolCallMessageRef = new AtomicReference<>();
 
             return getKit().chatStream(
-                                   getServiceAdapter(),
                                    getModel(),
                                    requestWithToolCall,
                                    180_000L,
@@ -151,7 +144,6 @@ public class DoubaoVisionStreamUnitTest extends AbstractDoubaoVisionModelUnitTes
                                                                                           .getId());
 
                                return getKit().chatStream(
-                                       getServiceAdapter(),
                                        getModel(),
                                        requestWithToolCall,
                                        180_000L,

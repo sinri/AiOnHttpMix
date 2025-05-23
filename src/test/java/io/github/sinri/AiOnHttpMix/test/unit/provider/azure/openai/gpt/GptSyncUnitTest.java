@@ -28,7 +28,6 @@ public class GptSyncUnitTest extends AbstractGptUnitTest {
                     .addMessage(GPTMessageInRequest.createAsUser("筑波山周边是哪些大名的势力范围", null));
             return getKit()
                     .chat(
-                            getServiceAdapter(),
                             getModel(),
                             request,
                             UUID.randomUUID().toString()
@@ -67,11 +66,10 @@ public class GptSyncUnitTest extends AbstractGptUnitTest {
                                                        .toJson()
                                     ))
                     );
-            AtomicReference<GPTMessageInResponse> msgRef=new AtomicReference<>();
-            AtomicReference<String> toolCallIdRef=new AtomicReference<>();
+            AtomicReference<GPTMessageInResponse> msgRef = new AtomicReference<>();
+            AtomicReference<String> toolCallIdRef = new AtomicReference<>();
             return getKit()
                     .chat(
-                            getServiceAdapter(),
                             getModel(),
                             request,
                             UUID.randomUUID().toString()
@@ -114,19 +112,18 @@ public class GptSyncUnitTest extends AbstractGptUnitTest {
                                 .toString()
                         );
                     })
-                    .compose(toolCallOutput->{
+                    .compose(toolCallOutput -> {
                         request.addToolCallMessage(msgRef.get());
-                        request.addToolOutputMessage(toolCallOutput,toolCallIdRef.get());
+                        request.addToolOutputMessage(toolCallOutput, toolCallIdRef.get());
 
                         return getKit()
                                 .chat(
-                                        getServiceAdapter(),
                                         getModel(),
                                         request,
                                         UUID.randomUUID().toString()
                                 );
                     })
-                    .compose(resp->{
+                    .compose(resp -> {
                         getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
 
                         GPTResponseChoice choice = resp.getChoices().get(0);

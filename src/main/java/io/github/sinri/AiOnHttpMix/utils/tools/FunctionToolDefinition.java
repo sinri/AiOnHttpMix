@@ -6,6 +6,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.json.schema.common.dsl.ObjectSchemaBuilder;
 import io.vertx.json.schema.common.dsl.Schemas;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+
 /**
  * 一个供调用的函数的定义。
  */
@@ -52,17 +56,32 @@ public interface FunctionToolDefinition extends JsonifiableEntity<FunctionToolDe
      * @param parameters 工具的参数描述，需要是一个合法的JSON Schema。
      * @see <a href="https://json-schema.org/understanding-json-schema">JSON Schema</a>
      */
-    default FunctionToolDefinition parameters(JsonObject parameters) {
+    default FunctionToolDefinition parameters(@Nullable JsonObject parameters) {
         return write("parameters", parameters);
     }
 
     /**
      * @param handler 给定一个JSON Schema的Builder，在此处理器里将其完善为工具的参数描述。
      */
-    default FunctionToolDefinition parameters(Handler<ObjectSchemaBuilder> handler) {
+    default FunctionToolDefinition parameters(@Nonnull Handler<ObjectSchemaBuilder> handler) {
         ObjectSchemaBuilder objectSchemaBuilder = Schemas.objectSchema();
         handler.handle(objectSchemaBuilder);
         return parameters(objectSchemaBuilder.toJson());
     }
 
+    default FunctionToolDefinition parameters(@Nonnull List<FunctionParameterDefinition> parameterDefinitions) {
+        if (parameterDefinitions.isEmpty()) {
+            return parameters((JsonObject) null);
+        }
+        return parameters(builder -> {
+            parameterDefinitions.forEach(parameterDefinition -> {
+                builder.property(
+                        parameterDefinition.getName(),
+                        Schemas.schema()
+                               .type(parameterDefinition.getType())
+                               .withKeyword("description", parameterDefinition.getDescription())
+                );
+            });
+        });
+    }
 }

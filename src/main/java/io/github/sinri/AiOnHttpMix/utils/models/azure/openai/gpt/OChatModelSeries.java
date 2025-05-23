@@ -9,6 +9,8 @@ import io.github.sinri.AiOnHttpMix.utils.specification.OModelSpecification;
  * @since 2.0.0
  */
 public abstract class OChatModelSeries extends OModelSpecification implements ChatModel {
+    public final static String NAME_OF_MODEL_SERIES = "OChatModelSeries";
+
     public final static String MODEL_NAME_OF_O1 = "o1";
     public final static String MODEL_NAME_OF_O3_MINI = "o3-mini";
 

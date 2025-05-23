@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.utils.specification;
 
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIConfigElement;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.o.OServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.ChatModelServiceAdapter;
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 
@@ -46,7 +46,7 @@ public abstract class OModelSpecification implements ModelSpecification {
      * This method is not tested yet.
      */
     @Override
-    public ChatModelServiceAdapter buildServiceAdapter(KeelConfigElement config) {
+    public ServiceAdapter buildServiceAdapter(KeelConfigElement config) {
         Map<String, OpenAIConfigElement> map = config.getChildren()
                                                      .entrySet()
                                                      .stream()
