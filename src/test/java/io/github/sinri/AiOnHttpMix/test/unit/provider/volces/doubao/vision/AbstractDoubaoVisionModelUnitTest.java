@@ -4,9 +4,10 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageI
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.ContentImageUrl;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
 import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.AbstractVolcesModelUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.models.volces.doubao.DoubaoVisionModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.vertx.json.schema.common.dsl.Schemas;
 import org.junit.Before;
 
@@ -62,7 +63,7 @@ public class AbstractDoubaoVisionModelUnitTest extends AbstractVolcesModelUnitTe
                                                                   )
                                                    )
                                            ))
-                                           .addTool(new DoubaoToolDefinition(f -> f
+                                           .addTool(new CommonToolDefinition(new CommonFunctionToolDefinition()
                                                    .name("query_current_weather")
                                                    .description("查询某地点当前的天气")
                                                    .parameters(Schemas.objectSchema()

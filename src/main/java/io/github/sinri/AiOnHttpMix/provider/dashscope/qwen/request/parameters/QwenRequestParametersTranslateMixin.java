@@ -58,9 +58,7 @@ interface QwenRequestParametersTranslateMixin<E> extends QwenRequestParametersCo
         var a = readJsonObjectArray("terms");
         if (a == null) return Map.of();
         Map<String, String> m = new HashMap<>();
-        a.forEach(x -> {
-            m.put(x.getString("source"), x.getString("target"));
-        });
+        a.forEach(x -> m.put(x.getString("source"), x.getString("target")));
         return m;
     }
 
@@ -80,9 +78,7 @@ interface QwenRequestParametersTranslateMixin<E> extends QwenRequestParametersCo
         var a = readJsonObjectArray("tm_list");
         if (a == null) return Map.of();
         Map<String, String> m = new HashMap<>();
-        a.forEach(x -> {
-            m.put(x.getString("source"), x.getString("target"));
-        });
+        a.forEach(x -> m.put(x.getString("source"), x.getString("target")));
         return m;
     }
 

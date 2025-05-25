@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix.tools;
+package io.github.sinri.AiOnHttpMix.utils.tools.common;
 
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
@@ -7,18 +7,18 @@ import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 
-public class MixToolCall extends JsonifiableEntityImpl<MixToolCall> implements ToolCall {
-    public MixToolCall(JsonObject jsonObject) {
+public class CommonToolCall extends JsonifiableEntityImpl<ToolCall> implements ToolCall {
+    public CommonToolCall(JsonObject jsonObject) {
         super(jsonObject);
     }
 
-    public static MixToolCall from(ToolCall toolCall) {
-        return new MixToolCall(new JsonObject()
-                .put("type", toolCall.getType())
-                .put("id", toolCall.getId())
-                .put("index", toolCall.getIndex())
-                .put("function", toolCall.getFunction() == null ? null
-                        : MixFunctionToolCall.from(toolCall.getFunction()).toJsonObject()));
+    public CommonToolCall(String id, Integer index, FunctionToolCall functionToolCall) {
+        this(new JsonObject()
+                .put("id", id)
+                .put("index", index)
+                .put("type", "function")
+                .put("function", functionToolCall == null ? null : functionToolCall.toJsonObject())
+        );
     }
 
     @Override
@@ -42,13 +42,13 @@ public class MixToolCall extends JsonifiableEntityImpl<MixToolCall> implements T
         if (a == null) {
             return null;
         } else {
-            return new MixFunctionToolCall(a);
+            return new CommonFunctionToolCall(a);
         }
     }
 
     @Nonnull
     @Override
-    public MixToolCall getImplementation() {
+    public ToolCall getImplementation() {
         return this;
     }
 }

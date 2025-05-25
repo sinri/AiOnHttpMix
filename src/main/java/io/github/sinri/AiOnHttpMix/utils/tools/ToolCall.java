@@ -1,5 +1,7 @@
 package io.github.sinri.AiOnHttpMix.utils.tools;
 
+import io.vertx.core.json.JsonObject;
+
 /**
  * 工具调用的发起请求。
  */
@@ -24,4 +26,6 @@ public interface ToolCall {
      * 当{@link ToolCall#getType()}返回非{@code function}时，本方法返回{@code null}，但这目前应该不可能发生。
      */
     FunctionToolCall getFunction();
+
+    JsonObject toJsonObject();
 }

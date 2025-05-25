@@ -1,6 +1,8 @@
 package io.github.sinri.AiOnHttpMix.mix.tools;
 
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionParameterDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
@@ -14,16 +16,16 @@ public interface MixFunctionAdapter {
 
     List<FunctionParameterDefinition> getParameters();
 
-    default MixFunctionToolDefinition toFunctionToolDefinition() {
-        MixFunctionToolDefinition functionToolDefinition = new MixFunctionToolDefinition();
-        functionToolDefinition.name(getFunctionName());
-        functionToolDefinition.description(getFunctionDescription());
-        functionToolDefinition.parameters(getParameters());
-        return functionToolDefinition;
+    default CommonFunctionToolDefinition toFunctionToolDefinition() {
+        return new CommonFunctionToolDefinition(
+                getFunctionName(),
+                getFunctionDescription(),
+                getParameters()
+        );
     }
 
-    default MixToolDefinition toToolDefinition() {
-        return new MixToolDefinition(toFunctionToolDefinition());
+    default CommonToolDefinition toToolDefinition() {
+        return new CommonToolDefinition(toFunctionToolDefinition());
     }
 
     /**

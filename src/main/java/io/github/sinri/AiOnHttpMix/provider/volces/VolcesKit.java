@@ -39,9 +39,7 @@ public class VolcesKit implements ServiceKit<DoubaoRequest, DoubaoResponse, Doub
             String requestId
     ) {
         return serviceAdapter.request(chatModel, request.toJsonObject(), requestId)
-                             .compose(rawResponse -> {
-                                 return Future.succeededFuture(DoubaoResponse.wrap(rawResponse));
-                             });
+                             .compose(rawResponse -> Future.succeededFuture(DoubaoResponse.wrap(rawResponse)));
     }
 
     public Future<Void> chatStream(

@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message;
 
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -80,7 +80,7 @@ public interface GPTMessageInRequest extends GPTMessage {
      */
     static GPTMessageInRequest createAsToolCall(
             @Nullable String content,
-            List<GPTToolCall> toolCalls,
+            List<CommonToolCall> toolCalls,
             @Nullable String name,
             @Nullable String refusal) {
         var j = new JsonObject()

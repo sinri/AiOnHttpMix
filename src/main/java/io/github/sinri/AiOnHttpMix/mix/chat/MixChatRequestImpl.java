@@ -1,14 +1,11 @@
 package io.github.sinri.AiOnHttpMix.mix.chat;
 
 import io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum;
-import io.github.sinri.AiOnHttpMix.mix.tools.MixToolDefinition;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.request.GPTRequest;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTToolDefinition;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.request.QwenRequest;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.tool.QwenToolDefinition;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.github.sinri.keel.core.json.JsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
 
@@ -46,12 +43,8 @@ class MixChatRequestImpl extends JsonifiableEntityImpl<MixChatRequest> implement
         if (isStream()) {
             request.stream(true);
         }
-        getMessages().forEach(m -> {
-            request.addMessage(m.toGPTMessageInChatRequest());
-        });
-        getTools().forEach(t -> {
-            request.addTool(new GPTToolDefinition(t.toJsonObject()));
-        });
+        getMessages().forEach(m -> request.addMessage(m.toGPTMessageInChatRequest()));
+        getTools().forEach(request::addTool);
         return request;
     }
 
@@ -65,16 +58,13 @@ class MixChatRequestImpl extends JsonifiableEntityImpl<MixChatRequest> implement
                     .incrementalOutput(true)
             );
         }
-        getMessages().forEach(m -> {
-            request.input(i -> i
-                    .addMessage(m.toQwenMessageInChatRequest())
-            );
-        });
-        getTools().forEach(t -> {
-            request.parameters(p -> p
-                    .addTool(new QwenToolDefinition(t.toJsonObject()))
-            );
-        });
+        getMessages().forEach(m -> request.input(i -> i
+                .addMessage(m.toQwenMessageInChatRequest())
+        ));
+        getTools().forEach(t -> request
+                .parameters(p -> p
+                        .addTool(t)
+                ));
         return request;
     }
 
@@ -84,12 +74,8 @@ class MixChatRequestImpl extends JsonifiableEntityImpl<MixChatRequest> implement
         if (isStream()) {
             request.stream(true);
         }
-        getMessages().forEach(m -> {
-            request.addMessage(m.toDoubaoMessageInChatRequest());
-        });
-        getTools().forEach(t -> {
-            request.addTool(new DoubaoToolDefinition(t.toJsonObject()));
-        });
+        getMessages().forEach(m -> request.addMessage(m.toDoubaoMessageInChatRequest()));
+        getTools().forEach(request::addTool);
         return request;
     }
 
@@ -133,17 +119,17 @@ class MixChatRequestImpl extends JsonifiableEntityImpl<MixChatRequest> implement
     }
 
     @Override
-    public MixChatRequest addTool(MixToolDefinition toolDefinition) {
+    public MixChatRequest addTool(CommonToolDefinition toolDefinition) {
         ensureJsonArray("tools")
                 .add(toolDefinition.toJsonObject());
         return this;
     }
 
     @Override
-    public List<MixToolDefinition> getTools() {
+    public List<CommonToolDefinition> getTools() {
         List<JsonObject> array = readJsonObjectArray("tools");
         if (array == null) return List.of();
-        return array.stream().map(MixToolDefinition::new).toList();
+        return array.stream().map(CommonToolDefinition::new).toList();
     }
 
     @Nonnull

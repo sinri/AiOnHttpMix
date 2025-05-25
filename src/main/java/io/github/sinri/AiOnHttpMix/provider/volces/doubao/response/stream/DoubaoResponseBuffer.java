@@ -3,8 +3,9 @@ package io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponse;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoFunctionToolCall;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -95,7 +96,7 @@ public class DoubaoResponseBuffer {
             JsonObject j = new JsonObject();
             j.put("index", index);
             j.put("finish_reason", finishReason);
-            j.put("message",messageBuffer.build().toJsonObject());
+            j.put("message", messageBuffer.build().toJsonObject());
 
             return DoubaoResponseChoice.wrap(j);
         }
@@ -124,7 +125,7 @@ public class DoubaoResponseBuffer {
             if (!Keel.stringHelper().isNullOrBlank(content)) {
                 contentBuffer.append(content);
             }
-            List<DoubaoToolCall> toolCalls = delta.getToolCalls();
+            List<CommonToolCall> toolCalls = delta.getToolCalls();
             if (toolCalls != null) {
                 for (int i = 0; i < toolCalls.size(); i++) {
                     toolCallBufferMap.computeIfAbsent(i, x -> new DoubaoToolCallBuffer())
@@ -143,7 +144,7 @@ public class DoubaoResponseBuffer {
                 JsonArray a = new JsonArray();
                 for (int i = 0; i < toolCallBufferMap.size(); i++) {
                     DoubaoToolCallBuffer doubaoToolCallBuffer = toolCallBufferMap.get(i);
-                    DoubaoToolCall doubaoToolCall = doubaoToolCallBuffer.build();
+                    CommonToolCall doubaoToolCall = doubaoToolCallBuffer.build();
                     a.add(doubaoToolCall.cloneAsJsonObject());
                 }
                 j.put("tool_calls", a);
@@ -159,7 +160,7 @@ public class DoubaoResponseBuffer {
         private String type;
         private Integer index;
 
-        public void accept(DoubaoToolCall doubaoToolCall) {
+        public void accept(CommonToolCall doubaoToolCall) {
             if (toolCallId == null) {
                 toolCallId = doubaoToolCall.getId();
             }
@@ -170,20 +171,20 @@ public class DoubaoResponseBuffer {
                 index = doubaoToolCall.getIndex();
             }
             if (Objects.equals("function", type)) {
-                DoubaoFunctionToolCall function = (DoubaoFunctionToolCall) doubaoToolCall.getFunction();
+                FunctionToolCall function = doubaoToolCall.getFunction();
                 functionToolCallBuffer.accept(function);
             }
         }
 
-        public DoubaoToolCall build() {
+        public CommonToolCall build() {
             JsonObject j = new JsonObject();
             j.put("index", index);
             j.put("id", toolCallId);
             j.put("type", type);
             if (Objects.equals("function", type)) {
-                j.put("function", functionToolCallBuffer.build().cloneAsJsonObject());
+                j.put("function", functionToolCallBuffer.build().toJsonObject());
             }
-            return new DoubaoToolCall(j);
+            return new CommonToolCall(j);
         }
     }
 
@@ -191,7 +192,7 @@ public class DoubaoResponseBuffer {
         private final StringBuilder nameBuffer = new StringBuilder();
         private final StringBuilder argumentsBuffer = new StringBuilder();
 
-        public void accept(DoubaoFunctionToolCall functionToolCall) {
+        public void accept(FunctionToolCall functionToolCall) {
             String name = functionToolCall.getName();
             if (!Keel.stringHelper().isNullOrBlank(name)) {
                 nameBuffer.append(name);
@@ -202,11 +203,11 @@ public class DoubaoResponseBuffer {
             }
         }
 
-        public DoubaoFunctionToolCall build() {
+        public FunctionToolCall build() {
             JsonObject j = new JsonObject();
             j.put("name", nameBuffer.toString());
             j.put("arguments", argumentsBuffer.toString());
-            return new DoubaoFunctionToolCall(j);
+            return new CommonFunctionToolCall(j);
         }
     }
 }

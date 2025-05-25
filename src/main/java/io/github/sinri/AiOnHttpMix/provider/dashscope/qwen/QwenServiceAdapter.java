@@ -52,27 +52,25 @@ public class QwenServiceAdapter implements ServiceAdapter {
                 )
         );
 
-        return Keel.useWebClient(webClient -> {
-            return webClient
-                    .postAbs(endpoint)
-                    .putHeader("Content-Type", "application/json")
-                    .putHeader("Authorization", "Bearer " + apiKey)
-                    .sendJsonObject(requestPayload)
-                    .compose(bufferHttpResponse -> {
-                        int statusCode = bufferHttpResponse.statusCode();
-                        if (statusCode != 200) {
-                            throw new AbnormalResponse(bufferHttpResponse);
-                        }
-                        JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
-                        AigcMix.getVerboseLogger().info(x -> x
-                                .message("bufferHttpResponse in DashscopeServiceMeta.request")
-                                .context(j -> j
-                                        .put("requestId", requestId)
-                                        .put("output", entries))
-                        );
-                        return Future.succeededFuture(entries);
-                    });
-        });
+        return Keel.useWebClient(webClient -> webClient
+                .postAbs(endpoint)
+                .putHeader("Content-Type", "application/json")
+                .putHeader("Authorization", "Bearer " + apiKey)
+                .sendJsonObject(requestPayload)
+                .compose(bufferHttpResponse -> {
+                    int statusCode = bufferHttpResponse.statusCode();
+                    if (statusCode != 200) {
+                        throw new AbnormalResponse(bufferHttpResponse);
+                    }
+                    JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
+                    AigcMix.getVerboseLogger().info(x -> x
+                            .message("bufferHttpResponse in DashscopeServiceMeta.request")
+                            .context(j -> j
+                                    .put("requestId", requestId)
+                                    .put("output", entries))
+                    );
+                    return Future.succeededFuture(entries);
+                }));
     }
 
     @Override

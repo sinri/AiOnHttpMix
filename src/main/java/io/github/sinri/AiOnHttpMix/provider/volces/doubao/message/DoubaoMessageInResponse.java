@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.volces.doubao.message;
 
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
@@ -37,9 +37,9 @@ public interface DoubaoMessageInResponse extends DoubaoMessage {
     /**
      * @return 模型生成的工具调用。
      */
-    default List<DoubaoToolCall> getToolCalls() {
+    default List<CommonToolCall> getToolCalls() {
         List<JsonObject> a = readJsonObjectArray("tool_calls");
         if (a == null) return List.of();
-        return a.stream().map(DoubaoToolCall::new).toList();
+        return a.stream().map(CommonToolCall::new).toList();
     }
 }

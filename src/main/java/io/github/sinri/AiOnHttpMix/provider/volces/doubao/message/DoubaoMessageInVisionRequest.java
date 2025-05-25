@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.provider.volces.doubao.message;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -70,11 +70,9 @@ public interface DoubaoMessageInVisionRequest extends DoubaoMessage {
      * @param content   模型回复的消息。
      * @param toolCalls 模型回复的工具调用信息。
      */
-    static DoubaoMessageInVisionRequest createAsToolCallMessage(@Nullable String content, @Nonnull List<DoubaoToolCall> toolCalls) {
+    static DoubaoMessageInVisionRequest createAsToolCallMessage(@Nullable String content, @Nonnull List<CommonToolCall> toolCalls) {
         var a = new JsonArray();
-        toolCalls.forEach(tc -> {
-            a.add(tc.cloneAsJsonObject());
-        });
+        toolCalls.forEach(tc -> a.add(tc.cloneAsJsonObject()));
         var j = new JsonObject()
                 .put("role", "assistant")
                 .put("tool_calls", a);

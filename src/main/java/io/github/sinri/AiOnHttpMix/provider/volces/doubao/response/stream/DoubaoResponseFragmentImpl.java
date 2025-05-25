@@ -14,9 +14,6 @@ class DoubaoResponseFragmentImpl implements DoubaoResponseFragment {
             String[] pair = line.split(":\\s*", 2);
             if (pair.length == 2) {
                 if (Objects.equals("data", pair[0])) {
-                    //                    if(pair[1].startsWith("[DONE]")){
-                    //                        break;
-                    //                    }
                     data = pair[1];
                     break;
                 }

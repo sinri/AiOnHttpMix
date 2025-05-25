@@ -4,11 +4,12 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenServiceAdapter;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.Content;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.request.QwenRequest;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.tool.QwenToolDefinition;
 import io.github.sinri.AiOnHttpMix.test.unit.provider.core.AbstractModelUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenVisionModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecification;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import io.vertx.json.schema.common.dsl.Schemas;
 import org.junit.Assert;
@@ -60,7 +61,7 @@ public abstract class AbstractQwenVisionModelUnitTest extends AbstractModelUnitT
                                                  )
                                          )
                                          .parameters(p -> p
-                                                 .addTool(new QwenToolDefinition(f -> f
+                                                 .addTool(new CommonToolDefinition(new CommonFunctionToolDefinition()
                                                          .name("query_current_weather")
                                                          .description("查询某地点当前的天气")
                                                          .parameters(Schemas.objectSchema()

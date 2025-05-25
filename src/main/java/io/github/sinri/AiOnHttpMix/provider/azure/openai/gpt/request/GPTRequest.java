@@ -3,8 +3,9 @@ package io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.request;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessage;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInResponse;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTToolCall;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.ToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
@@ -87,8 +88,7 @@ public interface GPTRequest extends JsonifiableEntity<GPTRequest> {
 
     /**
      * How many chat completion choices to generate for each input message.
-     * Note that you'll be charged based on the number of generated tokens across
-     * all of the choices.
+     * Note that you'll be charged based on the number of generated tokens across all of the choices.
      * Keep n as 1 to minimize costs.
      *
      * @param n default 1
@@ -162,23 +162,23 @@ public interface GPTRequest extends JsonifiableEntity<GPTRequest> {
      *
      * @param toolDefinition tool definition
      */
-    default GPTRequest addTool(GPTToolDefinition toolDefinition) {
+    default GPTRequest addTool(ToolDefinition toolDefinition) {
         ensureJsonArray("tools")
                 .add(toolDefinition.toJsonObject());
         return this;
     }
 
-    default GPTRequest addTool(Handler<GPTToolDefinition> toolDefinitionHandler) {
-        var x = new GPTToolDefinition(new JsonObject());
+    default GPTRequest addTool(Handler<ToolDefinition> toolDefinitionHandler) {
+        var x = new CommonToolDefinition(new JsonObject());
         toolDefinitionHandler.handle(x);
         return addTool(x);
     }
 
-    default List<GPTToolDefinition> tools() {
+    default List<CommonToolDefinition> tools() {
         List<JsonObject> tools = readJsonObjectArray("tools");
         if (tools == null)
             return List.of();
-        return tools.stream().map(GPTToolDefinition::new).toList();
+        return tools.stream().map(CommonToolDefinition::new).toList();
     }
 
     /**
@@ -352,7 +352,7 @@ public interface GPTRequest extends JsonifiableEntity<GPTRequest> {
         return this.addMessage(GPTMessageInRequest.createAsAssistant(content, null, null));
     }
 
-    default GPTRequest addToolCallMessage(@Nullable String content, List<GPTToolCall> toolCalls) {
+    default GPTRequest addToolCallMessage(@Nullable String content, List<CommonToolCall> toolCalls) {
         return this.addMessage(GPTMessageInRequest.createAsToolCall(content, toolCalls, null, null));
     }
 

@@ -1,11 +1,12 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.request.parameters;
 
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.tool.QwenToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 /**
  * @since 2.0.0
  */
@@ -30,7 +31,7 @@ interface QwenRequestParametersToolCallMixin<E> extends QwenRequestParametersCor
     default List<ToolDefinition> tools() {
         List<JsonObject> x = readJsonObjectArray("tools");
         if (x == null) return List.of();
-        return x.stream().map(QwenToolDefinition::new).collect(Collectors.toUnmodifiableList());
+        return x.stream().map(CommonToolDefinition::new).collect(Collectors.toUnmodifiableList());
     }
 
     /**

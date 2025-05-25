@@ -8,9 +8,10 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.request.parameters.Qw
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutput;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutputChoice;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutputSearchInfo;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.tool.QwenToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.json.schema.common.dsl.Schemas;
@@ -76,7 +77,7 @@ public class QwenChatSyncUnitTest extends AbstractQwenChatModelUnitTest {
                                              )
                                              .parameters(x -> x
                                                      .maxTokens(1024)
-                                                     .addTool(new QwenToolDefinition(f -> f
+                                                     .addTool(new CommonToolDefinition(new CommonFunctionToolDefinition()
                                                              .name("query_weather")
                                                              .parameters(Schemas.objectSchema()
                                                                                 .property("date", Schemas.stringSchema())

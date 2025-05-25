@@ -4,8 +4,9 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessage;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInChatRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInVisionRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.ToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -64,7 +65,7 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
         return addMessage(DoubaoMessageInChatRequest.createAsAssistantMessage(content));
     }
 
-    default DoubaoRequest addToolCallChatMessage(@Nullable String content, @Nonnull List<DoubaoToolCall> toolCalls) {
+    default DoubaoRequest addToolCallChatMessage(@Nullable String content, @Nonnull List<CommonToolCall> toolCalls) {
         return addMessage(DoubaoMessageInChatRequest.createAsToolCallMessage(content, toolCalls));
     }
 
@@ -186,9 +187,7 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
                 return List.of();
             }
             List<String> l = new ArrayList<>();
-            array.forEach(x -> {
-                l.add(x.toString());
-            });
+            array.forEach(x -> l.add(x.toString()));
             return Collections.unmodifiableList(l);
         }
         return List.of(s);
@@ -296,16 +295,16 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
      *         Calling能力的模型列表</a>
      *         支持该字段的模型请参见文档。
      */
-    default DoubaoRequest addTool(DoubaoToolDefinition toolDefinition) {
+    default DoubaoRequest addTool(ToolDefinition toolDefinition) {
         ensureJsonArray("tools")
                 .add(toolDefinition.toJsonObject());
         return this;
     }
 
-    default List<DoubaoToolDefinition> tools() {
+    default List<CommonToolDefinition> tools() {
         List<JsonObject> tools = readJsonObjectArray("tools");
         if (tools == null)
             return List.of();
-        return tools.stream().map(DoubaoToolDefinition::new).toList();
+        return tools.stream().map(CommonToolDefinition::new).toList();
     }
 }

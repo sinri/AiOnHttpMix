@@ -16,17 +16,6 @@ public interface QwenMessageInVisionRequest extends QwenMessage {
         return new QwenMessageImpl(jsonObject);
     }
 
-//    /**
-//     * 模型的目标或角色。
-//     * 如果设置系统消息，请放在messages列表的第一位。
-//     * QwQ 模型不建议设置 System Message，QVQ 模型设置System Message不会生效。
-//     */
-//    static QwenMessage createAsSystemInRequest(String content) {
-//        return create()
-//                .write("content", content)
-//                .write("role", "system");
-//    }
-
     /**
      * 用户发送给模型的消息。
      * 如果您的输入只有文本，则为string类型；如果您的输入包含图像等多模态数据，则为array类型。
@@ -38,47 +27,5 @@ public interface QwenMessageInVisionRequest extends QwenMessage {
                 .write("content", new JsonArray(contentList.stream().map(JsonifiableEntity::toJsonObject).toList()))
                 .write("role", "user");
     }
-
-//    /**
-//     * 模型对用户消息的回复。
-//     *
-//     * @param content 助手消息的内容。
-//     * @param partial 是否开启 Partial Mode。
-//     * @see <a href="https://help.aliyun.com/zh/model-studio/partial-mode">前缀续写</a> Partial Mode的使用方法请参考前缀续写。
-//     */
-//    static QwenMessage createAsAssistantInRequest(String content, Boolean partial) {
-//        var x = create()
-//                .write("content", content)
-//                .write("role", "assistant");
-//        if (partial != null) {
-//            x.write("partial", partial);
-//        }
-//        return x;
-//    }
-//
-//    /**
-//     * 模型对用户消息的回复。
-//     *
-//     * @param content 助手消息的内容。
-//     */
-//    static QwenMessage createAsAssistantInRequest(String content) {
-//        return createAsAssistantInRequest(content, null);
-//    }
-//
-//    /**
-//     * 工具的输出信息。
-//     *
-//     * @param content      工具消息的内容，一般为工具函数的输出。
-//     * @param tool_call_id 发起 Function Calling 后返回的
-//     *                     id，可以通过{@code response.output.choices[0].message.tool_calls[0]["id"]}获取，用于标记 Tool Message
-//     *                     对应的工具。
-//     */
-//    static QwenMessage createAsToolOutputInRequest(String content, String tool_call_id) {
-//        return create()
-//                .write("content", content)
-//                .write("tool_call_id", tool_call_id) // 非流式输出用这个
-//                .write("id", tool_call_id) // 流式输出用这个
-//                .write("role", "tool");
-//    }
 
 }

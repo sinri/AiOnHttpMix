@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message;
 
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
@@ -24,9 +24,9 @@ public interface GPTMessageInResponse extends GPTMessage {
         return readString("role");
     }
 
-    default List<GPTToolCall> getToolCalls() {
+    default List<CommonToolCall> getToolCalls() {
         List<JsonObject> a = readJsonObjectArray("tool_calls");
         if (a == null) return List.of();
-        return a.stream().map(GPTToolCall::new).toList();
+        return a.stream().map(CommonToolCall::new).toList();
     }
 }

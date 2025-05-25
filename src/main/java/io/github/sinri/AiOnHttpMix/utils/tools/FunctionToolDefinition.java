@@ -73,15 +73,11 @@ public interface FunctionToolDefinition extends JsonifiableEntity<FunctionToolDe
         if (parameterDefinitions.isEmpty()) {
             return parameters((JsonObject) null);
         }
-        return parameters(builder -> {
-            parameterDefinitions.forEach(parameterDefinition -> {
-                builder.property(
-                        parameterDefinition.getName(),
-                        Schemas.schema()
-                               .type(parameterDefinition.getType())
-                               .withKeyword("description", parameterDefinition.getDescription())
-                );
-            });
-        });
+        return parameters(builder -> parameterDefinitions.forEach(parameterDefinition -> builder.property(
+                parameterDefinition.getName(),
+                Schemas.schema()
+                       .type(parameterDefinition.getType())
+                       .withKeyword("description", parameterDefinition.getDescription())
+        )));
     }
 }

@@ -3,8 +3,8 @@ package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.vision;
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -18,8 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class DoubaoVisionSyncUnitTest extends AbstractDoubaoVisionModelUnitTest {
-
-
 
 
     @Test
@@ -66,7 +64,7 @@ public class DoubaoVisionSyncUnitTest extends AbstractDoubaoVisionModelUnitTest 
                                getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
                                getUnitTestLogger().info("content: " + message.getContent());
 
-                               List<DoubaoToolCall> toolCalls = message.getToolCalls();
+                               List<CommonToolCall> toolCalls = message.getToolCalls();
                                var tc = toolCalls.get(0);
                                FunctionToolCall function = tc.getFunction();
                                getUnitTestLogger().info("function " + function.getName() + "(" + function.getArguments() + ")");

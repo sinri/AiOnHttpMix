@@ -7,9 +7,10 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.ThinkingOption
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoice;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoiceDelta;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -97,7 +98,7 @@ public class VolcesDeepSeekR1StreamUnitTest extends AbstractVolcesDeepSeekR1Mode
             DoubaoRequest request = DoubaoRequest.create()
                                                  .addSystemChatMessage("你是一个王心凌铁粉")
                                                  .addUserChatMessage("王心凌在2024年8月开过演唱会吗")
-                                                 .addTool(new DoubaoToolDefinition(f -> f
+                                                 .addTool(new CommonToolDefinition(new CommonFunctionToolDefinition()
                                                          .name("query_event_schedule")
                                                          .description("查询演艺活动日程")
                                                          .parameters(Schemas.objectSchema()
@@ -131,7 +132,7 @@ public class VolcesDeepSeekR1StreamUnitTest extends AbstractVolcesDeepSeekR1Mode
             DoubaoRequest request = DoubaoRequest.create()
                                                  .addSystemChatMessage("你是一个王心凌铁粉")
                                                  .addUserChatMessage("王心凌在2024年8月开过演唱会吗")
-                                                 .addTool(new DoubaoToolDefinition(f -> f
+                                                 .addTool(new CommonToolDefinition(new CommonFunctionToolDefinition()
                                                          .name("query_event_schedule")
                                                          .description("查询演艺活动日程")
                                                          .parameters(Schemas.objectSchema()
@@ -159,7 +160,7 @@ public class VolcesDeepSeekR1StreamUnitTest extends AbstractVolcesDeepSeekR1Mode
                                getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
                                getUnitTestLogger().info("content: " + message.getContent());
 
-                               List<DoubaoToolCall> toolCalls = message.getToolCalls();
+                               List<CommonToolCall> toolCalls = message.getToolCalls();
                                var tc = toolCalls.get(0);
                                FunctionToolCall function = tc.getFunction();
                                getUnitTestLogger().info("function " + function.getName() + "(" + function.getArguments() + ")");

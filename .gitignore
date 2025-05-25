@@ -33,6 +33,8 @@ build/
 
 ### VS Code ###
 .vscode/
+.cursorrules/
+.cursor/
 
 ### Mac OS ###
 .DS_Store
@@ -43,6 +45,3 @@ src/test/resources/config.properties
 debug/
 runtime/
 .idea/
-.vscode/
-.cursorrules/
-.cursor/

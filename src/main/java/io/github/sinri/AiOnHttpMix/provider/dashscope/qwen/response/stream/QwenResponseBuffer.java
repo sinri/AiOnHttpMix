@@ -5,11 +5,11 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.Conten
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponse;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutput;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutputChoice;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.tool.QwenFunctionToolCall;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.tool.QwenToolCall;
 import io.github.sinri.AiOnHttpMix.utils.StreamPieceCollector;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -162,7 +162,7 @@ public class QwenResponseBuffer {
                 JsonArray toolCallArray = new JsonArray();
                 for (int i = 0; i < toolCallBufferMap.size(); i++) {
                     ToolCallBuffer toolCallBuffer = toolCallBufferMap.get(i);
-                    toolCallArray.add(toolCallBuffer.toToolCall().cloneAsJsonObject());
+                    toolCallArray.add(toolCallBuffer.toToolCall().toJsonObject());
                 }
                 x.put("tool_calls", toolCallArray);
             }
@@ -209,8 +209,8 @@ public class QwenResponseBuffer {
             functionToolCallBuffer.accept(function);
         }
 
-        public QwenToolCall toToolCall() {
-            return new QwenToolCall(new JsonObject()
+        public ToolCall toToolCall() {
+            return new CommonToolCall(new JsonObject()
                     .put("id", toolCallId)
                     .put("index", index)
                     .put("type", type)
@@ -238,8 +238,8 @@ public class QwenResponseBuffer {
             }
         }
 
-        public QwenFunctionToolCall toFunctionToolCall() {
-            return new QwenFunctionToolCall(new JsonObject()
+        public CommonFunctionToolCall toFunctionToolCall() {
+            return new CommonFunctionToolCall(new JsonObject()
                     .put("name", nameBuffer.toString())
                     .put("arguments", argumentsBuffer.toString())
             );

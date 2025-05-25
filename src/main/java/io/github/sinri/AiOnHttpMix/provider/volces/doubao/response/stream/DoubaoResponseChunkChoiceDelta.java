@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream;
 
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
@@ -37,9 +37,9 @@ public interface DoubaoResponseChunkChoiceDelta extends UnmodifiableJsonifiableE
     /**
      * @return 模型生成的工具调用。
      */
-    default List<DoubaoToolCall> getToolCalls() {
+    default List<CommonToolCall> getToolCalls() {
         List<JsonObject> a = readJsonObjectArray("tool_calls");
         if (a == null) return List.of();
-        return a.stream().map(DoubaoToolCall::new).toList();
+        return a.stream().map(CommonToolCall::new).toList();
     }
 }

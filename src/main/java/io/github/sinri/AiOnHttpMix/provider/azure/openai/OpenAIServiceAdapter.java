@@ -94,27 +94,25 @@ public abstract class OpenAIServiceAdapter implements ServiceAdapter {
                 )
         );
 
-        return Keel.useWebClient(webClient -> {
-            return webClient
-                    .postAbs(url)
-                    .putHeader("Content-Type", "application/json")
-                    .putHeader("api-key", configElement.getApiKey())
-                    .sendJsonObject(requestPayload)
-                    .compose(bufferHttpResponse -> {
-                        JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
-                        if (bufferHttpResponse.statusCode() != 200 || entries == null) {
-                            throw new AbnormalResponse(bufferHttpResponse);
-                        }
-                        AigcMix.getVerboseLogger().info(x -> x
-                                .message("bufferHttpResponse in AzureOpenAIServiceMeta.request")
-                                .context(j -> j
-                                        .put("output", entries)
-                                        .put("requestId", requestId)
-                                )
-                        );
-                        return Future.succeededFuture(entries);
-                    });
-        });
+        return Keel.useWebClient(webClient -> webClient
+                .postAbs(url)
+                .putHeader("Content-Type", "application/json")
+                .putHeader("api-key", configElement.getApiKey())
+                .sendJsonObject(requestPayload)
+                .compose(bufferHttpResponse -> {
+                    JsonObject entries = bufferHttpResponse.bodyAsJsonObject();
+                    if (bufferHttpResponse.statusCode() != 200 || entries == null) {
+                        throw new AbnormalResponse(bufferHttpResponse);
+                    }
+                    AigcMix.getVerboseLogger().info(x -> x
+                            .message("bufferHttpResponse in AzureOpenAIServiceMeta.request")
+                            .context(j -> j
+                                    .put("output", entries)
+                                    .put("requestId", requestId)
+                            )
+                    );
+                    return Future.succeededFuture(entries);
+                }));
     }
 
     /**

@@ -6,9 +6,10 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.QwenMessageIn
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutput;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutputChoice;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.tool.QwenToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.json.schema.common.dsl.Schemas;
@@ -39,14 +40,15 @@ public class QwenChatStreamUnitTest extends AbstractQwenChatModelUnitTest {
                                              .parameters(x -> x
                                                      .stream(true)
                                                      .incrementalOutput(true)
-                                                     .addTool(new QwenToolDefinition(f -> f
-                                                             .name("query_weather")
-                                                             .parameters(Schemas.objectSchema()
-                                                                                .property("date", Schemas.stringSchema())
-                                                                                .property("place", Schemas.stringSchema())
-                                                                                .toJson()
-                                                             )
-                                                     ))
+                                                     .addTool(
+                                                             new CommonToolDefinition(new CommonFunctionToolDefinition()
+                                                                     .name("query_weather")
+                                                                     .parameters(Schemas.objectSchema()
+                                                                                        .property("date", Schemas.stringSchema())
+                                                                                        .property("place", Schemas.stringSchema())
+                                                                                        .toJson()
+                                                                     ))
+                                                     )
                                              );
             getUnitTestLogger().info("req", request.toJsonObject());
             return getKit().chatStream(
@@ -175,7 +177,7 @@ public class QwenChatStreamUnitTest extends AbstractQwenChatModelUnitTest {
                                              .parameters(x -> x
                                                      .stream(true)
                                                      .incrementalOutput(true)
-                                                     .addTool(new QwenToolDefinition(f -> f
+                                                     .addTool(new CommonToolDefinition(new CommonFunctionToolDefinition()
                                                              .name("query_weather")
                                                              .parameters(Schemas.objectSchema()
                                                                                 .property("date", Schemas.stringSchema())
@@ -227,7 +229,7 @@ public class QwenChatStreamUnitTest extends AbstractQwenChatModelUnitTest {
                             .stream(true)
                             .incrementalOutput(true)
                             .resultFormat("message")
-                            .addTool(new QwenToolDefinition(f -> f
+                            .addTool(new CommonToolDefinition(new CommonFunctionToolDefinition()
                                     .name("query_weather")
                                     .description("查询指定地区在某一天的天气记录或天气预报")
                                     .parameters(Schemas.objectSchema()

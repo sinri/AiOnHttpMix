@@ -4,13 +4,14 @@ import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageI
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.request.GPTRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.sync.GPTResponseChoice;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTFunctionToolDefinition;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.FunctionParameterDefinition;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.json.schema.common.dsl.Schemas;
+import io.vertx.json.schema.common.dsl.SchemaType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,15 +57,16 @@ public class GptSyncUnitTest extends AbstractGptUnitTest {
                     .addUserMessage("王心凌的2025年下半年演唱会是什么时候")
                     .addTool(x -> x
                             .type("function")
-                            .function(new GPTFunctionToolDefinition()
-                                    .name("query_event_schedule")
-                                    .description("查询演艺活动日程")
-                                    .parameters(Schemas.objectSchema()
-                                                       .property("name", Schemas.stringSchema())
-                                                       .property("date_range_start", Schemas.stringSchema())
-                                                       .property("date_range_end", Schemas.stringSchema())
-                                                       .toJson()
-                                    ))
+                            .function(new CommonFunctionToolDefinition(
+                                            "query_event_schedule",
+                                            "查询演艺活动日程",
+                                            List.of(
+                                                    new FunctionParameterDefinition(SchemaType.STRING, "name", "艺人姓名"),
+                                                    new FunctionParameterDefinition(SchemaType.STRING, "date_range_start", "开始日期"),
+                                                    new FunctionParameterDefinition(SchemaType.STRING, "date_range_end", "结束日期")
+                                            )
+                                    )
+                            )
                     );
             AtomicReference<GPTMessageInResponse> msgRef = new AtomicReference<>();
             AtomicReference<String> toolCallIdRef = new AtomicReference<>();
@@ -87,9 +89,9 @@ public class GptSyncUnitTest extends AbstractGptUnitTest {
 
                         getUnitTestLogger().info("role " + role + " saith: " + content);
 
-                        List<GPTToolCall> toolCalls = message.getToolCalls();
+                        List<CommonToolCall> toolCalls = message.getToolCalls();
                         Assert.assertFalse(toolCalls.isEmpty());
-                        GPTToolCall toolCall = toolCalls.get(0);
+                        CommonToolCall toolCall = toolCalls.get(0);
                         toolCallIdRef.set(toolCall.getId());
                         FunctionToolCall functionCall = toolCall.getFunction();
                         String name = functionCall.getName();

@@ -37,9 +37,7 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
                                      chatModel,
                                      request.toJsonObject(),
                                      requestId)
-                             .compose(jsonObject -> {
-                                 return Future.succeededFuture(GPTResponse.wrap(jsonObject));
-                             });
+                             .compose(jsonObject -> Future.succeededFuture(GPTResponse.wrap(jsonObject)));
     }
 
     @Override
@@ -107,9 +105,7 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
                 cutterTimeout,
                 requestId
         )
-                .compose(v -> {
-                    return Future.succeededFuture(buffer.build());
-                });
+                .compose(v -> Future.succeededFuture(buffer.build()));
 
     }
 }

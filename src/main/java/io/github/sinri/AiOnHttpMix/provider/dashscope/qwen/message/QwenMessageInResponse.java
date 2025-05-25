@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message;
 
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.tool.QwenToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
@@ -55,6 +55,6 @@ public interface QwenMessageInResponse extends QwenMessage {
     default List<ToolCall> getToolCalls() {
         List<JsonObject> x = readJsonObjectArray("tool_calls");
         if (x == null) return List.of();
-        return x.stream().map(QwenToolCall::new).collect(Collectors.toUnmodifiableList());
+        return x.stream().map(CommonToolCall::new).collect(Collectors.toUnmodifiableList());
     }
 }

@@ -42,9 +42,7 @@ public abstract class VolcesModelSpecification implements ModelSpecification {
         Map<String, String> modelDeploymentMap = new HashMap<>();
         KeelConfigElement models = config.extract("model");
         if (models != null) {
-            models.getChildren().forEach((k, v) -> {
-                modelDeploymentMap.put(k, v.getValueAsString());
-            });
+            models.getChildren().forEach((k, v) -> modelDeploymentMap.put(k, v.getValueAsString()));
         }
         return new VolcesServiceAdapter(apiKey, modelDeploymentMap);
     }

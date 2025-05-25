@@ -1,6 +1,5 @@
 package io.github.sinri.AiOnHttpMix.mix.chat;
 
-import io.github.sinri.AiOnHttpMix.mix.tools.MixToolCall;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessage;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInRequest;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.QwenMessage;
@@ -8,6 +7,7 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.QwenMessageIn
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessage;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInChatRequest;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.github.sinri.keel.core.json.JsonifiableEntityImpl;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -57,11 +57,10 @@ class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage> implement
 
     @Override
     public MixChatMessage setToolCalls(List<ToolCall> toolCalls) {
-        return write("tool_calls", new JsonArray(
-                toolCalls
-                        .stream()
-                        .map(toolCall -> MixToolCall.from(toolCall).toJsonObject())
-                        .collect(Collectors.toList())));
+        return write("tool_calls", new JsonArray(toolCalls
+                .stream()
+                .map(ToolCall::toJsonObject)
+                .collect(Collectors.toList())));
     }
 
     @Override
@@ -70,7 +69,7 @@ class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage> implement
         if (a == null) {
             return List.of();
         } else {
-            return a.stream().map(MixToolCall::new).collect(Collectors.toList());
+            return a.stream().map(CommonToolCall::new).collect(Collectors.toList());
         }
     }
 
@@ -90,17 +89,15 @@ class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage> implement
         List<ToolCall> toolCalls = this.getToolCalls();
         if (!toolCalls.isEmpty()) {
             JsonArray array = new JsonArray();
-            toolCalls.forEach(toolCall -> {
-                array.add(new JsonObject()
-                        .put("id", toolCall.getId())
-                        .put("type", toolCall.getType())
-                        .put("function",
-                                toolCall.getFunction() == null ? null
-                                        : new JsonObject()
-                                        .put("name", toolCall.getFunction().getName())
-                                        .put("arguments", toolCall.getFunction().getArguments()))
-                        .put("index", toolCall.getIndex()));
-            });
+            toolCalls.forEach(toolCall -> array.add(new JsonObject()
+                    .put("id", toolCall.getId())
+                    .put("type", toolCall.getType())
+                    .put("function",
+                            toolCall.getFunction() == null ? null
+                                    : new JsonObject()
+                                    .put("name", toolCall.getFunction().getName())
+                                    .put("arguments", toolCall.getFunction().getArguments()))
+                    .put("index", toolCall.getIndex())));
             j.put("tool_calls", array);
         }
         String toolCallId = this.getToolCallId();

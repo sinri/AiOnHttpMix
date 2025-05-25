@@ -43,9 +43,7 @@ public class QwenKit implements ServiceKit<QwenRequest, QwenResponse, QwenRespon
             QwenRequest request,
             String requestId) {
         return getServiceAdapter().request(chatModel, request.toJsonObject(), requestId)
-                                  .compose(rawResponse -> {
-                                      return Future.succeededFuture(QwenResponse.wrap(rawResponse));
-                                  });
+                                  .compose(rawResponse -> Future.succeededFuture(QwenResponse.wrap(rawResponse)));
     }
 
     @Override
@@ -100,8 +98,6 @@ public class QwenKit implements ServiceKit<QwenRequest, QwenResponse, QwenRespon
                 return Future.failedFuture(throwable);
             }
         }, cutterTimeout, requestId)
-                .compose(v -> {
-                    return Future.succeededFuture(qwenResponseBuffer.toQwenResponse());
-                });
+                .compose(v -> Future.succeededFuture(qwenResponseBuffer.toQwenResponse()));
     }
 }

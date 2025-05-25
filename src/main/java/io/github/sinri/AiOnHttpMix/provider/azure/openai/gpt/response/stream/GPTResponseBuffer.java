@@ -3,11 +3,12 @@ package io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.sync.GPTResponse;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.sync.GPTResponseChoice;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTFunctionToolCall;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.tool.GPTToolCall;
 import io.github.sinri.AiOnHttpMix.utils.StreamPieceCollector;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
+import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -41,7 +42,7 @@ public class GPTResponseBuffer implements StreamPieceCollector<GPTResponseChunk,
         }
 
         var choices = piece.getChoices();
-        if (choices.size() > 0) {
+        if (!choices.isEmpty()) {
             for (int i = 0; i < choices.size(); i++) {
                 var choice = choices.get(i);
                 choiceBufferMap.computeIfAbsent(i, k -> new ChoiceBuffer()).accept(choice);
@@ -57,9 +58,9 @@ public class GPTResponseBuffer implements StreamPieceCollector<GPTResponseChunk,
         j.put("object", object);
         j.put("created", created);
         j.put("choices", new JsonArray(choiceBufferMap.values().stream()
-                .map(ChoiceBuffer::build)
-                .map(x -> x.cloneAsJsonObject())
-                .toList()));
+                                                      .map(ChoiceBuffer::build)
+                                                      .map(UnmodifiableJsonifiableEntity::cloneAsJsonObject)
+                                                      .toList()));
         return GPTResponse.wrap(j);
     }
 
@@ -126,14 +127,14 @@ public class GPTResponseBuffer implements StreamPieceCollector<GPTResponseChunk,
             j.put("content", contentBuilder.toString());
 
             j.put("tool_calls", new JsonArray(toolCallsMap.values().stream()
-                    .map(x -> x.build().cloneAsJsonObject())
-                    .toList()));
+                                                          .map(x -> x.build().cloneAsJsonObject())
+                                                          .toList()));
 
             return GPTMessageInResponse.wrap(j);
         }
     }
 
-    public static class ToolCallBuffer implements StreamPieceCollector<ToolCall, GPTToolCall> {
+    public static class ToolCallBuffer implements StreamPieceCollector<ToolCall, CommonToolCall> {
         private final FunctionToolCallBuffer functionToolCallBuffer = new FunctionToolCallBuffer();
         private Integer index;
         private String type;
@@ -156,17 +157,17 @@ public class GPTResponseBuffer implements StreamPieceCollector<GPTResponseChunk,
         }
 
         @Override
-        public GPTToolCall build() {
+        public CommonToolCall build() {
             JsonObject j = new JsonObject();
             j.put("index", index);
             j.put("type", type);
             j.put("id", id);
-            j.put("function", functionToolCallBuffer.build().cloneAsJsonObject());
-            return new GPTToolCall(j);
+            j.put("function", functionToolCallBuffer.build().toJsonObject());
+            return new CommonToolCall(j);
         }
     }
 
-    public static class FunctionToolCallBuffer implements StreamPieceCollector<FunctionToolCall, GPTFunctionToolCall> {
+    public static class FunctionToolCallBuffer implements StreamPieceCollector<FunctionToolCall, FunctionToolCall> {
         private final StringBuilder nameBuilder = new StringBuilder();
         private final StringBuilder argumentsBuilder = new StringBuilder();
 
@@ -183,8 +184,8 @@ public class GPTResponseBuffer implements StreamPieceCollector<GPTResponseChunk,
         }
 
         @Override
-        public GPTFunctionToolCall build() {
-            return new GPTFunctionToolCall(new JsonObject()
+        public FunctionToolCall build() {
+            return new CommonFunctionToolCall(new JsonObject()
                     .put("name", nameBuilder.toString())
                     .put("arguments", argumentsBuilder.toString()));
         }

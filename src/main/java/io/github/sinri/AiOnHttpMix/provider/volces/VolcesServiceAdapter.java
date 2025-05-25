@@ -32,9 +32,7 @@ public class VolcesServiceAdapter implements ServiceAdapter {
         Map<String, String> modelDeploymentMap = new HashMap<>();
         KeelConfigElement models = config.extract("model");
         if (models != null) {
-            models.getChildren().forEach((k, v) -> {
-                modelDeploymentMap.put(k, v.getValueAsString());
-            });
+            models.getChildren().forEach((k, v) -> modelDeploymentMap.put(k, v.getValueAsString()));
         }
 
         this.apiKey = apiKey;
@@ -71,26 +69,24 @@ public class VolcesServiceAdapter implements ServiceAdapter {
                 )
         );
 
-        return Keel.useWebClient(webClient -> {
-            return webClient
-                    .postAbs(url)
-                    .bearerTokenAuthentication(apiKey)
-                    .sendJsonObject(requestPayload)
-                    .compose(bufferHttpResponse -> {
-                        if (bufferHttpResponse.statusCode() != 200) {
-                            throw new AbnormalResponse(bufferHttpResponse);
-                        } else {
-                            JsonObject respAsJsonObject = bufferHttpResponse.bodyAsJsonObject();
-                            AigcMix.getVerboseLogger().info(x -> x
-                                    .message("bufferHttpResponse in VolcesServiceMeta.request")
-                                    .context(j -> j
-                                            .put("requestId", requestId)
-                                            .put("output", respAsJsonObject))
-                            );
-                            return Future.succeededFuture(respAsJsonObject);
-                        }
-                    });
-        });
+        return Keel.useWebClient(webClient -> webClient
+                .postAbs(url)
+                .bearerTokenAuthentication(apiKey)
+                .sendJsonObject(requestPayload)
+                .compose(bufferHttpResponse -> {
+                    if (bufferHttpResponse.statusCode() != 200) {
+                        throw new AbnormalResponse(bufferHttpResponse);
+                    } else {
+                        JsonObject respAsJsonObject = bufferHttpResponse.bodyAsJsonObject();
+                        AigcMix.getVerboseLogger().info(x -> x
+                                .message("bufferHttpResponse in VolcesServiceMeta.request")
+                                .context(j -> j
+                                        .put("requestId", requestId)
+                                        .put("output", respAsJsonObject))
+                        );
+                        return Future.succeededFuture(respAsJsonObject);
+                    }
+                }));
     }
 
     @Override
@@ -104,16 +100,14 @@ public class VolcesServiceAdapter implements ServiceAdapter {
                         .setSsl(true)
                         .setDefaultHost(VolcesModelSpecification.hostOfV3ChatCompletions)
                         .setDefaultPort(443),
-                client -> {
-                    return client.request(HttpMethod.POST, VolcesModelSpecification.pathOfV3ChatCompletions)
-                                 .compose(httpClientRequest -> {
-                                     httpClientRequest
-                                             .putHeader("Content-Type", "application/json")
-                                             .putHeader("Authorization", "Bearer " + apiKey);
-                                     return httpClientRequest
-                                             .send(requestPayload.toString());
-                                 });
-                },
+                client -> client.request(HttpMethod.POST, VolcesModelSpecification.pathOfV3ChatCompletions)
+                            .compose(httpClientRequest -> {
+                                 httpClientRequest
+                                         .putHeader("Content-Type", "application/json")
+                                         .putHeader("Authorization", "Bearer " + apiKey);
+                                 return httpClientRequest
+                                         .send(requestPayload.toString());
+                             }),
                 fragment -> {
                     AigcMix.getVerboseLogger().info("[" + requestId + "] sse fragment: \n" + fragment);
                     return cutterProcessFunc.apply(fragment);

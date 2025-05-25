@@ -4,8 +4,8 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageI
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoice;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoiceDelta;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.tool.DoubaoToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -116,7 +116,7 @@ public class DoubaoVisionStreamUnitTest extends AbstractDoubaoVisionModelUnitTes
                                getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
                                getUnitTestLogger().info("content: " + message.getContent());
 
-                               List<DoubaoToolCall> toolCalls = message.getToolCalls();
+                               List<CommonToolCall> toolCalls = message.getToolCalls();
                                var tc = toolCalls.get(0);
                                FunctionToolCall function = tc.getFunction();
                                getUnitTestLogger().info("function " + function.getName() + "(" + function.getArguments() + ")");
@@ -140,8 +140,9 @@ public class DoubaoVisionStreamUnitTest extends AbstractDoubaoVisionModelUnitTes
                            .compose(toolCallOutputContent -> {
                                DoubaoMessageInResponse msg = toolCallMessageRef.get();
                                requestWithToolCall.addToolCallChatMessage(msg.getContent(), msg.getToolCalls());
-                               requestWithToolCall.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls().get(0)
-                                                                                          .getId());
+                               requestWithToolCall.addToolOutputChatMessage(toolCallOutputContent, msg.getToolCalls()
+                                                                                                      .get(0)
+                                                                                                      .getId());
 
                                return getKit().chatStream(
                                        getModel(),
