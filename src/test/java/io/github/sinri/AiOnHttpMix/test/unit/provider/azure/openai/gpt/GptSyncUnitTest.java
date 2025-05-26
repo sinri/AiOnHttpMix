@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.azure.openai.gpt;
 
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInResponse;
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInTextRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.request.GPTRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.sync.GPTResponseChoice;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionParameterDefinition;
@@ -25,8 +25,8 @@ public class GptSyncUnitTest extends AbstractGptUnitTest {
         async(() -> {
             GPTRequest request = GPTRequest
                     .create()
-                    .addMessage(GPTMessageInRequest.createAsSystem("你是日本战国史学家", null))
-                    .addMessage(GPTMessageInRequest.createAsUser("筑波山周边是哪些大名的势力范围", null));
+                    .addMessage(GPTMessageInTextRequest.createAsSystem("你是日本战国史学家", null))
+                    .addMessage(GPTMessageInTextRequest.createAsUser("筑波山周边是哪些大名的势力范围", null));
             return getKit()
                     .chat(
                             getModel(),

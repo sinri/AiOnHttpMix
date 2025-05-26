@@ -9,7 +9,7 @@ This project, as an SDK, encapsulates certain LLM capabilities via APIs provided
 When using LLMs, you must determine which **model** to use. For example, a **model** could be
 `gpt-4o` (from the OpenAI ChatGPT series) or
 `qwen-plus` (from the Dashscope Qwen series). Different models have different abilities, styles, and pricing, which affect your choice. Models are defined by the interface
-`io.github.sinri.AiOnHttpMix.utils.models.ChatModel`.
+`io.github.sinri.AiOnHttpMix.utils.models.TextModel`.
 
 All LLMs in this project are accessed via HTTP APIs. Some models share the same API format and can use the same request/response implementation; others cannot. Models sharing the same API format (and often the same endpoint) are grouped into a
 **model series**, defined by `io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification`.
@@ -60,7 +60,7 @@ To abstract the real-world LLM service mapping, this project introduces the conc
 #### Example: Dashscope Qwen
 
 - **Service Provider**: `io.github.sinri.AiOnHttpMix.utils.providers.ServiceProvider.dashscope`
-- **Model Series**: `io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenChatModelSeries`
+- **Model Series**: `io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenTextModelSeries`
 - **Model**: `QwenModelSeries.model("qwen-plus")`
 - **Service Adapter**: `io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenServiceAdapter`
 

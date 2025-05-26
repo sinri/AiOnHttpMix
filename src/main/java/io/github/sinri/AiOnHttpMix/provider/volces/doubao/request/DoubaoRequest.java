@@ -3,9 +3,9 @@ package io.github.sinri.AiOnHttpMix.provider.volces.doubao.request;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessage;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInChatRequest;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInVisionRequest;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.DoubaoVisionContent;
+import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolDefinition;
-import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
@@ -57,7 +57,7 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
         return addMessage(DoubaoMessageInChatRequest.createAsUserMessage(content));
     }
 
-    default DoubaoRequest addUserVisionMessage(List<Content> contentList) {
+    default DoubaoRequest addUserVisionMessage(List<DoubaoVisionContent> contentList) {
         return addMessage(DoubaoMessageInVisionRequest.createAsUserMessage(contentList));
     }
 
@@ -65,7 +65,7 @@ public interface DoubaoRequest extends JsonifiableEntity<DoubaoRequest> {
         return addMessage(DoubaoMessageInChatRequest.createAsAssistantMessage(content));
     }
 
-    default DoubaoRequest addToolCallChatMessage(@Nullable String content, @Nonnull List<CommonToolCall> toolCalls) {
+    default DoubaoRequest addToolCallChatMessage(@Nullable String content, @Nonnull List<ToolCall> toolCalls) {
         return addMessage(DoubaoMessageInChatRequest.createAsToolCallMessage(content, toolCalls));
     }
 

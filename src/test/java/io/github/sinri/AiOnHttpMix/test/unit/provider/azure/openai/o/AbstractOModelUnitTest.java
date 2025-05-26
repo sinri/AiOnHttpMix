@@ -4,13 +4,13 @@ import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.GPTKit;
 import io.github.sinri.AiOnHttpMix.test.unit.provider.core.AbstractModelUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.OChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.OTextModelSeries;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import org.junit.Assert;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-public abstract class AbstractOModelUnitTest extends AbstractModelUnitTest<OChatModelSeries> {
+public abstract class AbstractOModelUnitTest extends AbstractModelUnitTest<OTextModelSeries> {
     private final GPTKit gptKit;
 
     public AbstractOModelUnitTest() {
@@ -23,8 +23,8 @@ public abstract class AbstractOModelUnitTest extends AbstractModelUnitTest<OChat
     }
 
     @Override
-    protected OChatModelSeries buildModel() {
-        return OChatModelSeries.model(OChatModelSeries.MODEL_NAME_OF_O1);
+    protected OTextModelSeries buildModel() {
+        return OTextModelSeries.model(OTextModelSeries.MODEL_NAME_OF_O1);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.request;
 
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessage;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInResponse;
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInTextRequest;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
@@ -341,19 +341,19 @@ public interface GPTRequest extends JsonifiableEntity<GPTRequest> {
     }
 
     default GPTRequest addSystemMessage(String content) {
-        return this.addMessage(GPTMessageInRequest.createAsSystem(content, null));
+        return this.addMessage(GPTMessageInTextRequest.createAsSystem(content, null));
     }
 
     default GPTRequest addUserMessage(String content) {
-        return this.addMessage(GPTMessageInRequest.createAsUser(content, null));
+        return this.addMessage(GPTMessageInTextRequest.createAsUser(content, null));
     }
 
     default GPTRequest addAssistantMessage(String content) {
-        return this.addMessage(GPTMessageInRequest.createAsAssistant(content, null, null));
+        return this.addMessage(GPTMessageInTextRequest.createAsAssistant(content, null, null));
     }
 
     default GPTRequest addToolCallMessage(@Nullable String content, List<CommonToolCall> toolCalls) {
-        return this.addMessage(GPTMessageInRequest.createAsToolCall(content, toolCalls, null, null));
+        return this.addMessage(GPTMessageInTextRequest.createAsToolCall(content, toolCalls, null, null));
     }
 
     default GPTRequest addToolCallMessage(GPTMessageInResponse messageInResponse) {
@@ -361,17 +361,17 @@ public interface GPTRequest extends JsonifiableEntity<GPTRequest> {
     }
 
     default GPTRequest addToolOutputMessage(@Nullable String content, String tool_call_id) {
-        return this.addMessage(GPTMessageInRequest.createAsToolOutput(content, tool_call_id));
+        return this.addMessage(GPTMessageInTextRequest.createAsToolOutput(content, tool_call_id));
     }
 
     /**
      * A list of messages comprising the conversation so far.
      */
-    default List<GPTMessageInRequest> messages() {
+    default List<GPTMessageInTextRequest> messages() {
         List<JsonObject> messages = readJsonObjectArray("messages");
         if (messages == null)
             return List.of();
-        return messages.stream().map(GPTMessageInRequest::wrap).toList();
+        return messages.stream().map(GPTMessageInTextRequest::wrap).toList();
     }
 
     // Field data_sources is not implemented: The configuration entries for Azure

@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream;
 
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.QwenMessageInResponse;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.Content;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.QwenVisionContent;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponse;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutput;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutputChoice;
@@ -150,7 +150,7 @@ public class QwenResponseBuffer {
                 JsonArray array = new JsonArray();
                 for (int i = 0; i < contentBufferMap.size(); i++) {
                     var cb = contentBufferMap.get(i);
-                    Content built = cb.build();
+                    QwenVisionContent built = cb.build();
                     array.add(built.toJsonObject());
                 }
                 x.put("content", array);
@@ -173,7 +173,7 @@ public class QwenResponseBuffer {
     /**
      * For Vision Model, i.e. QwenVL series.
      */
-    public static class ContentOfTextBuffer implements StreamPieceCollector<String, Content> {
+    public static class ContentOfTextBuffer implements StreamPieceCollector<String, QwenVisionContent> {
         private final StringBuilder textBuilder = new StringBuilder();
 
         @Override
@@ -182,8 +182,8 @@ public class QwenResponseBuffer {
         }
 
         @Override
-        public Content build() {
-            return Content.wrap(new JsonObject()
+        public QwenVisionContent build() {
+            return QwenVisionContent.wrap(new JsonObject()
                     .put("text", textBuilder.toString()));
         }
     }

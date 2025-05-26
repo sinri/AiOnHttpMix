@@ -4,7 +4,7 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.QwenMessage;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.QwenMessageInChatRequest;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.QwenMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.QwenMessageInVisionRequest;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.Content;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.QwenVisionContent;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -51,7 +51,7 @@ public interface QwenRequestInput extends JsonifiableEntity<QwenRequestInput> {
         return addMessage(QwenMessageInChatRequest.createAsUserInRequest(content));
     }
 
-    default QwenRequestInput addUserVisionMessage(List<Content> contentList) {
+    default QwenRequestInput addUserVisionMessage(List<QwenVisionContent> contentList) {
         return addMessage(QwenMessageInVisionRequest.createAsUserInRequest(contentList));
     }
 

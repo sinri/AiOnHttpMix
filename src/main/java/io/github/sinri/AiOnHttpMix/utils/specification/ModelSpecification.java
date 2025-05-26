@@ -28,4 +28,9 @@ public interface ModelSpecification {
      * @return 构建完成的大语言模型服务适配器
      */
     ServiceAdapter buildServiceAdapter(KeelConfigElement config);
+
+    /**
+     * @return whether this model with the ability of vision
+     */
+    boolean isWithVisionAbility();
 }

@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.mix.service;
 
-import io.github.sinri.AiOnHttpMix.mix.chat.MixChatRequest;
-import io.github.sinri.AiOnHttpMix.mix.chat.MixChatResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.text.MixChatRequest;
+import io.github.sinri.AiOnHttpMix.mix.chat.text.MixChatResponse;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.GPTKit;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenKit;

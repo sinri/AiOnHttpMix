@@ -2,7 +2,7 @@ package io.github.sinri.AiOnHttpMix.test.unit.provider.dashscope.qwen.vision;
 
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenServiceAdapter;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.Content;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.QwenVisionContent;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.request.QwenRequest;
 import io.github.sinri.AiOnHttpMix.test.unit.provider.core.AbstractModelUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
@@ -42,10 +42,10 @@ public abstract class AbstractQwenVisionModelUnitTest extends AbstractModelUnitT
                                             .input(input -> input
                                                     .addUserVisionMessage(
                                                             List.of(
-                                                                    Content.create()
-                                                                           .setText("这个图片里的人类在干什么"),
-                                                                    Content.create()
-                                                                           .setImage(imageUrl)
+                                                                    QwenVisionContent.create()
+                                                                                     .setText("这个图片里的人类在干什么"),
+                                                                    QwenVisionContent.create()
+                                                                                     .setImage(imageUrl)
                                                             )
                                                     )
                                             );
@@ -53,10 +53,10 @@ public abstract class AbstractQwenVisionModelUnitTest extends AbstractModelUnitT
                                          .input(input -> input
                                                  .addUserVisionMessage(
                                                          List.of(
-                                                                 Content.create()
-                                                                        .setText("这个图片里的地点当前的天气是什么"),
-                                                                 Content.create()
-                                                                        .setImage(imageUrl)
+                                                                 QwenVisionContent.create()
+                                                                                  .setText("这个图片里的地点当前的天气是什么"),
+                                                                 QwenVisionContent.create()
+                                                                                  .setImage(imageUrl)
                                                          )
                                                  )
                                          )

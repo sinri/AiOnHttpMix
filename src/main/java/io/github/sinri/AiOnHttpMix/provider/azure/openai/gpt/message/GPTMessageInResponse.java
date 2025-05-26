@@ -12,16 +12,8 @@ public interface GPTMessageInResponse extends GPTMessage {
 
     // annotations: an array but unknown
 
-    default String getContent() {
-        return readString("content");
-    }
-
     default String getRefusal() {
         return readString("refusal");
-    }
-
-    default String getRole() {
-        return readString("role");
     }
 
     default List<CommonToolCall> getToolCalls() {

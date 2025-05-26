@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.dashscope.qwen.chat;
 
 import io.github.sinri.AiOnHttpMix.test.unit.provider.core.AbstractModelRawUnitTest;
-import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenTextModelSeries;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import org.junit.Test;
  * 对Qwen的底层服务进行单元测试。
  */
 public class QwenChatLowLevelUnitTest extends AbstractQwenChatModelUnitTest
-        implements AbstractModelRawUnitTest<QwenChatModelSeries> {
+        implements AbstractModelRawUnitTest<QwenTextModelSeries> {
     public QwenChatLowLevelUnitTest() {
     }
 

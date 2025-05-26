@@ -1,10 +1,9 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.vision;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInVisionRequest;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.ContentImageUrl;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.DoubaoVisionContent;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
-import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.thinking.AbstractDoubaoThinkingModelUnitTest;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
@@ -21,12 +20,12 @@ public class DoubaoVisionLowLevelUnitTest extends AbstractDoubaoVisionModelUnitT
                                              //.addMessage(DoubaoMessageInChatRequest.createAsSystemMessage())
                                              .addMessage(DoubaoMessageInVisionRequest.createAsUserMessage(
                                                      List.of(
-                                                             Content.create()
-                                                                    .setType("text")
-                                                                    .setText("这个图片里的动物是啥啊"),
-                                                             Content.create()
-                                                                    .setType("image_url")
-                                                                    .setImageUrl(ContentImageUrl.create()
+                                                             DoubaoVisionContent.create()
+                                                                                .setType("text")
+                                                                                .setText("这个图片里的动物是啥啊"),
+                                                             DoubaoVisionContent.create()
+                                                                                .setType("image_url")
+                                                                                .setImageUrl(ContentImageUrl.create()
                                                                                                 .setUrl(imageUrl)
                                                                     )
                                                      )

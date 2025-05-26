@@ -1,6 +1,10 @@
 package io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen;
 
-public abstract non-sealed class QwenVisionModelSeries extends QwenModelSeries {
+import io.github.sinri.AiOnHttpMix.utils.models.VisionModel;
+import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecification;
+
+public abstract class QwenVisionModelSeries extends DashscopeModelSpecification
+        implements VisionModel {
     public final static String NAME_OF_MODEL_SERIES = "QwenVisionModelSeries";
 
     public final static String MODEL_NAME_OF_QWEN_VL_MAX = "qwen-vl-max";
@@ -15,5 +19,10 @@ public abstract non-sealed class QwenVisionModelSeries extends QwenModelSeries {
                 return modelName;
             }
         };
+    }
+
+    @Override
+    public boolean isWithVisionAbility() {
+        return true;
     }
 }

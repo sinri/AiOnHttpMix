@@ -1,10 +1,10 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.vision;
 
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInVisionRequest;
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.ContentImageUrl;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.DoubaoVisionContent;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.request.DoubaoRequest;
-import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.AbstractVolcesModelUnitTest;
+import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.AbstractVolcesVisionModelUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.models.volces.doubao.DoubaoVisionModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
@@ -13,7 +13,7 @@ import org.junit.Before;
 
 import java.util.List;
 
-public class AbstractDoubaoVisionModelUnitTest extends AbstractVolcesModelUnitTest<DoubaoVisionModelSeries> {
+public class AbstractDoubaoVisionModelUnitTest extends AbstractVolcesVisionModelUnitTest<DoubaoVisionModelSeries> {
 
     protected DoubaoRequest requestWithoutToolCall;
     protected DoubaoRequest requestWithToolCall;
@@ -39,12 +39,12 @@ public class AbstractDoubaoVisionModelUnitTest extends AbstractVolcesModelUnitTe
                                               //.addMessage(DoubaoMessageInChatRequest.createAsSystemMessage())
                                               .addMessage(DoubaoMessageInVisionRequest.createAsUserMessage(
                                                       List.of(
-                                                              Content.create()
-                                                                     .setType("text")
-                                                                     .setText("这个图片里的动物吃什么"),
-                                                              Content.create()
-                                                                     .setType("image_url")
-                                                                     .setImageUrl(ContentImageUrl.create()
+                                                              DoubaoVisionContent.create()
+                                                                                 .setType("text")
+                                                                                 .setText("这个图片里的动物吃什么"),
+                                                              DoubaoVisionContent.create()
+                                                                                 .setType("image_url")
+                                                                                 .setImageUrl(ContentImageUrl.create()
                                                                                                  .setUrl(imageUrl)
                                                                      )
                                                       )
@@ -53,12 +53,12 @@ public class AbstractDoubaoVisionModelUnitTest extends AbstractVolcesModelUnitTe
                                            //.addMessage(DoubaoMessageInChatRequest.createAsSystemMessage())
                                            .addMessage(DoubaoMessageInVisionRequest.createAsUserMessage(
                                                    List.of(
-                                                           Content.create()
-                                                                  .setType("text")
-                                                                  .setText("这个图片里的地点当前的天气是什么"),
-                                                           Content.create()
-                                                                  .setType("image_url")
-                                                                  .setImageUrl(ContentImageUrl.create()
+                                                           DoubaoVisionContent.create()
+                                                                              .setType("text")
+                                                                              .setText("这个图片里的地点当前的天气是什么"),
+                                                           DoubaoVisionContent.create()
+                                                                              .setType("image_url")
+                                                                              .setImageUrl(ContentImageUrl.create()
                                                                                               .setUrl(imageUrl)
                                                                   )
                                                    )

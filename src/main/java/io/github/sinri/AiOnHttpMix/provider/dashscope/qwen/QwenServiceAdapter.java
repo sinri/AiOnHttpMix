@@ -4,7 +4,7 @@ import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
 import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
-import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenTextModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen.QwenVisionModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.providers.DashscopeServiceProvider;
 import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecification;
@@ -35,7 +35,7 @@ public class QwenServiceAdapter implements ServiceAdapter {
         requestPayload.put("model", chatModel.getModelName());
 
         String endpoint;
-        if (chatModel instanceof QwenChatModelSeries) {
+        if (chatModel instanceof QwenTextModelSeries) {
             endpoint = DashscopeServiceProvider.endpointOfDashscopeQwenTextGenerate;
         } else if (chatModel instanceof QwenVisionModelSeries) {
             endpoint = DashscopeServiceProvider.endpointOfDashscopeQwenMultimodalGenerate;
@@ -80,7 +80,7 @@ public class QwenServiceAdapter implements ServiceAdapter {
         requestPayload.put("model", chatModel.getModelName());
 
         String path;
-        if (chatModel instanceof QwenChatModelSeries) {
+        if (chatModel instanceof QwenTextModelSeries) {
             path = DashscopeServiceProvider.pathOfDashscopeQwenTextGenerate;
         } else if (chatModel instanceof QwenVisionModelSeries) {
             path = DashscopeServiceProvider.pathOfDashscopeQwenMultimodalGenerate;

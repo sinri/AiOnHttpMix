@@ -5,7 +5,7 @@ import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 
-class GPTMessageImpl extends JsonifiableEntityImpl<GPTMessage> implements GPTMessageInRequest, GPTMessageInResponse {
+class GPTMessageImpl extends JsonifiableEntityImpl<GPTMessage> implements GPTMessageInTextRequest, GPTMessageInVisionRequest, GPTMessageInResponse {
     public GPTMessageImpl() {
         super();
     }

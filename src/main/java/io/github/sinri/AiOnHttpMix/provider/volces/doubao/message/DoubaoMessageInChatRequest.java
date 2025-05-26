@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.volces.doubao.message;
 
-import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -61,9 +61,9 @@ public interface DoubaoMessageInChatRequest extends DoubaoMessage {
      * @param content   模型回复的消息。
      * @param toolCalls 模型回复的工具调用信息。
      */
-    static DoubaoMessageInChatRequest createAsToolCallMessage(@Nullable String content, @Nonnull List<CommonToolCall> toolCalls) {
+    static DoubaoMessageInChatRequest createAsToolCallMessage(@Nullable String content, @Nonnull List<ToolCall> toolCalls) {
         var a = new JsonArray();
-        toolCalls.forEach(tc -> a.add(tc.cloneAsJsonObject()));
+        toolCalls.forEach(tc -> a.add(tc.toJsonObject()));
         var j = new JsonObject()
                 .put("role", "assistant")
                 .put("tool_calls", a);

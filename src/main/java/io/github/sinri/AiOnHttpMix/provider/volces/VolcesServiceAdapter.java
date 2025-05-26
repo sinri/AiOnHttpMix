@@ -101,13 +101,13 @@ public class VolcesServiceAdapter implements ServiceAdapter {
                         .setDefaultHost(VolcesModelSpecification.hostOfV3ChatCompletions)
                         .setDefaultPort(443),
                 client -> client.request(HttpMethod.POST, VolcesModelSpecification.pathOfV3ChatCompletions)
-                            .compose(httpClientRequest -> {
-                                 httpClientRequest
-                                         .putHeader("Content-Type", "application/json")
-                                         .putHeader("Authorization", "Bearer " + apiKey);
-                                 return httpClientRequest
-                                         .send(requestPayload.toString());
-                             }),
+                                .compose(httpClientRequest -> {
+                                    httpClientRequest
+                                            .putHeader("Content-Type", "application/json")
+                                            .putHeader("Authorization", "Bearer " + apiKey);
+                                    return httpClientRequest
+                                            .send(requestPayload.toString());
+                                }),
                 fragment -> {
                     AigcMix.getVerboseLogger().info("[" + requestId + "] sse fragment: \n" + fragment);
                     return cutterProcessFunc.apply(fragment);

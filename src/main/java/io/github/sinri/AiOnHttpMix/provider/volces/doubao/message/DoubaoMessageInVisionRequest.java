@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.volces.doubao.message;
 
-import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.Content;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.vision.DoubaoVisionContent;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonArray;
@@ -36,7 +36,7 @@ public interface DoubaoMessageInVisionRequest extends DoubaoMessage {
      *
      * @param contentList 纯文本消息内容，大语言模型支持传入此类型。
      */
-    static DoubaoMessageInVisionRequest createAsUserMessage(List<Content> contentList) {
+    static DoubaoMessageInVisionRequest createAsUserMessage(List<DoubaoVisionContent> contentList) {
         return new DoubaoMessageImpl(new JsonObject()
                 .put("role", "user")
                 .put("content", new JsonArray(contentList.stream().map(UnmodifiableJsonifiableEntity::cloneAsJsonObject)
@@ -54,10 +54,10 @@ public interface DoubaoMessageInVisionRequest extends DoubaoMessage {
         return new DoubaoMessageImpl(new JsonObject()
                 .put("role", "assistant")
                 .put("content", new JsonArray()
-                        .add(Content.create()
-                                    .setText("text")
-                                    .setText(content)
-                                    .toJsonObject()
+                        .add(DoubaoVisionContent.create()
+                                                .setText("text")
+                                                .setText(content)
+                                                .toJsonObject()
                         )
                 )
         );

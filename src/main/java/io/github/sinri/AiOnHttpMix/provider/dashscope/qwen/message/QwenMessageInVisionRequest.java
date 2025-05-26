@@ -1,6 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message;
 
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.Content;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.message.vision.QwenVisionContent;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -22,7 +22,7 @@ public interface QwenMessageInVisionRequest extends QwenMessage {
      *
      * @param contentList 用户消息的内容。
      */
-    static QwenMessage createAsUserInRequest(List<Content> contentList) {
+    static QwenMessage createAsUserInRequest(List<QwenVisionContent> contentList) {
         return create()
                 .write("content", new JsonArray(contentList.stream().map(JsonifiableEntity::toJsonObject).toList()))
                 .write("role", "user");

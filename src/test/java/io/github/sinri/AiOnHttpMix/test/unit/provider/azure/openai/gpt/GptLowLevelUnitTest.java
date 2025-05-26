@@ -1,12 +1,12 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.azure.openai.gpt;
 
 import io.github.sinri.AiOnHttpMix.test.unit.provider.core.AbstractModelRawUnitTest;
-import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.GPTChatModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.GPTVisionModelSeries;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
 
-public class GptLowLevelUnitTest extends AbstractGptUnitTest implements AbstractModelRawUnitTest<GPTChatModelSeries> {
+public class GptLowLevelUnitTest extends AbstractGptUnitTest implements AbstractModelRawUnitTest<GPTVisionModelSeries> {
     private JsonObject generateRequest(boolean useStreamIncrement) {
         JsonObject request = new JsonObject();
         request.put("messages", new JsonArray()

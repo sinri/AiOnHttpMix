@@ -1,16 +1,16 @@
 package io.github.sinri.AiOnHttpMix.test.unit.provider.volces.doubao.common;
 
-import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.AbstractVolcesModelUnitTest;
-import io.github.sinri.AiOnHttpMix.utils.models.volces.doubao.DoubaoChatModelSeries;
+import io.github.sinri.AiOnHttpMix.test.unit.provider.volces.AbstractVolcesTextModelUnitTest;
+import io.github.sinri.AiOnHttpMix.utils.models.volces.doubao.DoubaoTextModelSeries;
 
-public class AbstractDoubaoNormalModelUnitTest extends AbstractVolcesModelUnitTest<DoubaoChatModelSeries> {
+public class AbstractDoubaoNormalModelUnitTest extends AbstractVolcesTextModelUnitTest<DoubaoTextModelSeries> {
 
     public AbstractDoubaoNormalModelUnitTest() {
         super();
     }
 
     @Override
-    protected DoubaoChatModelSeries buildModel() {
-        return DoubaoChatModelSeries.model(DoubaoChatModelSeries.MODEL_NAME_OF_DOUBAO_PRO_32K);
+    protected DoubaoTextModelSeries buildModel() {
+        return DoubaoTextModelSeries.model(DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_PRO_32K);
     }
 }

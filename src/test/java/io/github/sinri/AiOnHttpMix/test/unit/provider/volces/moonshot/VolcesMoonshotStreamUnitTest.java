@@ -8,8 +8,8 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.Doubao
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunkChoiceDelta;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
-import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -162,7 +162,7 @@ public class VolcesMoonshotStreamUnitTest extends AbstractVolcesMoonshotModelUni
                                getUnitTestLogger().info("reasoning content: " + message.getReasoningContent());
                                getUnitTestLogger().info("content: " + message.getContent());
 
-                               List<CommonToolCall> toolCalls = message.getToolCalls();
+                               List<ToolCall> toolCalls = message.getToolCalls();
                                var tc = toolCalls.get(0);
                                FunctionToolCall function = tc.getFunction();
                                getUnitTestLogger().info("function " + function.getName() + "(" + function.getArguments() + ")");
