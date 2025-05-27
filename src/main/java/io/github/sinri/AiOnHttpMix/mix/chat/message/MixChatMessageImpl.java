@@ -25,6 +25,11 @@ import java.util.stream.Collectors;
 class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage>
         implements MixChatMessage {
     private final static String KEY_ROLE = "role";
+    private final static String KEY_TEXT_CONTENT = "text_content";
+    private final static String KEY_VISION_CONTENT = "vision_content";
+    private final static String KEY_TOOL_CALL_ID = "tool_call_id";
+    private final static String KEY_TOOL_CALLS = "tool_calls";
+    private final static String KEY_REASONING_CONTENT = "reasoning_content";
 
     public MixChatMessageImpl() {
         super();
@@ -36,37 +41,37 @@ class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage>
 
     @Override
     public MixChatMessage setRole(String role) {
-        return write("role", role);
+        return write(KEY_ROLE, role);
     }
 
     @Override
     public String getRole() {
-        return readString("role");
+        return readString(KEY_ROLE);
     }
 
     @Override
     public MixChatMessage setTextContent(String content) {
-        return write("text_content", content);
+        return write(KEY_TEXT_CONTENT, content);
     }
 
     @Override
     public String getTextContent() {
-        return readString("text_content");
+        return readString(KEY_TEXT_CONTENT);
     }
 
     @Override
     public MixChatMessage setReasoningContent(String reasoningContent) {
-        return write("reasoning_content", reasoningContent);
+        return write(KEY_REASONING_CONTENT, reasoningContent);
     }
 
     @Override
     public String getReasoningContent() {
-        return readString("reasoning_content");
+        return readString(KEY_REASONING_CONTENT);
     }
 
     @Override
     public MixChatMessage setToolCalls(List<ToolCall> toolCalls) {
-        return write("tool_calls", new JsonArray(toolCalls
+        return write(KEY_TOOL_CALLS, new JsonArray(toolCalls
                 .stream()
                 .map(ToolCall::toJsonObject)
                 .collect(Collectors.toList())));
@@ -74,7 +79,7 @@ class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage>
 
     @Override
     public List<ToolCall> getToolCalls() {
-        var a = readJsonObjectArray("tool_calls");
+        var a = readJsonObjectArray(KEY_TOOL_CALLS);
         if (a == null) {
             return List.of();
         } else {
@@ -84,7 +89,7 @@ class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage>
 
     @Override
     public String getToolCallId() {
-        return readString("tool_call_id");
+        return readString(KEY_TOOL_CALL_ID);
     }
 
     private JsonObject toCommonChatRequestJsonObject() {
@@ -199,13 +204,13 @@ class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage>
 
     @Override
     public MixChatMessage setToolCallId(String toolCallId) {
-        return write("tool_call_id", toolCallId);
+        return write(KEY_TOOL_CALL_ID, toolCallId);
     }
 
     @Override
     public List<MixChatVisionContentElement> getVisionContent() {
         //List<MixChatVisionContentElement> list=new ArrayList<>();
-        var a = readJsonObjectArray("vision_content");
+        var a = readJsonObjectArray(KEY_VISION_CONTENT);
         if (a == null) {
             return List.of();
         } else {
@@ -215,6 +220,6 @@ class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage>
 
     @Override
     public MixChatMessage setVisionContent(List<MixChatVisionContentElement> content) {
-        return write("vision_content", new JsonArray(content.stream().map(JsonifiableEntity::toJsonObject).toList()));
+        return write(KEY_VISION_CONTENT, new JsonArray(content.stream().map(JsonifiableEntity::toJsonObject).toList()));
     }
 }
