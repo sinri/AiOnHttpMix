@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix.chat.text;
+package io.github.sinri.AiOnHttpMix.mix.chat.request;
 
 import io.github.sinri.AiOnHttpMix.mix.chat.message.MixChatMessage;
 import io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum;
@@ -83,6 +83,11 @@ class MixChatRequestImpl extends JsonifiableEntityImpl<MixChatRequest> implement
     @Override
     public String getRequestId() {
         return readString("request_id");
+    }
+
+    @Override
+    public MixChatRequest setRequestId(String requestId) {
+        return write("request_id", requestId);
     }
 
     @Override

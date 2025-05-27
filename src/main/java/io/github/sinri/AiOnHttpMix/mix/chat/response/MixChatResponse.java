@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix.chat.text;
+package io.github.sinri.AiOnHttpMix.mix.chat.response;
 
 import io.github.sinri.AiOnHttpMix.mix.chat.message.MixChatMessage;
 import io.github.sinri.AiOnHttpMix.mix.chat.message.MixChatVisionContentElement;

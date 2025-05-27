@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.mix.chat.text;
+package io.github.sinri.AiOnHttpMix.mix.chat.request;
 
 import io.github.sinri.AiOnHttpMix.mix.chat.message.MixChatMessage;
 import io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum;
@@ -33,6 +33,8 @@ public interface MixChatRequest extends JsonifiableEntity<MixChatRequest> {
     DoubaoRequest toDoubaoRequest();
 
     String getRequestId();
+
+    MixChatRequest setRequestId(String requestId);
 
     long getTimeout();
 

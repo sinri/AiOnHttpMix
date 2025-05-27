@@ -3,7 +3,7 @@ package io.github.sinri.AiOnHttpMix.test.unit.mix.mixin.vision;
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.chat.message.MixChatMessage;
 import io.github.sinri.AiOnHttpMix.mix.chat.message.MixChatVisionContentElement;
-import io.github.sinri.AiOnHttpMix.mix.chat.text.MixChatRequest;
+import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionParameterDefinition;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;

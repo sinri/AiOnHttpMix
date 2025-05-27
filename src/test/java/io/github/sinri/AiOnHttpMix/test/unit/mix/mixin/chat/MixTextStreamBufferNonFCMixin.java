@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.test.unit.mix.mixin.chat;
 
 import io.github.sinri.AiOnHttpMix.mix.chat.message.MixChatMessage;
-import io.github.sinri.AiOnHttpMix.mix.chat.text.MixChatRequest;
+import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum;
 import io.github.sinri.AiOnHttpMix.test.unit.mix.mixin.MixCoreMixin;
 import io.vertx.core.Future;

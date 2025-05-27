@@ -1,7 +1,7 @@
 package io.github.sinri.AiOnHttpMix.mix.service;
 
-import io.github.sinri.AiOnHttpMix.mix.chat.text.MixChatRequest;
-import io.github.sinri.AiOnHttpMix.mix.chat.text.MixChatResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
+import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
