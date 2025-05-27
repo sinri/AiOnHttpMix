@@ -64,14 +64,6 @@ public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
         GPTResponseChoice choice = choices.get(0);
         GPTMessageInResponse message = choice.getMessage();
 
-        //        var j = new JsonObject();
-        //        String role = message.getRole();
-        //        j.put("role", role);
-        //        String content = message.getContent();
-        //        j.put("content", content);
-        //        List<CommonToolCall> toolCalls = message.getToolCalls();
-        //        handleToolCalls(toolCalls, j);
-
         MixChatMessage mixChatMessage = MixChatMessage.create();
         mixChatMessage.setRole(message.getRole());
         String content = message.getContent();

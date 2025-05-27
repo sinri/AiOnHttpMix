@@ -25,9 +25,7 @@ public class Dalle3Kit {
 
     public Future<Dalle3Response> draw(Dalle3Parameters parameters, String requestId) {
         return this.draw(parameters.toJsonObject(), requestId)
-                   .compose(jsonObject -> {
-                       return Future.succeededFuture(Dalle3Response.wrap(jsonObject));
-                   });
+                   .compose(jsonObject -> Future.succeededFuture(Dalle3Response.wrap(jsonObject)));
     }
 
     public Future<Dalle3Response> draw(Handler<Dalle3Parameters> parametersHandler, String requestId) {

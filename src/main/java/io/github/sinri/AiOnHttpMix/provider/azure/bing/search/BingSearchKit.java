@@ -5,7 +5,6 @@ import io.github.sinri.AiOnHttpMix.provider.azure.bing.search.v7.BingSearchParam
 import io.github.sinri.AiOnHttpMix.provider.azure.bing.search.v7.BingSearchResponse;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.client.WebClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,40 +28,38 @@ public class BingSearchKit {
                 )
         );
 
-        WebClient webClient = WebClient.create(Keel.getVertx());
-        var x = webClient
-                .get(443, "api.bing.microsoft.com", "/v7.0/search")
-                .ssl(true);
-        parameters.forEach(e -> {
-            x.addQueryParam(e.getKey(), String.valueOf(e.getValue()));
+        return Keel.useWebClient(webClient -> {
+            var x = webClient
+                    .get(443, "api.bing.microsoft.com", "/v7.0/search")
+                    .ssl(true);
+            parameters.forEach(e -> {
+                x.addQueryParam(e.getKey(), String.valueOf(e.getValue()));
+            });
+
+            return x.putHeader("Ocp-Apim-Subscription-Key", subscriptionKey)
+                    .send()
+                    .compose(bufferHttpResponse -> {
+                        Map<String, String> headers = new HashMap<>();
+                        bufferHttpResponse.headers().forEach(headers::put);
+
+                        String body = bufferHttpResponse.bodyAsString();
+                        BingSearchResponse bingSearchResponse = BingSearchResponse.wrap(
+                                bufferHttpResponse.statusCode(),
+                                headers,
+                                body
+                        );
+
+                        AigcMix.getVerboseLogger().info(e -> e
+                                .message("bufferHttpResponse in BingSearchKit.callBingSearch")
+                                .context(j -> j
+                                        .put("output", bingSearchResponse.cloneAsJsonObject())
+                                        .put("request_id", requestId)
+                                )
+                        );
+
+                        return Future.succeededFuture(bingSearchResponse);
+                    });
         });
-
-        return x.putHeader("Ocp-Apim-Subscription-Key", subscriptionKey)
-                .send()
-                .compose(bufferHttpResponse -> {
-                    Map<String, String> headers = new HashMap<>();
-                    bufferHttpResponse.headers().forEach(headers::put);
-
-                    String body = bufferHttpResponse.bodyAsString();
-                    BingSearchResponse bingSearchResponse = BingSearchResponse.wrap(
-                            bufferHttpResponse.statusCode(),
-                            headers,
-                            body
-                    );
-
-                    AigcMix.getVerboseLogger().info(e -> e
-                            .message("bufferHttpResponse in BingSearchKit.callBingSearch")
-                            .context(j -> j
-                                    .put("output", bingSearchResponse.cloneAsJsonObject())
-                                    .put("request_id", requestId)
-                            )
-                    );
-
-                    return Future.succeededFuture(bingSearchResponse);
-                })
-                .andThen(ar -> {
-                    webClient.close();
-                });
     }
 
     public Future<BingSearchResponse> callBingSearch(BingSearchParameters parameters, String requestId) {

@@ -32,9 +32,7 @@ public interface GPTMessage extends JsonifiableEntity<GPTMessage> {
 
     default GPTMessage setVisionContent(List<GPTVisionMessageContent> contentList) {
         JsonArray array = new JsonArray();
-        contentList.forEach(c -> {
-            array.add(c.toJsonObject());
-        });
+        contentList.forEach(c -> array.add(c.toJsonObject()));
         return write("content", array);
     }
 }

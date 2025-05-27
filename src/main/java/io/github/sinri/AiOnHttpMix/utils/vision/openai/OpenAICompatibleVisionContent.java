@@ -25,14 +25,12 @@ public interface OpenAICompatibleVisionContent<C, P extends OpenAICompatibleVisi
 
 
     /**
+     * Sample code:
+     * {@code return P.wrap(Objects.requireNonNull(readJsonObject("image_url")));}
+     *
      * @return 图片消息的内容部分。
      */
     P getImageUrl();
-    //    default P getImageUrl() {
-    //        JsonObject x = readJsonObject("image_url");
-    //        Objects.requireNonNull(x);
-    //        return OpenAICompatibleVisionContentForImageUrl.wrap(x);
-    //    }
 
     /**
      * For type {@code image_url}.

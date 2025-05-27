@@ -55,18 +55,17 @@ public class DashscopeWanxKit {
     }
 
     private Future<JsonObject> callAsyncTaskQuery(String taskId, String requestId) {
-        return Keel.useWebClient(webClient -> {
-                       return webClient.getAbs(endpointOfDashscopeAsyncTaskQuery + taskId)
-                                       .putHeader("Authorization", "Bearer " + apiKey)
-                                       .send();
-                   })
+        return Keel.useWebClient(webClient -> webClient
+                           .getAbs(endpointOfDashscopeAsyncTaskQuery + taskId)
+                           .putHeader("Authorization", "Bearer " + apiKey)
+                           .send())
                    .compose(resp -> {
                        var r = resp.bodyAsJsonObject();
                        return Future.succeededFuture(r);
                    });
     }
 
-    public final Future<JsonObject> request(String api, JsonObject requestBody, String requestId) {
+    private Future<JsonObject> request(String api, JsonObject requestBody, String requestId) {
         return this.request(api, Map.of(), requestBody, requestId);
     }
 
