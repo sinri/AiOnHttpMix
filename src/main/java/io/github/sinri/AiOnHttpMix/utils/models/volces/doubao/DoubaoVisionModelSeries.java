@@ -11,6 +11,7 @@ public abstract class DoubaoVisionModelSeries extends VolcesVisionModelSeries {
     public final static String NAME_OF_MODEL_SERIES = "DoubaoVisionModelSeries";
 
     public final static String MODEL_NAME_OF_DOUBAO_1d5_VISION_PRO_32K_250115 = "doubao-1.5-vision-pro-32k-250115";
+    public final static String MODEL_NAME_OF_DOUBAO_1d5_THINKING_VISION_PRO_250428 = "doubao-1.5-thinking-vision-pro-250428";
 
     public static DoubaoVisionModelSeries model(String modelName) {
         return new DoubaoVisionModelSeries() {

@@ -10,7 +10,9 @@ import io.github.sinri.AiOnHttpMix.utils.models.volces.VolcesTextModelSeries;
 public abstract class VolcesMoonshotTextModelSeries extends VolcesTextModelSeries {
     public final static String NAME_OF_MODEL_SERIES = "VolcesMoonshotChatModelSeries";
 
+    @Deprecated
     public static final String MODEL_NAME_OF_MOONSHOT_V1_8k = "moonshot-v1-8k";
+    @Deprecated
     public static final String MODEL_NAME_OF_MOONSHOT_V1_32k = "moonshot-v1-32k";
     public static final String MODEL_NAME_OF_MOONSHOT_V1_128k = "moonshot-v1-128k";
 

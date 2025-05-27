@@ -22,6 +22,10 @@ import java.util.List;
 
 public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
 
+    static MixChatResponse wrap(JsonObject jsonObject) {
+        return new MixChatResponseImpl(jsonObject);
+    }
+
     @Deprecated
     private static <T extends ToolCall> void handleToolCalls(List<T> toolCalls, JsonObject j) {
         if (!toolCalls.isEmpty()) {

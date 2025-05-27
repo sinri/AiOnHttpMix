@@ -1,6 +1,5 @@
 package io.github.sinri.AiOnHttpMix.provider.azure.openai;
 
-import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.OTextModelSeries;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 
 import javax.annotation.Nonnull;
@@ -12,13 +11,13 @@ import java.util.List;
 public class OpenAIConfigElement extends KeelConfigElement {
 
     public OpenAIConfigElement(
-            OTextModelSeries model,
+            String model,
             String apiKey,
             String resourceName,
             String deployment,
             String apiVersion
     ) {
-        super(model.getModelName());
+        super(model);
         this.ensureChild("apiKey").setValue(apiKey);
         this.ensureChild("resourceName").setValue(resourceName);
         this.ensureChild("deployment").setValue(deployment);

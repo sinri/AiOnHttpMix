@@ -12,6 +12,8 @@ public abstract class DoubaoTextModelSeries extends VolcesTextModelSeries {
 
 
     public final static String MODEL_NAME_OF_DOUBAO_PRO_32K = "doubao-pro-32k";
+    public final static String MODEL_NAME_OF_DOUBAO_PRO_128K = "doubao-pro-128k";
+    public final static String MODEL_NAME_OF_DOUBAO_PRO_256K = "doubao-pro-256k";
     public final static String MODEL_NAME_OF_DOUBAO_1D5_THINKING_PRO_250415 = "doubao-1.5-thinking-pro-250415";
 
     public static DoubaoTextModelSeries model(String modelName) {
