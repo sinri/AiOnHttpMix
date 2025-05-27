@@ -8,7 +8,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import org.junit.Test;
 
-public class MirageSyncUnitTest extends AbstractMirageUnitTest {
+public class MirageStreamUnitTest extends AbstractMirageUnitTest {
     @Test
     public void test1() {
         AigcMix.enableVerboseLogger();
@@ -23,19 +23,17 @@ public class MirageSyncUnitTest extends AbstractMirageUnitTest {
                             )
                     );
 
-            return getMirageKit().requestSync(
+            return getMirageKit().requestStream(
                                          SupportedModelEnum.ChatGPT4o.name(),
                                          true,
-                                         requestEntity
+                                         requestEntity,
+                                         s -> {
+                                             getUnitTestLogger().info("fragment: \n" + s);
+                                             return Future.succeededFuture();
+                                         }
                                  )
                                  .compose(resp -> {
-                                     getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
-
-                                     MixChatMessage message = resp.getMessage();
-                                     String role = message.getRole();
-                                     String textContent = message.getTextContent();
-                                     getUnitTestLogger().info(role + ":" + textContent);
-
+                                     getUnitTestLogger().info("fin");
                                      return Future.succeededFuture();
                                  });
         });

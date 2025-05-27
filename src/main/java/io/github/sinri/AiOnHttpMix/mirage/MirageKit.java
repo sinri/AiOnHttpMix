@@ -2,8 +2,13 @@ package io.github.sinri.AiOnHttpMix.mirage;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.vertx.core.Future;
+import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
+
+import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
@@ -22,11 +27,7 @@ public class MirageKit {
         return mirageDomain;
     }
 
-    protected JsonObject buildRequestBody(
-            String model,
-            boolean useNyaCode,
-            MirageRequestEntity llmRequestBody
-    ) {
+    protected JsonObject buildRequestBody(String model, boolean useNyaCode, MirageRequestEntity llmRequestBody) {
         return buildRequestBody(
                 model,
                 useNyaCode,
@@ -37,14 +38,9 @@ public class MirageKit {
 
     /**
      * @param model      模型的定义，一般约定使用 {@link io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum} 。
-     *                   param service    对应模型定义在Mirage服务内提供的服务；当同一个模型有不同部署时，通过服务区分。
      * @param useNyaCode 传输内容是否使用NyaCode编码绕过防火墙。
      */
-    private JsonObject buildRequestBody(
-            String model,
-            boolean useNyaCode,
-            JsonObject llmRequestBody
-    ) {
+    private JsonObject buildRequestBody(String model, boolean useNyaCode, JsonObject llmRequestBody) {
         var timestamp = System.currentTimeMillis();
         String checksum = Keel.digestHelper().md5(clientCode + "@" + timestamp + "@" + clientSecret);
 
@@ -63,11 +59,7 @@ public class MirageKit {
         return body;
     }
 
-    public Future<MixChatResponse> requestSync(
-            String model,
-            boolean useNyaCode,
-            MirageRequestEntity llmRequestBody
-    ) {
+    public Future<MixChatResponse> requestSync(String model, boolean useNyaCode, MirageRequestEntity llmRequestBody) {
         var body = buildRequestBody(
                 model,
                 useNyaCode,
@@ -93,5 +85,29 @@ public class MirageKit {
                                 return Future.succeededFuture(mixChatResponse);
                             });
         });
+    }
+
+    public Future<Void> requestStream(String model, boolean useNyaCode, MirageRequestEntity llmRequestBody, Function<String, Future<Void>> func) {
+        var body = buildRequestBody(
+                model,
+                useNyaCode,
+                llmRequestBody
+        );
+        return ServiceAdapter.callStreamWithCutter(
+                new HttpClientOptions()
+                        .setKeepAlive(true)
+                        .setSsl(true)
+                        .setDefaultHost(getMirageDomain())
+                        .setDefaultPort(443),
+                client -> client
+                        .request(HttpMethod.POST, "/mirage/aigc/llm/stream")
+                        .compose(httpClientRequest -> {
+                            httpClientRequest.putHeader("Content-Type", "application/json");
+                            return httpClientRequest
+                                    .send(body.toString());
+                        }),
+                func,
+                llmRequestBody.getMaxExecutionSeconds() * 1000L
+        );
     }
 }

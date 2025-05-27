@@ -5,6 +5,8 @@ import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 
+import java.util.Objects;
+
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class MirageRequestEntity extends JsonifiableEntityImpl<MirageRequestEntity> {
@@ -25,5 +27,9 @@ public class MirageRequestEntity extends JsonifiableEntityImpl<MirageRequestEnti
     @Override
     public MirageRequestEntity getImplementation() {
         return this;
+    }
+
+    public Integer getMaxExecutionSeconds() {
+        return Objects.requireNonNullElse(readInteger("max_execution_seconds"),180);
     }
 }
