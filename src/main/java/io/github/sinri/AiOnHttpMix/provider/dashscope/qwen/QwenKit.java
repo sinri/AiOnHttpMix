@@ -98,6 +98,6 @@ public class QwenKit implements ServiceKit<QwenRequest, QwenResponse, QwenRespon
                 return Future.failedFuture(throwable);
             }
         }, cutterTimeout, requestId)
-                .compose(v -> Future.succeededFuture(qwenResponseBuffer.toQwenResponse()));
+                .compose(v -> Future.succeededFuture(qwenResponseBuffer.build()));
     }
 }

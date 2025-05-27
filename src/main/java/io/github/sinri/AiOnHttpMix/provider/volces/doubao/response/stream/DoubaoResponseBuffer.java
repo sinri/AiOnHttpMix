@@ -3,6 +3,7 @@ package io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageInResponse;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponse;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
+import io.github.sinri.AiOnHttpMix.utils.StreamPieceCollector;
 import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
@@ -16,7 +17,7 @@ import java.util.Objects;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-public class DoubaoResponseBuffer {
+public class DoubaoResponseBuffer implements StreamPieceCollector<DoubaoResponseChunk, DoubaoResponse> {
     private final Map<Integer, DoubaoResponseChoiceBuffer> choiceBufferMap;
     private String id;
     private String model;
@@ -52,6 +53,7 @@ public class DoubaoResponseBuffer {
         }
     }
 
+    @Override
     public DoubaoResponse build() {
         JsonObject j = new JsonObject();
         j.put("id", id);
@@ -71,7 +73,7 @@ public class DoubaoResponseBuffer {
         return DoubaoResponse.wrap(j);
     }
 
-    private static class DoubaoResponseChoiceBuffer {
+    private static class DoubaoResponseChoiceBuffer implements StreamPieceCollector<DoubaoResponseChunkChoice, DoubaoResponseChoice> {
         private final DoubaoMessageInResponseBuffer messageBuffer;
         private Integer index;
         private String finishReason;
@@ -92,6 +94,7 @@ public class DoubaoResponseBuffer {
             messageBuffer.accept(delta);
         }
 
+        @Override
         public DoubaoResponseChoice build() {
             JsonObject j = new JsonObject();
             j.put("index", index);
@@ -103,7 +106,7 @@ public class DoubaoResponseBuffer {
 
     }
 
-    private static class DoubaoMessageInResponseBuffer {
+    private static class DoubaoMessageInResponseBuffer implements StreamPieceCollector<DoubaoResponseChunkChoiceDelta, DoubaoMessageInResponse> {
         private final StringBuilder reasoningContentBuffer = new StringBuilder();
         private final StringBuilder contentBuffer = new StringBuilder();
         private final Map<Integer, DoubaoToolCallBuffer> toolCallBufferMap;
@@ -134,6 +137,7 @@ public class DoubaoResponseBuffer {
             }
         }
 
+        @Override
         public DoubaoMessageInResponse build() {
             JsonObject j = new JsonObject();
             j.put("role", role);
@@ -154,7 +158,7 @@ public class DoubaoResponseBuffer {
         }
     }
 
-    private static class DoubaoToolCallBuffer {
+    private static class DoubaoToolCallBuffer implements StreamPieceCollector<CommonToolCall, CommonToolCall> {
         private final DoubaoFunctionToolCallBuffer functionToolCallBuffer = new DoubaoFunctionToolCallBuffer();
         private String toolCallId;
         private String type;
@@ -176,6 +180,7 @@ public class DoubaoResponseBuffer {
             }
         }
 
+        @Override
         public CommonToolCall build() {
             JsonObject j = new JsonObject();
             j.put("index", index);
@@ -188,7 +193,7 @@ public class DoubaoResponseBuffer {
         }
     }
 
-    private static class DoubaoFunctionToolCallBuffer {
+    private static class DoubaoFunctionToolCallBuffer implements StreamPieceCollector<FunctionToolCall, FunctionToolCall> {
         private final StringBuilder nameBuffer = new StringBuilder();
         private final StringBuilder argumentsBuffer = new StringBuilder();
 
@@ -203,6 +208,7 @@ public class DoubaoResponseBuffer {
             }
         }
 
+        @Override
         public FunctionToolCall build() {
             JsonObject j = new JsonObject();
             j.put("name", nameBuffer.toString());

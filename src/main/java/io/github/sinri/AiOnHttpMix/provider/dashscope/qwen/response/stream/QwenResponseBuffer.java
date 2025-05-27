@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-public class QwenResponseBuffer {
+public class QwenResponseBuffer implements StreamPieceCollector<QwenResponseChunk, QwenResponse> {
     private final UsageBuffer usageBuffer;
     private final OutputBuffer outputBuffer;
     private String requestId;
@@ -39,16 +39,16 @@ public class QwenResponseBuffer {
         outputBuffer.accept(output);
     }
 
-    public QwenResponse toQwenResponse() {
-
+    @Override
+    public QwenResponse build() {
         return QwenResponse.wrap(new JsonObject()
                 .put("request_id", requestId)
-                .put("usage", usageBuffer.toUsage())
-                .put("output", outputBuffer.toOutput().cloneAsJsonObject())
+                .put("usage", usageBuffer.build())
+                .put("output", outputBuffer.build().cloneAsJsonObject())
         );
     }
 
-    public static class OutputBuffer {
+    public static class OutputBuffer implements StreamPieceCollector<QwenResponseOutput, QwenResponseOutput> {
         private final Map<Integer, ChoiceBuffer> choiceBufferMap = new HashMap<>();
 
         public OutputBuffer() {
@@ -64,11 +64,12 @@ public class QwenResponseBuffer {
             }
         }
 
-        public QwenResponseOutput toOutput() {
+        @Override
+        public QwenResponseOutput build() {
             JsonArray choices = new JsonArray();
             for (int i = 0; i < choiceBufferMap.size(); i++) {
                 ChoiceBuffer choiceBuffer = choiceBufferMap.get(i);
-                QwenResponseOutputChoice choice = choiceBuffer.toChoice();
+                QwenResponseOutputChoice choice = choiceBuffer.build();
                 choices.add(choice.cloneAsJsonObject());
             }
             return QwenResponseOutput.wrap(new JsonObject()
@@ -76,7 +77,7 @@ public class QwenResponseBuffer {
         }
     }
 
-    public static class ChoiceBuffer {
+    public static class ChoiceBuffer implements StreamPieceCollector<QwenResponseOutputChoice, QwenResponseOutputChoice> {
         private final MessageBuffer messageBuffer;
         private String finishReason;
 
@@ -91,15 +92,16 @@ public class QwenResponseBuffer {
             messageBuffer.accept(message);
         }
 
-        public QwenResponseOutputChoice toChoice() {
+        @Override
+        public QwenResponseOutputChoice build() {
             return QwenResponseOutputChoice.wrap(new JsonObject()
                     .put("finish_reason", finishReason)
-                    .put("message", messageBuffer.toMessage().cloneAsJsonObject())
+                    .put("message", messageBuffer.build().cloneAsJsonObject())
             );
         }
     }
 
-    public static class MessageBuffer {
+    public static class MessageBuffer implements StreamPieceCollector<QwenMessageInResponse, QwenMessageInResponse> {
         private final Map<Integer, ContentOfTextBuffer> contentBufferMap;
         private final StringBuilder content;
         private final StringBuilder reasoningContent;
@@ -141,7 +143,8 @@ public class QwenResponseBuffer {
             }
         }
 
-        public QwenMessageInResponse toMessage() {
+        @Override
+        public QwenMessageInResponse build() {
             JsonObject x = new JsonObject()
                     .put("role", role);
             if (contentBufferMap.isEmpty()) {
@@ -162,7 +165,7 @@ public class QwenResponseBuffer {
                 JsonArray toolCallArray = new JsonArray();
                 for (int i = 0; i < toolCallBufferMap.size(); i++) {
                     ToolCallBuffer toolCallBuffer = toolCallBufferMap.get(i);
-                    toolCallArray.add(toolCallBuffer.toToolCall().toJsonObject());
+                    toolCallArray.add(toolCallBuffer.build().toJsonObject());
                 }
                 x.put("tool_calls", toolCallArray);
             }
@@ -188,7 +191,7 @@ public class QwenResponseBuffer {
         }
     }
 
-    public static class ToolCallBuffer {
+    public static class ToolCallBuffer implements StreamPieceCollector<ToolCall, ToolCall> {
         private final FunctionToolCallBuffer functionToolCallBuffer;
         private String toolCallId;
         private Integer index;
@@ -209,17 +212,18 @@ public class QwenResponseBuffer {
             functionToolCallBuffer.accept(function);
         }
 
-        public ToolCall toToolCall() {
+        @Override
+        public ToolCall build() {
             return new CommonToolCall(new JsonObject()
                     .put("id", toolCallId)
                     .put("index", index)
                     .put("type", type)
-                    .put("function", functionToolCallBuffer.toFunctionToolCall().cloneAsJsonObject())
+                    .put("function", functionToolCallBuffer.build().cloneAsJsonObject())
             );
         }
     }
 
-    public static class FunctionToolCallBuffer {
+    public static class FunctionToolCallBuffer implements StreamPieceCollector<FunctionToolCall, CommonFunctionToolCall> {
         private final StringBuilder nameBuffer = new StringBuilder();
         private final StringBuilder argumentsBuffer = new StringBuilder();
 
@@ -238,7 +242,8 @@ public class QwenResponseBuffer {
             }
         }
 
-        public CommonFunctionToolCall toFunctionToolCall() {
+        @Override
+        public CommonFunctionToolCall build() {
             return new CommonFunctionToolCall(new JsonObject()
                     .put("name", nameBuffer.toString())
                     .put("arguments", argumentsBuffer.toString())
@@ -246,7 +251,7 @@ public class QwenResponseBuffer {
         }
     }
 
-    public static class UsageBuffer {
+    public static class UsageBuffer implements StreamPieceCollector<JsonObject, JsonObject> {
         private int total_tokens = 0;
         private int input_tokens = 0;
         private int output_tokens = 0;
@@ -261,7 +266,8 @@ public class QwenResponseBuffer {
             output_tokens += usage.getInteger("output_tokens");
         }
 
-        public JsonObject toUsage() {
+        @Override
+        public JsonObject build() {
             return new JsonObject()
                     .put("total_tokens", total_tokens)
                     .put("input_tokens", input_tokens)
