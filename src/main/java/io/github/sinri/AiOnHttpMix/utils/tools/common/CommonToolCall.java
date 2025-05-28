@@ -7,6 +7,11 @@ import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 
+/**
+ * 通用工具调用实现。
+ * 
+ * @since 2.0.0
+ */
 public class CommonToolCall extends JsonifiableEntityImpl<ToolCall> implements ToolCall {
     public CommonToolCall(JsonObject jsonObject) {
         super(jsonObject);

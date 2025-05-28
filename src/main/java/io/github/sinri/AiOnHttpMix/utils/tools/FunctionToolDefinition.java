@@ -42,11 +42,11 @@ public interface FunctionToolDefinition extends JsonifiableEntity<FunctionToolDe
         return write("description", description);
     }
 
-
     /**
      * @return 工具的参数描述，需要是一个合法的JSON Schema。
      *         如果parameters参数为空，表示function没有入参。
-     * @see <a href="https://json-schema.org/understanding-json-schema">JSON Schema</a>
+     * @see <a href="https://json-schema.org/understanding-json-schema">JSON
+     *      Schema</a>
      */
     default JsonObject parameters() {
         return readJsonObject("parameters");
@@ -54,7 +54,8 @@ public interface FunctionToolDefinition extends JsonifiableEntity<FunctionToolDe
 
     /**
      * @param parameters 工具的参数描述，需要是一个合法的JSON Schema。
-     * @see <a href="https://json-schema.org/understanding-json-schema">JSON Schema</a>
+     * @see <a href="https://json-schema.org/understanding-json-schema">JSON
+     *      Schema</a>
      */
     default FunctionToolDefinition parameters(@Nullable JsonObject parameters) {
         return write("parameters", parameters);
@@ -69,15 +70,29 @@ public interface FunctionToolDefinition extends JsonifiableEntity<FunctionToolDe
         return parameters(objectSchemaBuilder.toJson());
     }
 
+    /**
+     * 通过参数定义列表设置工具的参数描述。
+     * 如果参数定义列表为空，则设置parameters为null，表示函数没有入参。
+     * 
+     * @param parameterDefinitions 参数定义列表，每个元素包含参数的类型、名称、描述和是否必需等信息
+     * @return 当前FunctionToolDefinition实例，支持链式调用
+     */
     default FunctionToolDefinition parameters(@Nonnull List<FunctionParameterDefinition> parameterDefinitions) {
         if (parameterDefinitions.isEmpty()) {
             return parameters((JsonObject) null);
         }
-        return parameters(builder -> parameterDefinitions.forEach(parameterDefinition -> builder.property(
-                parameterDefinition.getName(),
-                Schemas.schema()
-                       .type(parameterDefinition.getType())
-                       .withKeyword("description", parameterDefinition.getDescription())
-        )));
+        return parameters(builder -> {
+            parameterDefinitions.forEach(parameterDefinition -> {
+                var x = Schemas.schema()
+                        .type(parameterDefinition.getType())
+                        .withKeyword("description", parameterDefinition.getDescription());
+                if (parameterDefinition.getRequired() != null) {
+                    builder.requiredProperty(parameterDefinition.getName(), x);
+                } else {
+                    builder.property(parameterDefinition.getName(), x);
+                }
+            });
+
+        });
     }
 }

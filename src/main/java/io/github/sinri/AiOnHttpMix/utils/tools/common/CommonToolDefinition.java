@@ -7,6 +7,11 @@ import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 
+/**
+ * 通用工具定义实现。
+ * 
+ * @since 2.0.0
+ */
 public class CommonToolDefinition extends JsonifiableEntityImpl<ToolDefinition> implements ToolDefinition {
     public CommonToolDefinition() {
         this(new JsonObject());
