@@ -2,17 +2,20 @@ package io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt;
 
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.core.filter.OpenAIPromptFilterResults;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.request.GPTRequest;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPTResponseBuffer;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPTResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPTResponseFragment;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.sync.GPTResponse;
+import io.github.sinri.AiOnHttpMix.utils.FilteredRequest;
 import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.ServiceKit;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
+import java.util.List;
 import java.util.function.Function;
 
 public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseChunk> {
@@ -37,7 +40,19 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
                                      chatModel,
                                      request.toJsonObject(),
                                      requestId)
-                             .compose(jsonObject -> Future.succeededFuture(GPTResponse.wrap(jsonObject)));
+                             .compose(jsonObject -> Future.succeededFuture(GPTResponse.wrap(jsonObject)))
+                             .compose(resp -> {
+                                 List<OpenAIPromptFilterResults> promptFilterResults = resp.getPromptFilterResults();
+                                 if (promptFilterResults.stream()
+                                                        .filter(pfr -> pfr.getContentFilterResults()
+                                                                          .whetherFiltered())
+                                                        .findFirst()
+                                                        .isEmpty()) {
+                                     return Future.succeededFuture(resp);
+                                 } else {
+                                     throw new FilteredRequest();
+                                 }
+                             });
     }
 
     @Override
@@ -68,6 +83,7 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
                 chatModel,
                 request.toJsonObject(),
                 fragment -> {
+                    AigcMix.getVerboseLogger().info("fragment:\n" + fragment);
                     try {
                         GPTResponseFragment f = GPTResponseFragment.wrap(fragment);
                         JsonObject data = f.getData();
@@ -99,6 +115,7 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
                 chatModel,
                 request,
                 chunk -> {
+                    AigcMix.getVerboseLogger().info("chunk:", chunk.cloneAsJsonObject());
                     buffer.accept(chunk);
                     return Future.succeededFuture();
                 },

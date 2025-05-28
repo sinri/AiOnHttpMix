@@ -22,6 +22,8 @@ public interface MixChatRequest extends JsonifiableEntity<MixChatRequest> {
         return new MixChatRequestImpl(jsonObject);
     }
 
+    SupportedModelEnum getSupportedModelEnum();
+
     MixChatRequest setSupportedModelEnum(SupportedModelEnum supportedModelEnum);
 
     ChatModel getChatModel();

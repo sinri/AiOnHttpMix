@@ -17,10 +17,14 @@ public class MirageKit {
     private final String clientCode;
     private final String clientSecret;
 
-    public MirageKit(String mirageDomain, String clientCode, String clientSecret) {
+    private MirageKit(String mirageDomain, String clientCode, String clientSecret) {
         this.mirageDomain = mirageDomain;
         this.clientCode = clientCode;
         this.clientSecret = clientSecret;
+    }
+
+    public MirageKit(MirageConfigElement configElement) {
+        this(configElement.getDomain(), configElement.getClientCode(), configElement.getClientSecret());
     }
 
     public String getMirageDomain() {

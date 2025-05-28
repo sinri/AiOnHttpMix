@@ -22,6 +22,8 @@ public class GPTResponseBuffer implements StreamPieceCollector<GPTResponseChunk,
     private String object;
     private Integer created;
 
+    private final JsonArray promptFilterResults = new JsonArray();
+
     public GPTResponseBuffer() {
 
     }
@@ -48,6 +50,9 @@ public class GPTResponseBuffer implements StreamPieceCollector<GPTResponseChunk,
                 choiceBufferMap.computeIfAbsent(i, k -> new ChoiceBuffer()).accept(choice);
             }
         }
+
+        piece.getPromptFilterResults()
+             .forEach(pfr -> this.promptFilterResults.add(pfr.cloneAsJsonObject()));
     }
 
     @Override
@@ -61,6 +66,7 @@ public class GPTResponseBuffer implements StreamPieceCollector<GPTResponseChunk,
                                                       .map(ChoiceBuffer::build)
                                                       .map(UnmodifiableJsonifiableEntity::cloneAsJsonObject)
                                                       .toList()));
+        j.put("prompt_filter_results", this.promptFilterResults);
         return GPTResponse.wrap(j);
     }
 

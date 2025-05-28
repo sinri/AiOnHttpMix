@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream;
 
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.core.filter.OpenAIPromptFilterResults;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
@@ -26,8 +27,10 @@ public interface GPTResponseChunk extends UnmodifiableJsonifiableEntity {
         return this.readString("object");
     }
 
-    default List<JsonObject> getPromptFilterResults() {
-        return readJsonObjectArray("prompt_filter_results");
+    default List<OpenAIPromptFilterResults> getPromptFilterResults() {
+        var a = readJsonObjectArray("prompt_filter_results");
+        if (a == null) return List.of();
+        return a.stream().map(OpenAIPromptFilterResults::wrap).toList();
     }
 
     default List<GPTResponseChunkChoice> getChoices() {

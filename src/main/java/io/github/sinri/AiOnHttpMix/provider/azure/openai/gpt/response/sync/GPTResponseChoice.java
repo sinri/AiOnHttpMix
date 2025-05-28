@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.sync;
 
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.core.filter.OpenAIContentFilterChoiceResults;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.message.GPTMessageInResponse;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
@@ -9,8 +10,10 @@ public interface GPTResponseChoice extends UnmodifiableJsonifiableEntity {
         return new GPTResponseChoiceImpl(jsonObject);
     }
 
-    default JsonObject getContentFilterResults() {
-        return readJsonObject("content_filter_results");
+    default OpenAIContentFilterChoiceResults getContentFilterResults() {
+        var x = readJsonObject("content_filter_results");
+        if (x == null) x = new JsonObject();
+        return OpenAIContentFilterChoiceResults.wrap(x);
     }
 
     default String getFinishReason() {
