@@ -16,8 +16,8 @@ public interface MixTextStreamNonFCMixin extends MixCoreMixin {
                                                                 .setRole("user")
                                                                 .setTextContent("文明VI里面埃里温城邦的加成是什么")
                                       ),
-                        fragment -> {
-                            getUnitTestLogger().info("fragment: \n" + fragment);
+                        fragmentData -> {
+                            getUnitTestLogger().info("fragment data: \n" + fragmentData);
                             return Future.succeededFuture();
                         }
                 )

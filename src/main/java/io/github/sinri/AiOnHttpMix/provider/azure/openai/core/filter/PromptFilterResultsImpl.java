@@ -4,7 +4,7 @@ import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntityImpl;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
-import java.util.Objects;
+import javax.annotation.Nullable;
 
 final class PromptFilterResultsImpl extends UnmodifiableJsonifiableEntityImpl implements OpenAIPromptFilterResults {
     public PromptFilterResultsImpl(@Nonnull JsonObject jsonObject) {
@@ -12,8 +12,10 @@ final class PromptFilterResultsImpl extends UnmodifiableJsonifiableEntityImpl im
     }
 
     @Override
+    @Nullable
     public OpenAIContentFilterPromptResults getContentFilterResults() {
-        JsonObject contentFilterResults = readJsonObject("content_filter_results");
-        return new ContentFilterPromptResultsImpl(Objects.requireNonNull(contentFilterResults));
+        JsonObject cfr = readJsonObject("content_filter_results");
+        if (cfr == null) return null;
+        return new ContentFilterPromptResultsImpl(cfr);
     }
 }

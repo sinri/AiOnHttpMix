@@ -1,11 +1,16 @@
 package io.github.sinri.AiOnHttpMix.test.unit.mix.withMirage.text;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum;
 import io.github.sinri.AiOnHttpMix.test.unit.mix.mixin.chat.MixTextStreamNonFCMixin;
 import io.github.sinri.AiOnHttpMix.test.unit.mix.withMirage.AbstractMixMirageUnitTest;
 import org.junit.Test;
 
 public class MixMirageTextStreamNonFCUnitTest extends AbstractMixMirageUnitTest implements MixTextStreamNonFCMixin {
+    public MixMirageTextStreamNonFCUnitTest() {
+        super();
+        AigcMix.enableVerboseLogger();
+    }
 
 
     @Test

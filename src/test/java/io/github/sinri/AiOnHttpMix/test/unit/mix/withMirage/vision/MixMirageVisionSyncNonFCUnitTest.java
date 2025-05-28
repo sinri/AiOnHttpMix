@@ -7,6 +7,11 @@ import io.github.sinri.AiOnHttpMix.test.unit.mix.withMirage.AbstractMixMirageUni
 import org.junit.Test;
 
 public class MixMirageVisionSyncNonFCUnitTest extends AbstractMixMirageUnitTest implements MixVisionSyncNonFCMixin {
+    public MixMirageVisionSyncNonFCUnitTest() {
+        super();
+        AigcMix.enableVerboseLogger();
+    }
+
     @Test
     public void testSyncSimpleForGPT() {
         async(() -> toTestSync(SupportedModelEnum.ChatGPT4o));

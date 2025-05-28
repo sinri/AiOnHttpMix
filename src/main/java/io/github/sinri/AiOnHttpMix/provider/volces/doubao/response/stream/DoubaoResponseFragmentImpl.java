@@ -1,24 +1,26 @@
 package io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream;
 
+import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 class DoubaoResponseFragmentImpl implements DoubaoResponseFragment {
-    private String data;
+    private final String data;
 
     public DoubaoResponseFragmentImpl(String s) {
-        String[] lines = s.split("[\r\n]+");
-        for (var line : lines) {
-            String[] pair = line.split(":\\s*", 2);
-            if (pair.length == 2) {
-                if (Objects.equals("data", pair[0])) {
-                    data = pair[1];
-                    break;
-                }
-            }
-        }
+        //        String[] lines = s.split("[\r\n]+");
+        //        for (var line : lines) {
+        //            String[] pair = line.split(":\\s*", 2);
+        //            if (pair.length == 2) {
+        //                if (Objects.equals("data", pair[0])) {
+        //                    data = pair[1];
+        //                    break;
+        //                }
+        //            }
+        //        }
+
+        this.data = ServiceAdapter.extractFragmentData(s);
     }
 
     @Override

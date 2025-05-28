@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.mix.service;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
@@ -13,6 +14,7 @@ import io.github.sinri.AiOnHttpMix.utils.specification.GPTModelSpecification;
 import io.github.sinri.AiOnHttpMix.utils.specification.VolcesModelSpecification;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 
 import java.util.function.Function;
 
@@ -54,7 +56,7 @@ public class NativeMixServiceAdapter extends MixServiceAdapter {
     }
 
     @Override
-    public Future<Void> requestStream(MixChatRequest request, Function<String, Future<Void>> fragmentHandler) {
+    public Future<Void> requestStream(MixChatRequest request, Function<JsonObject, Future<Void>> fragmentDataHandler) {
         var chatModel = request.getChatModel();
         if (chatModel instanceof GPTModelSpecification) {
             var serviceAdapter = chatModel.buildServiceAdapter(getConfig().extract("azure", "openai"));
@@ -62,7 +64,18 @@ public class NativeMixServiceAdapter extends MixServiceAdapter {
             return serviceKit.chatStream(
                     chatModel,
                     request.toGPTRequest().toJsonObject(),
-                    fragmentHandler,
+                    fragment -> {
+                        return GPTKit.parseStreamFragmentToChunk(fragment)
+                                     .compose(chunk -> {
+                                         if (chunk != null) {
+                                             return fragmentDataHandler.apply(chunk.cloneAsJsonObject());
+                                         } else {
+                                             AigcMix.getVerboseLogger()
+                                                    .warning("chunk parsed from this fragment is null: " + fragment);
+                                         }
+                                         return Future.succeededFuture();
+                                     });
+                    },
                     request.getTimeout(),
                     request.getRequestId()
             );
@@ -72,7 +85,15 @@ public class NativeMixServiceAdapter extends MixServiceAdapter {
             return serviceKit.chatStream(
                     chatModel,
                     request.toDoubaoRequest().toJsonObject(),
-                    fragmentHandler,
+                    fragment -> {
+                        return VolcesKit.parseStreamFragmentToChunk(fragment)
+                                        .compose(chunk -> {
+                                            if (chunk != null) {
+                                                return fragmentDataHandler.apply(chunk.cloneAsJsonObject());
+                                            }
+                                            return Future.succeededFuture();
+                                        });
+                    },
                     request.getTimeout(),
                     request.getRequestId()
             );
@@ -82,7 +103,15 @@ public class NativeMixServiceAdapter extends MixServiceAdapter {
             return serviceKit.chatStream(
                     chatModel,
                     request.toQwenRequest().toJsonObject(),
-                    fragmentHandler,
+                    fragment -> {
+                        return QwenKit.parseStreamFragmentToChunk(fragment)
+                                      .compose(chunk -> {
+                                          if (chunk != null) {
+                                              return fragmentDataHandler.apply(chunk.cloneAsJsonObject());
+                                          }
+                                          return Future.succeededFuture();
+                                      });
+                    },
                     request.getTimeout(),
                     request.getRequestId()
             );

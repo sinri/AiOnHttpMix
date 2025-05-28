@@ -9,6 +9,8 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonObject;
 
+import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
@@ -20,6 +22,20 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @since 2.0.0
  */
 public interface ServiceAdapter {
+
+    @Nullable
+    static String extractFragmentData(String fragment) {
+        var lines = fragment.split("[\r\n]+");
+        for (var line : lines) {
+            var pair = line.split(":\\s*", 2);
+            if (pair.length == 2) {
+                if (Objects.equals(pair[0], "data")) {
+                    return pair[1];
+                }
+            }
+        }
+        return null;
+    }
 
     static Future<Void> callStreamWithCutter(
             HttpClientOptions httpClientOptions,

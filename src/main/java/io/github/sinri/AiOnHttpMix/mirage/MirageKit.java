@@ -35,6 +35,40 @@ public class MirageKit {
         this(configElement.getDomain(), configElement.getClientCode(), configElement.getClientSecret());
     }
 
+    /**
+     * 根据指定的ChatModel语法，构建一个Function；
+     * 其入参为Fragment（未解析之前的SSE的原始Fragment字符串）；
+     * 其输出为一个Chunk的JsonObject格式字符串表达。
+     */
+    private static Function<String, Future<JsonObject>> getTransformerOfFragmentToDataForChatModel(ChatModel chatModel) {
+        Function<String, Future<JsonObject>> transformer;
+        if (chatModel instanceof GPTModelSpecification) {
+            transformer = fragment -> {
+                return GPTKit.parseStreamFragmentToChunk(fragment)
+                             .compose(chunk -> {
+                                 return Future.succeededFuture(chunk.cloneAsJsonObject());
+                             });
+            };
+        } else if (chatModel instanceof VolcesModelSpecification) {
+            transformer = fragment -> {
+                return VolcesKit.parseStreamFragmentToChunk(fragment)
+                                .compose(chunk -> {
+                                    return Future.succeededFuture(chunk.cloneAsJsonObject());
+                                });
+            };
+        } else if (chatModel instanceof DashscopeModelSpecification) {
+            transformer = fragment -> {
+                return QwenKit.parseStreamFragmentToChunk(fragment)
+                              .compose(chunk -> {
+                                  return Future.succeededFuture(chunk.cloneAsJsonObject());
+                              });
+            };
+        } else {
+            throw new IllegalArgumentException("model is not supported");
+        }
+        return transformer;
+    }
+
     public String getMirageDomain() {
         return mirageDomain;
     }
@@ -88,37 +122,11 @@ public class MirageKit {
         });
     }
 
-    public Future<Void> requestStream(boolean useNyaCode, MixChatRequest mixChatRequest, Function<String, Future<Void>> func) {
+    public Future<Void> requestStream(boolean useNyaCode, MixChatRequest mixChatRequest, Function<String, Future<Void>> fragmentDataProcessor) {
         var body = buildRequestBody(useNyaCode, mixChatRequest);
 
         ChatModel chatModel = mixChatRequest.getChatModel();
-
-        Function<String, Future<JsonObject>> transformer;
-        if (chatModel instanceof GPTModelSpecification) {
-            transformer = fragment -> {
-                return GPTKit.parseStreamFragmentToChunk(fragment)
-                             .compose(chunk -> {
-                                 return Future.succeededFuture(chunk.cloneAsJsonObject());
-                             });
-            };
-        } else if (chatModel instanceof VolcesModelSpecification) {
-            transformer = fragment -> {
-                return VolcesKit.parseStreamFragmentToChunk(fragment)
-                                .compose(chunk -> {
-                                    return Future.succeededFuture(chunk.cloneAsJsonObject());
-                                });
-            };
-        } else if (chatModel instanceof DashscopeModelSpecification) {
-            transformer = fragment -> {
-                return QwenKit.parseStreamFragmentToChunk(fragment)
-                              .compose(chunk -> {
-                                  return Future.succeededFuture(chunk.cloneAsJsonObject());
-                              });
-            };
-        } else {
-            throw new IllegalArgumentException("model is not supported");
-        }
-
+        Function<String, Future<JsonObject>> transformerOfFragmentToData = getTransformerOfFragmentToDataForChatModel(chatModel);
 
         return ServiceAdapter.callStreamWithCutter(
                 new HttpClientOptions()
@@ -134,10 +142,10 @@ public class MirageKit {
                                     .send(body.toString());
                         }),
                 fragment -> {
-                    return transformer.apply(fragment)
-                                      .compose(jsonObject -> {
-                                          return func.apply(jsonObject.toString());
-                                      });
+                    return transformerOfFragmentToData.apply(fragment)
+                                                      .compose(jsonObject -> {
+                                                          return fragmentDataProcessor.apply(jsonObject.toString());
+                                                      });
                 },
                 mixChatRequest.getTimeout()
         );

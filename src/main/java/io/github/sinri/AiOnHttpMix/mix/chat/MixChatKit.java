@@ -4,6 +4,7 @@ import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
 import io.github.sinri.AiOnHttpMix.mix.service.MixServiceAdapter;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 
 import java.util.function.Function;
 
@@ -27,9 +28,9 @@ public class MixChatKit {
         return adapter.request(request);
     }
 
-    public Future<Void> chatStream(MixChatRequest request, Function<String, Future<Void>> fragmentHandler) {
+    public Future<Void> chatStream(MixChatRequest request, Function<JsonObject, Future<Void>> fragmentDataHandler) {
         request.setStream(true);
-        return adapter.requestStream(request, fragmentHandler);
+        return adapter.requestStream(request, fragmentDataHandler);
     }
 
     public Future<MixChatResponse> chatStream(MixChatRequest request) {

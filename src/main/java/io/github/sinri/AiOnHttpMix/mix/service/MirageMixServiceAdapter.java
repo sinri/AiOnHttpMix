@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.mix.service;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mirage.MirageConfigElement;
 import io.github.sinri.AiOnHttpMix.mirage.MirageKit;
 import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
@@ -16,6 +17,7 @@ import io.github.sinri.AiOnHttpMix.utils.specification.GPTModelSpecification;
 import io.github.sinri.AiOnHttpMix.utils.specification.VolcesModelSpecification;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -37,8 +39,20 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
     }
 
     @Override
-    public Future<Void> requestStream(MixChatRequest request, Function<String, Future<Void>> fragmentHandler) {
-        return mirageKit.requestStream(true, request, fragmentHandler);
+    public Future<Void> requestStream(MixChatRequest request, Function<JsonObject, Future<Void>> fragmentDataHandler) {
+        return mirageKit.requestStream(true, request, fragmentData -> {
+            AigcMix.getVerboseLogger()
+                   .debug("MirageMixServiceAdapter.requestStream with fragment data: \n" + fragmentData);
+            try {
+                //                String fragmentData = ServiceAdapter.extractFragmentData(fragment);
+                Objects.requireNonNull(fragmentData);
+                var j = new JsonObject(fragmentData);
+                return fragmentDataHandler.apply(j);
+            } catch (Throwable throwable) {
+                AigcMix.getVerboseLogger().exception(throwable);
+                return Future.succeededFuture();
+            }
+        });
     }
 
     @Override
@@ -46,43 +60,43 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
         ChatModel chatModel = request.getChatModel();
         if (chatModel instanceof GPTModelSpecification) {
             GPTResponseBuffer buffer = new GPTResponseBuffer();
-            return requestStream(request, fragment -> GPTKit.handleStreamFragment(
-                    fragment,
-                    chunk -> {
-                        buffer.accept(chunk);
-                        return Future.succeededFuture();
-                    }
-            ))
-                    .compose(v -> {
-                        var x = MixChatResponse.from(buffer.build());
-                        return Future.succeededFuture(x);
-                    });
+            return mirageKit.requestStream(true, request, fragment -> GPTKit.handleStreamFragment(
+                                    fragment,
+                                    chunk -> {
+                                        buffer.accept(chunk);
+                                        return Future.succeededFuture();
+                                    }
+                            ))
+                            .compose(v -> {
+                                var x = MixChatResponse.from(buffer.build());
+                                return Future.succeededFuture(x);
+                            });
         } else if (chatModel instanceof VolcesModelSpecification) {
             DoubaoResponseBuffer buffer = new DoubaoResponseBuffer();
-            return requestStream(request, fragment -> VolcesKit.handleStreamFragment(
-                    fragment,
-                    chunk -> {
-                        buffer.accept(chunk);
-                        return Future.succeededFuture();
-                    }
-            ))
-                    .compose(v -> {
-                        var x = MixChatResponse.from(buffer.build());
-                        return Future.succeededFuture(x);
-                    });
+            return mirageKit.requestStream(true, request, fragment -> VolcesKit.handleStreamFragment(
+                                    fragment,
+                                    chunk -> {
+                                        buffer.accept(chunk);
+                                        return Future.succeededFuture();
+                                    }
+                            ))
+                            .compose(v -> {
+                                var x = MixChatResponse.from(buffer.build());
+                                return Future.succeededFuture(x);
+                            });
         } else if (chatModel instanceof DashscopeModelSpecification) {
             QwenResponseBuffer buffer = new QwenResponseBuffer();
-            return requestStream(request, fragment -> QwenKit.handleStreamFragment(
-                    fragment,
-                    chunk -> {
-                        buffer.accept(chunk);
-                        return Future.succeededFuture();
-                    }
-            ))
-                    .compose(v -> {
-                        var x = MixChatResponse.from(buffer.build());
-                        return Future.succeededFuture(x);
-                    });
+            return mirageKit.requestStream(true, request, fragment -> QwenKit.handleStreamFragment(
+                                    fragment,
+                                    chunk -> {
+                                        buffer.accept(chunk);
+                                        return Future.succeededFuture();
+                                    }
+                            ))
+                            .compose(v -> {
+                                var x = MixChatResponse.from(buffer.build());
+                                return Future.succeededFuture(x);
+                            });
         } else {
             throw new IllegalArgumentException("model is not supported");
         }

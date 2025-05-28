@@ -71,10 +71,12 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
                              .compose(resp -> {
                                  List<OpenAIPromptFilterResults> promptFilterResults = resp.getPromptFilterResults();
                                  if (promptFilterResults.stream()
-                                                        .filter(pfr -> pfr.getContentFilterResults()
-                                                                          .whetherFiltered())
-                                                        .findFirst()
-                                                        .isEmpty()) {
+                                                        .noneMatch(pfr -> {
+                                                            var cfr = pfr.getContentFilterResults();
+                                                            if (cfr == null) return false;
+                                                            return cfr.whetherFiltered();
+                                                        })
+                                 ) {
                                      return Future.succeededFuture(resp);
                                  } else {
                                      throw new FilteredRequest();
