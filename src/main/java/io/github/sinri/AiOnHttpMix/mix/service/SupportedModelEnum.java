@@ -10,9 +10,13 @@ import io.github.sinri.AiOnHttpMix.utils.models.volces.doubao.DoubaoTextModelSer
 import io.github.sinri.AiOnHttpMix.utils.models.volces.doubao.DoubaoVisionModelSeries;
 import io.github.sinri.AiOnHttpMix.utils.models.volces.moonshot.VolcesMoonshotTextModelSeries;
 
+/**
+ * Mix体系内支持的模型枚举。
+ */
 public enum SupportedModelEnum {
     /**
-     * @deprecated use {@link io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum#ChatGPT4}
+     * @deprecated use
+     *             {@link io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum#ChatGPT4}
      */
     @Deprecated
     ChatGPT(GPTTextModelSeries.NAME_OF_MODEL_SERIES, GPTTextModelSeries.MODEL_NAME_OF_GPT_4),
@@ -24,40 +28,57 @@ public enum SupportedModelEnum {
     QwenTurbo(QwenTextModelSeries.NAME_OF_MODEL_SERIES, QwenTextModelSeries.MODEL_NAME_OF_QWEN_TURBO),
     QwenTurboLatest(QwenTextModelSeries.NAME_OF_MODEL_SERIES, QwenTextModelSeries.MODEL_NAME_OF_QWEN_TURBO_LATEST),
     QwenLong(QwenTextModelSeries.NAME_OF_MODEL_SERIES, QwenTextModelSeries.MODEL_NAME_OF_QWEN_LONG),
-    //    DeepSeekReasonerOnDashScope(SupportedProvider.DashScope, "deepseek-r1"),
-    //    DeepSeekChatOnDashScope(SupportedProvider.DashScope, "deepseek-v3"),
+    // DeepSeekReasonerOnDashScope(SupportedProvider.DashScope, "deepseek-r1"),
+    // DeepSeekChatOnDashScope(SupportedProvider.DashScope, "deepseek-v3"),
     /**
      * @deprecated use {@link SupportedModelEnum#Doubao1d5ThinkingPro250415}
      */
     @Deprecated
-    Doubao(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_1D5_THINKING_PRO_250415),
+    Doubao(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES,
+            DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_1D5_THINKING_PRO_250415),
     DoubaoPro32K(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_PRO_32K),
     DoubaoPro128K(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_PRO_128K),
     DoubaoPro256K(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_PRO_256K),
-    Doubao1d5ThinkingPro250415(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_1D5_THINKING_PRO_250415),
-    KimiOnVolces(VolcesMoonshotTextModelSeries.NAME_OF_MODEL_SERIES, VolcesMoonshotTextModelSeries.MODEL_NAME_OF_MOONSHOT_V1_128k),
-    DeepSeekReasonerOnVolces(VolcesDeepSeekTextModelSeries.NAME_OF_MODEL_SERIES, VolcesDeepSeekTextModelSeries.MODEL_NAME_OF_DEEPSEEK_R1_250120),
-    DeepSeekChatOnVolces(VolcesDeepSeekTextModelSeries.NAME_OF_MODEL_SERIES, VolcesDeepSeekTextModelSeries.MODEL_NAME_OF_DEEPSEEK_V3_241226),
+    Doubao1d5ThinkingPro250415(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES,
+            DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_1D5_THINKING_PRO_250415),
+    KimiOnVolces(VolcesMoonshotTextModelSeries.NAME_OF_MODEL_SERIES,
+            VolcesMoonshotTextModelSeries.MODEL_NAME_OF_MOONSHOT_V1_128k),
+    DeepSeekReasonerOnVolces(VolcesDeepSeekTextModelSeries.NAME_OF_MODEL_SERIES,
+            VolcesDeepSeekTextModelSeries.MODEL_NAME_OF_DEEPSEEK_R1_250120),
+    DeepSeekChatOnVolces(VolcesDeepSeekTextModelSeries.NAME_OF_MODEL_SERIES,
+            VolcesDeepSeekTextModelSeries.MODEL_NAME_OF_DEEPSEEK_V3_241226),
 
-    //    DeepSeekChat(SupportedProvider.DeepSeek, DeepseekModel.ChatModel.getCode()),
-    //    DeepSeekReasoner(SupportedProvider.DeepSeek, DeepseekModel.ReasonerModel.getCode()),
+    // DeepSeekChat(SupportedProvider.DeepSeek, DeepseekModel.ChatModel.getCode()),
+    // DeepSeekReasoner(SupportedProvider.DeepSeek,
+    // DeepseekModel.ReasonerModel.getCode()),
 
     ChatGPT4o(GPTVisionModelSeries.NAME_OF_MODEL_SERIES, GPTVisionModelSeries.MODEL_NAME_OF_GPT_4O),
     QwenVLPlus(QwenVisionModelSeries.NAME_OF_MODEL_SERIES, QwenVisionModelSeries.MODEL_NAME_OF_QWEN_VL_PLUS),
-    QwenVLPlusLatest(QwenVisionModelSeries.NAME_OF_MODEL_SERIES, QwenVisionModelSeries.MODEL_NAME_OF_QWEN_VL_PLUS_LATEST),
+    QwenVLPlusLatest(QwenVisionModelSeries.NAME_OF_MODEL_SERIES,
+            QwenVisionModelSeries.MODEL_NAME_OF_QWEN_VL_PLUS_LATEST),
     QwenVLMax(QwenVisionModelSeries.NAME_OF_MODEL_SERIES, QwenVisionModelSeries.MODEL_NAME_OF_QWEN_VL_MAX),
     QwenVLMaxLatest(QwenVisionModelSeries.NAME_OF_MODEL_SERIES, QwenVisionModelSeries.MODEL_NAME_OF_QWEN_VL_MAX_LATEST),
-    Doubao1d5VisionPro32k250115(DoubaoVisionModelSeries.NAME_OF_MODEL_SERIES, DoubaoVisionModelSeries.MODEL_NAME_OF_DOUBAO_1d5_VISION_PRO_32K_250115),
-    ;
+    Doubao1d5VisionPro32k250115(DoubaoVisionModelSeries.NAME_OF_MODEL_SERIES,
+            DoubaoVisionModelSeries.MODEL_NAME_OF_DOUBAO_1d5_VISION_PRO_32K_250115),
+            ;
 
     private final String seriesName;
     private final String chatModelName;
 
+    /**
+     * @param seriesName    模型系列名称
+     * @param chatModelName 聊天模型名称
+     */
     SupportedModelEnum(String seriesName, String chatModelName) {
         this.seriesName = seriesName;
         this.chatModelName = chatModelName;
     }
 
+    /**
+     * 根据系列名称和对应的模型名称，创建对应的 ChatModel 实例。
+     *
+     * @return 对应的 ChatModel 实例
+     */
     public ChatModel getChatModel() {
         return switch (seriesName) {
             case GPTTextModelSeries.NAME_OF_MODEL_SERIES -> new GPTTextModelSeries() {
