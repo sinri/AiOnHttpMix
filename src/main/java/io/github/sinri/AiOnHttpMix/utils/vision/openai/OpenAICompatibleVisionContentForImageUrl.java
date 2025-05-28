@@ -2,6 +2,24 @@ package io.github.sinri.AiOnHttpMix.utils.vision.openai;
 
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 
+/**
+ * OpenAICompatibleVisionContentForImageUrl 接口用于描述兼容 OpenAI Vision API 的图片内容实体，
+ * 主要用于封装图片的 URL 或 Base64 编码信息，以便在多种视觉模型（如 OpenAI、火山引擎等）中统一处理图片输入。
+ * <p>
+ * 该接口继承自 JsonifiableEntity，支持 JSON 序列化与反序列化。
+ * <ul>
+ *   <li>通过 {@link #getUrl()} 获取图片的 URL 或 Base64 字符串。</li>
+ *   <li>通过 {@link #setUrl(String)} 设置图片的 URL 或 Base64 字符串。</li>
+ * </ul>
+ * <p>
+ * 适用场景：
+ * <ul>
+ *   <li>需要将图片以 URL 或 Base64 格式传递给兼容 OpenAI Vision API 的服务时。</li>
+ *   <li>需要统一处理不同视觉模型图片输入参数时。</li>
+ * </ul>
+ *
+ * @param <C> 实现类自身类型，用于链式调用
+ */
 public interface OpenAICompatibleVisionContentForImageUrl<C> extends JsonifiableEntity<C> {
     default String getUrl() {
         return readString("url");
