@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
+@Deprecated
 public class MirageRequestEntity extends JsonifiableEntityImpl<MirageRequestEntity> {
 
     public MirageRequestEntity() {

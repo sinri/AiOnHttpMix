@@ -26,6 +26,33 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
         this.serviceAdapter = serviceAdapter;
     }
 
+    public static Future<GPTResponseChunk> parseStreamFragmentToChunk(String fragment) {
+        AigcMix.getVerboseLogger().info("fragment:\n" + fragment);
+        GPTResponseFragment f = GPTResponseFragment.wrap(fragment);
+        JsonObject data = f.getData();
+        if (data == null) return Future.succeededFuture(null);
+        GPTResponseChunk chunk = GPTResponseChunk.wrap(data);
+        return Future.succeededFuture(chunk);
+    }
+
+    public static Future<Void> handleStreamFragment(String fragment, Function<GPTResponseChunk, Future<Void>> cutterProcessFunc) {
+        return Future.succeededFuture()
+                     .compose(v -> {
+                         return parseStreamFragmentToChunk(fragment);
+                     })
+                     .compose(chunk -> {
+                         if (chunk == null) {
+                             AigcMix.getVerboseLogger().warning("data in fragment is parsed to null");
+                             return Future.succeededFuture();
+                         } else {
+                             return cutterProcessFunc.apply(chunk);
+                         }
+                     })
+                     .onFailure(e -> {
+                         AigcMix.getVerboseLogger().exception(e);
+                     });
+    }
+
     @Override
     public ServiceAdapter getServiceAdapter() {
         return serviceAdapter;
@@ -82,23 +109,7 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
         return chatStream(
                 chatModel,
                 request.toJsonObject(),
-                fragment -> {
-                    AigcMix.getVerboseLogger().info("fragment:\n" + fragment);
-                    try {
-                        GPTResponseFragment f = GPTResponseFragment.wrap(fragment);
-                        JsonObject data = f.getData();
-                        if (data != null) {
-                            GPTResponseChunk chunk = GPTResponseChunk.wrap(data);
-                            return cutterProcessFunc.apply(chunk);
-                        } else {
-                            AigcMix.getVerboseLogger().warning("data in fragment is parsed to null");
-                            return Future.succeededFuture();
-                        }
-                    } catch (Throwable e) {
-                        AigcMix.getVerboseLogger().exception(e);
-                        return Future.failedFuture(e);
-                    }
-                },
+                fragment -> handleStreamFragment(fragment, cutterProcessFunc),
                 cutterTimeout,
                 requestId);
     }
@@ -123,6 +134,5 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
                 requestId
         )
                 .compose(v -> Future.succeededFuture(buffer.build()));
-
     }
 }

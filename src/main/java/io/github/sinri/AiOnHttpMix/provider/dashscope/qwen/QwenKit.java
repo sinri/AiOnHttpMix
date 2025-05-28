@@ -23,6 +23,26 @@ public class QwenKit implements ServiceKit<QwenRequest, QwenResponse, QwenRespon
         this.serviceAdapter = serviceAdapter;
     }
 
+    public static Future<QwenResponseChunk> parseStreamFragmentToChunk(String fragment) {
+        QwenResponseFragment qwenResponseFragment = QwenResponseFragment.wrap(fragment);
+        JsonObject data = qwenResponseFragment.getData();
+        QwenResponseChunk chunk = QwenResponseChunk.wrap(data);
+        return Future.succeededFuture(chunk);
+    }
+
+    public static Future<Void> handleStreamFragment(String fragment, Function<QwenResponseChunk, Future<Void>> chunkProcessFunc) {
+        return Future.succeededFuture()
+                     .compose(v -> {
+                         return parseStreamFragmentToChunk(fragment);
+                     })
+                     .compose(chunk -> {
+                         return chunkProcessFunc.apply(chunk);
+                     })
+                     .onFailure(throwable -> {
+                         AigcMix.getVerboseLogger().exception(throwable, "chunk parse error");
+                     });
+    }
+
     @Override
     public QwenServiceAdapter getServiceAdapter() {
         return serviceAdapter;
@@ -35,7 +55,6 @@ public class QwenKit implements ServiceKit<QwenRequest, QwenResponse, QwenRespon
             String requestId) {
         return getServiceAdapter().request(chatModel, rawRequest, requestId);
     }
-
 
     @Override
     public Future<QwenResponse> chat(
@@ -64,16 +83,7 @@ public class QwenKit implements ServiceKit<QwenRequest, QwenResponse, QwenRespon
             long cutterTimeout,
             String requestId) {
         request.parameters(p -> p.stream(true).incrementalOutput(true));
-        return chatStream(chatModel, request.toJsonObject(), s -> {
-            try {
-                QwenResponseFragment fragment = QwenResponseFragment.wrap(s);
-                JsonObject data = fragment.getData();
-                return chunkProcessFunc.apply(QwenResponseChunk.wrap(data));
-            } catch (Throwable throwable) {
-                AigcMix.getVerboseLogger().exception(throwable, "chunk parse error");
-                return Future.failedFuture(throwable);
-            }
-        }, cutterTimeout, requestId);
+        return chatStream(chatModel, request.toJsonObject(), s -> handleStreamFragment(s, chunkProcessFunc), cutterTimeout, requestId);
     }
 
     @Override
@@ -81,23 +91,22 @@ public class QwenKit implements ServiceKit<QwenRequest, QwenResponse, QwenRespon
             ChatModel chatModel,
             QwenRequest request,
             long cutterTimeout,
-            String requestId) {
+            String requestId
+    ) {
         request.parameters(p -> p.stream(true).incrementalOutput(true));
 
         QwenResponseBuffer qwenResponseBuffer = new QwenResponseBuffer();
 
-        return chatStream(chatModel, request.toJsonObject(), s -> {
-            try {
-                QwenResponseFragment fragment = QwenResponseFragment.wrap(s);
-                JsonObject data = fragment.getData();
-                var chunk = QwenResponseChunk.wrap(data);
-                qwenResponseBuffer.accept(chunk);
-                return Future.succeededFuture();
-            } catch (Throwable throwable) {
-                AigcMix.getVerboseLogger().exception(throwable, "chunk parse error");
-                return Future.failedFuture(throwable);
-            }
-        }, cutterTimeout, requestId)
+        return chatStream(
+                chatModel,
+                request,
+                chunk -> {
+                    qwenResponseBuffer.accept(chunk);
+                    return Future.succeededFuture();
+                },
+                cutterTimeout,
+                requestId
+        )
                 .compose(v -> Future.succeededFuture(qwenResponseBuffer.build()));
     }
 }

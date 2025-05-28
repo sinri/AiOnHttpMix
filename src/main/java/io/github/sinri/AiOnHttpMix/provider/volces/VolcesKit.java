@@ -20,6 +20,36 @@ public class VolcesKit implements ServiceKit<DoubaoRequest, DoubaoResponse, Doub
         this.serviceAdapter = serviceAdapter;
     }
 
+    public static Future<DoubaoResponseChunk> parseStreamFragmentToChunk(String fragment) {
+        DoubaoResponseFragment f = DoubaoResponseFragment.wrap(fragment);
+        JsonObject data = f.getData();
+        if (data != null) {
+            DoubaoResponseChunk c = DoubaoResponseChunk.wrap(data);
+            return Future.succeededFuture(c);
+        } else {
+            AigcMix.getVerboseLogger().warning("in fragment data is null");
+            return Future.succeededFuture(null);
+        }
+    }
+
+    public static Future<Void> handleStreamFragment(String fragment, Function<DoubaoResponseChunk, Future<Void>> chunkProcessor) {
+        return Future.succeededFuture()
+                     .compose(v -> {
+                         return parseStreamFragmentToChunk(fragment);
+                     })
+                     .compose(chunk -> {
+                         if (chunk == null) {
+                             AigcMix.getVerboseLogger().warning("in fragment data is null");
+                             return Future.succeededFuture();
+                         } else {
+                             return chunkProcessor.apply(chunk);
+                         }
+                     })
+                     .onFailure(throwable -> {
+                         AigcMix.getVerboseLogger().exception(throwable);
+                     });
+    }
+
     @Override
     public VolcesServiceAdapter getServiceAdapter() {
         return serviceAdapter;
@@ -61,22 +91,7 @@ public class VolcesKit implements ServiceKit<DoubaoRequest, DoubaoResponse, Doub
             String requestId
     ) {
         request.stream(true);
-        return serviceAdapter.requestStream(chatModel, request.toJsonObject(), fragment -> {
-            try {
-                DoubaoResponseFragment f = DoubaoResponseFragment.wrap(fragment);
-                JsonObject data = f.getData();
-                if (data != null) {
-                    DoubaoResponseChunk c = DoubaoResponseChunk.wrap(data);
-                    return chunkProcessor.apply(c);
-                } else {
-                    AigcMix.getVerboseLogger().warning("in fragment data is null");
-                    return Future.succeededFuture();
-                }
-            } catch (Throwable throwable) {
-                AigcMix.getVerboseLogger().exception(throwable);
-                return Future.failedFuture(throwable);
-            }
-        }, cutterTimeout, requestId);
+        return serviceAdapter.requestStream(chatModel, request.toJsonObject(), fragment -> handleStreamFragment(fragment, chunkProcessor), cutterTimeout, requestId);
     }
 
     public Future<DoubaoResponse> chatStream(
@@ -87,25 +102,19 @@ public class VolcesKit implements ServiceKit<DoubaoRequest, DoubaoResponse, Doub
     ) {
         request.stream(true);
         DoubaoResponseBuffer buffer = new DoubaoResponseBuffer();
-        return serviceAdapter.requestStream(chatModel, request.toJsonObject(), fragment -> {
-                                 try {
-                                     DoubaoResponseFragment f = DoubaoResponseFragment.wrap(fragment);
-                                     JsonObject data = f.getData();
-                                     if (data != null) {
-                                         DoubaoResponseChunk c = DoubaoResponseChunk.wrap(data);
-                                         buffer.accept(c);
-                                     } else {
-                                         AigcMix.getVerboseLogger().warning("in fragment data is null");
-                                     }
-                                     return Future.succeededFuture();
-                                 } catch (Throwable throwable) {
-                                     AigcMix.getVerboseLogger().exception(throwable);
-                                     return Future.failedFuture(throwable);
-                                 }
-                             }, cutterTimeout, requestId)
-                             .compose(v -> {
-                                 var x = buffer.build();
-                                 return Future.succeededFuture(x);
-                             });
+        return chatStream(
+                chatModel,
+                request,
+                chunk -> {
+                    buffer.accept(chunk);
+                    return Future.succeededFuture();
+                },
+                cutterTimeout,
+                requestId
+        )
+                .compose(v -> {
+                    var x = buffer.build();
+                    return Future.succeededFuture(x);
+                });
     }
 }
