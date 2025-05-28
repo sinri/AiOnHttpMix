@@ -122,6 +122,17 @@ public class MirageKit {
         });
     }
 
+
+    /**
+     * Initiates a streaming request for processing chat data using the specified parameters.
+     *
+     * @param useNyaCode            determines whether to use NyaCode encoding to bypass firewalls during transmission
+     * @param mixChatRequest        an object encapsulating the details of the chat request, including the chat model
+     *                              and other metadata
+     * @param fragmentDataProcessor a function that processes Fragment Data (a json object string), returning a Future
+     *                              indicating completion or error
+     * @return a Future representing the eventual completion or failure of the streaming process
+     */
     public Future<Void> requestStream(boolean useNyaCode, MixChatRequest mixChatRequest, Function<String, Future<Void>> fragmentDataProcessor) {
         var body = buildRequestBody(useNyaCode, mixChatRequest);
 

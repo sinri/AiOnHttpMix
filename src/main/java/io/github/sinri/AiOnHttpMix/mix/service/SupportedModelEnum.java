@@ -31,6 +31,9 @@ public enum SupportedModelEnum {
      */
     @Deprecated
     Doubao(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_1D5_THINKING_PRO_250415),
+    DoubaoPro32K(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_PRO_32K),
+    DoubaoPro128K(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_PRO_128K),
+    DoubaoPro256K(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_PRO_256K),
     Doubao1d5ThinkingPro250415(DoubaoTextModelSeries.NAME_OF_MODEL_SERIES, DoubaoTextModelSeries.MODEL_NAME_OF_DOUBAO_1D5_THINKING_PRO_250415),
     KimiOnVolces(VolcesMoonshotTextModelSeries.NAME_OF_MODEL_SERIES, VolcesMoonshotTextModelSeries.MODEL_NAME_OF_MOONSHOT_V1_128k),
     DeepSeekReasonerOnVolces(VolcesDeepSeekTextModelSeries.NAME_OF_MODEL_SERIES, VolcesDeepSeekTextModelSeries.MODEL_NAME_OF_DEEPSEEK_R1_250120),

@@ -5,12 +5,12 @@ import io.github.sinri.AiOnHttpMix.mirage.MirageConfigElement;
 import io.github.sinri.AiOnHttpMix.mirage.MirageKit;
 import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
-import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.GPTKit;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPTResponseBuffer;
-import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenKit;
+import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPTResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseBuffer;
-import io.github.sinri.AiOnHttpMix.provider.volces.VolcesKit;
+import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseBuffer;
+import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.stream.DoubaoResponseChunk;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
 import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecification;
 import io.github.sinri.AiOnHttpMix.utils.specification.GPTModelSpecification;
@@ -44,7 +44,6 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
             AigcMix.getVerboseLogger()
                    .debug("MirageMixServiceAdapter.requestStream with fragment data: \n" + fragmentData);
             try {
-                //                String fragmentData = ServiceAdapter.extractFragmentData(fragment);
                 Objects.requireNonNull(fragmentData);
                 var j = new JsonObject(fragmentData);
                 return fragmentDataHandler.apply(j);
@@ -60,39 +59,45 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
         ChatModel chatModel = request.getChatModel();
         if (chatModel instanceof GPTModelSpecification) {
             GPTResponseBuffer buffer = new GPTResponseBuffer();
-            return mirageKit.requestStream(true, request, fragment -> GPTKit.handleStreamFragment(
-                                    fragment,
-                                    chunk -> {
+            return mirageKit.requestStream(
+                                    true,
+                                    request,
+                                    fragmentData -> {
+                                        GPTResponseChunk chunk = GPTResponseChunk.wrap(new JsonObject(fragmentData));
                                         buffer.accept(chunk);
                                         return Future.succeededFuture();
                                     }
-                            ))
+                            )
                             .compose(v -> {
                                 var x = MixChatResponse.from(buffer.build());
                                 return Future.succeededFuture(x);
                             });
         } else if (chatModel instanceof VolcesModelSpecification) {
             DoubaoResponseBuffer buffer = new DoubaoResponseBuffer();
-            return mirageKit.requestStream(true, request, fragment -> VolcesKit.handleStreamFragment(
-                                    fragment,
-                                    chunk -> {
+            return mirageKit.requestStream(
+                                    true,
+                                    request,
+                                    fragmentData -> {
+                                        DoubaoResponseChunk chunk = DoubaoResponseChunk.wrap(new JsonObject(fragmentData));
                                         buffer.accept(chunk);
                                         return Future.succeededFuture();
                                     }
-                            ))
+                            )
                             .compose(v -> {
                                 var x = MixChatResponse.from(buffer.build());
                                 return Future.succeededFuture(x);
                             });
         } else if (chatModel instanceof DashscopeModelSpecification) {
             QwenResponseBuffer buffer = new QwenResponseBuffer();
-            return mirageKit.requestStream(true, request, fragment -> QwenKit.handleStreamFragment(
-                                    fragment,
-                                    chunk -> {
+            return mirageKit.requestStream(
+                                    true,
+                                    request,
+                                    fragmentData -> {
+                                        QwenResponseChunk chunk = QwenResponseChunk.wrap(new JsonObject(fragmentData));
                                         buffer.accept(chunk);
                                         return Future.succeededFuture();
                                     }
-                            ))
+                            )
                             .compose(v -> {
                                 var x = MixChatResponse.from(buffer.build());
                                 return Future.succeededFuture(x);

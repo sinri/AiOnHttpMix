@@ -10,7 +10,7 @@ public class MixMirageTextStreamBufferNonFCUnitTest extends AbstractMixMirageUni
 
     public MixMirageTextStreamBufferNonFCUnitTest() {
         super();
-        AigcMix.enableVerboseLogger();
+        // AigcMix.enableVerboseLogger();
     }
 
     @Test

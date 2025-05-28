@@ -8,6 +8,10 @@ import io.vertx.core.Future;
 import org.junit.Test;
 
 public class MirageSyncNonFCUnitTest extends AbstractMirageUnitTest {
+    public MirageSyncNonFCUnitTest(){
+        super();
+        AigcMix.enableVerboseLogger();
+    }
 
     private MixChatRequest buildMirageRequestEntity() {
         MixChatRequest request = MixChatRequest.create();
@@ -36,13 +40,11 @@ public class MirageSyncNonFCUnitTest extends AbstractMirageUnitTest {
 
     @Test
     public void test1() {
-        AigcMix.enableVerboseLogger();
         async(() -> act(SupportedModelEnum.ChatGPT4o));
     }
 
     @Test
     public void test2() {
-        AigcMix.enableVerboseLogger();
         async(() -> act(SupportedModelEnum.QwenPlusLatest));
     }
 
@@ -51,13 +53,11 @@ public class MirageSyncNonFCUnitTest extends AbstractMirageUnitTest {
      */
     @Test
     public void test3() {
-        AigcMix.enableVerboseLogger();
         async(() -> act(SupportedModelEnum.Doubao1d5ThinkingPro250415));
     }
 
     @Test
     public void test4() {
-        AigcMix.enableVerboseLogger();
         async(() -> act(SupportedModelEnum.DeepSeekChatOnVolces));
     }
 }

@@ -27,12 +27,19 @@ public class GPTKit implements ServiceKit<GPTRequest, GPTResponse, GPTResponseCh
     }
 
     public static Future<GPTResponseChunk> parseStreamFragmentToChunk(String fragment) {
-        AigcMix.getVerboseLogger().info("fragment:\n" + fragment);
+        AigcMix.getVerboseLogger().info("GPTKit::parseStreamFragmentToChunk for fragment:\n" + fragment);
+        if(fragment.startsWith("{")){
+            throw new RuntimeException("!!!");
+        }
         GPTResponseFragment f = GPTResponseFragment.wrap(fragment);
-        JsonObject data = f.getData();
-        if (data == null) return Future.succeededFuture(null);
-        GPTResponseChunk chunk = GPTResponseChunk.wrap(data);
-        return Future.succeededFuture(chunk);
+        try {
+            JsonObject data = new JsonObject(f.getRawData());
+            GPTResponseChunk chunk = GPTResponseChunk.wrap(data);
+            return Future.succeededFuture(chunk);
+        } catch (Throwable throwable) {
+            AigcMix.getVerboseLogger().exception(throwable, "GPTKit::parseStreamFragmentToChunk got null data");
+            return Future.succeededFuture(null);
+        }
     }
 
     public static Future<Void> handleStreamFragment(String fragment, Function<GPTResponseChunk, Future<Void>> cutterProcessFunc) {
