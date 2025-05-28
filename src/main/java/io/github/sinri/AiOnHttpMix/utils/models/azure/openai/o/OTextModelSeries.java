@@ -1,4 +1,4 @@
-package io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt;
+package io.github.sinri.AiOnHttpMix.utils.models.azure.openai.o;
 
 import io.github.sinri.AiOnHttpMix.utils.models.TextModel;
 import io.github.sinri.AiOnHttpMix.utils.specification.OModelSpecification;

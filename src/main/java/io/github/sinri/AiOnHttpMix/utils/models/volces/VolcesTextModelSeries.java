@@ -4,7 +4,7 @@ import io.github.sinri.AiOnHttpMix.utils.models.TextModel;
 import io.github.sinri.AiOnHttpMix.utils.specification.VolcesModelSpecification;
 
 /**
- * 火山引擎提供的各系列模型。
+ * 火山引擎提供的各系列文本模型。
  *
  * @since 2.0.0
  */

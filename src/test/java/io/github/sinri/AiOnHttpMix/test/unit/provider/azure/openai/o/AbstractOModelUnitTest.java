@@ -4,7 +4,7 @@ import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.GPTKit;
 import io.github.sinri.AiOnHttpMix.test.unit.provider.core.AbstractModelUnitTest;
 import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
-import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.gpt.OTextModelSeries;
+import io.github.sinri.AiOnHttpMix.utils.models.azure.openai.o.OTextModelSeries;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import org.junit.Assert;
 

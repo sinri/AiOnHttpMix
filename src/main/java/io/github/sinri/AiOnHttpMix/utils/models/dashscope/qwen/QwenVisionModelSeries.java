@@ -3,6 +3,11 @@ package io.github.sinri.AiOnHttpMix.utils.models.dashscope.qwen;
 import io.github.sinri.AiOnHttpMix.utils.models.VisionModel;
 import io.github.sinri.AiOnHttpMix.utils.specification.DashscopeModelSpecification;
 
+/**
+ * Dashscope Qwen系列模型，支持视觉理解。
+ *
+ * @since 2.0.0
+ */
 public abstract class QwenVisionModelSeries extends DashscopeModelSpecification
         implements VisionModel {
     public final static String NAME_OF_MODEL_SERIES = "QwenVisionModelSeries";
