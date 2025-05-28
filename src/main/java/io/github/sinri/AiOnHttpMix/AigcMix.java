@@ -8,6 +8,9 @@ import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * 大语言模型服务套件全局控制器。
+ */
 public class AigcMix {
 
     private static final KeelIssueRecorder<KeelEventLog> silentVerboseLogger;
