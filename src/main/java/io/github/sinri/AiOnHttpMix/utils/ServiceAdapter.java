@@ -22,7 +22,12 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @since 2.0.0
  */
 public interface ServiceAdapter {
-
+    /**
+     * 从流式响应片段中提取数据部分。
+     * 
+     * @param fragment 流式响应的一个片段，通常包含 "data: " 前缀的数据行
+     * @return 提取出的数据内容，如果没有找到数据则返回 null
+     */
     @Nullable
     static String extractFragmentData(String fragment) {
         var lines = fragment.split("[\r\n]+");
@@ -37,24 +42,34 @@ public interface ServiceAdapter {
         return null;
     }
 
+    /**
+     * 使用流式响应处理器处理HTTP请求。
+     * 
+     * @param httpClientOptions HTTP客户端配置选项
+     * @param requestFunction   用于创建HTTP请求的函数
+     * @param cutterProcessFunc 处理流式响应片段的函数
+     * @param cutterTimeout     流式响应处理超时时间(毫秒)
+     * @return 处理完成的Future
+     * @since 2.0.0
+     */
     static Future<Void> callStreamWithCutter(
             HttpClientOptions httpClientOptions,
             Function<HttpClient, Future<HttpClientResponse>> requestFunction,
             Function<String, Future<Void>> cutterProcessFunc,
-            long cutterTimeout
-    ) {
+            long cutterTimeout) {
         return Keel.useHttpClient(
                 httpClientOptions,
                 client -> Future.succeededFuture()
-                                .compose(v -> requestFunction.apply(client))
-                                .compose(httpClientResponse -> {
-                                    IntravenouslyCutterOnString cutter = new IntravenouslyCutterOnString(cutterProcessFunc::apply, cutterTimeout);
-                                    httpClientResponse
-                                            .handler(cutter::acceptFromStream)
-                                            .endHandler(ended -> cutter.stopHere())
-                                            .exceptionHandler(cutter::stopHere);
-                                    return cutter.waitForAllHandled();
-                                }));
+                        .compose(v -> requestFunction.apply(client))
+                        .compose(httpClientResponse -> {
+                            IntravenouslyCutterOnString cutter = new IntravenouslyCutterOnString(
+                                    cutterProcessFunc::apply, cutterTimeout);
+                            httpClientResponse
+                                    .handler(cutter::acceptFromStream)
+                                    .endHandler(ended -> cutter.stopHere())
+                                    .exceptionHandler(cutter::stopHere);
+                            return cutter.waitForAllHandled();
+                        }));
     }
 
     /**
@@ -77,7 +92,8 @@ public interface ServiceAdapter {
      */
     default void assertModelCompatible(ChatModel chatModel) {
         if (!isModelCompatible(chatModel)) {
-            throw new IllegalArgumentException("Model " + chatModel.getModelName() + " is not compatible with this service adapter.");
+            throw new IllegalArgumentException(
+                    "Model " + chatModel.getModelName() + " is not compatible with this service adapter.");
         }
     }
 
@@ -92,8 +108,7 @@ public interface ServiceAdapter {
     Future<JsonObject> request(
             ChatModel chatModel,
             JsonObject requestPayload,
-            String requestId
-    );
+            String requestId);
 
     /**
      * 发起调用请求进行大模型推理，并通过SSE的方式，流式获取大模型推理结果。
@@ -110,7 +125,6 @@ public interface ServiceAdapter {
             JsonObject requestPayload,
             Function<String, Future<Void>> cutterProcessFunc,
             long cutterTimeout,
-            String requestId
-    );
+            String requestId);
 
 }
