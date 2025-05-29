@@ -14,7 +14,6 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoRe
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
 import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;

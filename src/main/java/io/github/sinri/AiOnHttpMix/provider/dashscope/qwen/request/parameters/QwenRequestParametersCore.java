@@ -3,6 +3,7 @@ package io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.request.parameters;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+
 /**
  * @since 2.0.0
  */
@@ -152,8 +153,7 @@ interface QwenRequestParametersCore<E> extends JsonifiableEntity<E> {
      * 返回内容的格式。
      */
     default E responseFormatTypeAsText() {
-        this.write("response_format", new JsonObject().put("type", "text"));
-        return this.getImplementation();
+        return responseFormat(new JsonObject().put("type", "text"));
     }
 
     /**
@@ -164,8 +164,16 @@ interface QwenRequestParametersCore<E> extends JsonifiableEntity<E> {
      * @see <a href="https://help.aliyun.com/zh/model-studio/json-mode">结构化输出</a>
      */
     default E responseFormatTypeAsJsonObject() {
-        this.write("response_format", new JsonObject().put("type", "json_object"));
-        return this.getImplementation();
+        return responseFormat(new JsonObject().put("type", "json_object"));
+    }
+
+    /**
+     * 返回内容的格式。
+     *
+     * @see <a href="https://help.aliyun.com/zh/model-studio/json-mode">结构化输出</a>
+     */
+    default E responseFormat(JsonObject responseFormat) {
+        return this.write("response_format", responseFormat);
     }
 
     /**
