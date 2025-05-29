@@ -3,6 +3,7 @@ package io.github.sinri.AiOnHttpMix.mirage;
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.response.stream.MixChatResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.GPTKit;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.QwenKit;
 import io.github.sinri.AiOnHttpMix.provider.volces.VolcesKit;
@@ -29,7 +30,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * 并通过校验码机制保障请求安全。
  * <p>
  * 典型用法：
- * 
+ *
  * <pre>
  *     MirageKit kit = new MirageKit(config);
  *     kit.requestSync(...);
@@ -58,10 +59,6 @@ public class MirageKit {
 
     /**
      * 通过完整参数构造 MirageKit 实例。
-     *
-     * @param mirageDomain Mirage 服务域名
-     * @param clientCode   客户端标识码
-     * @param clientSecret 客户端密钥
      */
     public MirageKit(MirageConfigElement configElement) {
         this(configElement.getDomain(), configElement.getClientCode(), configElement.getClientSecret());
@@ -81,23 +78,23 @@ public class MirageKit {
         if (chatModel instanceof GPTModelSpecification) {
             transformer = fragment -> {
                 return GPTKit.parseStreamFragmentToChunk(fragment)
-                        .compose(chunk -> {
-                            return Future.succeededFuture(chunk.cloneAsJsonObject());
-                        });
+                             .compose(chunk -> {
+                                 return Future.succeededFuture(chunk.cloneAsJsonObject());
+                             });
             };
         } else if (chatModel instanceof VolcesModelSpecification) {
             transformer = fragment -> {
                 return VolcesKit.parseStreamFragmentToChunk(fragment)
-                        .compose(chunk -> {
-                            return Future.succeededFuture(chunk.cloneAsJsonObject());
-                        });
+                                .compose(chunk -> {
+                                    return Future.succeededFuture(chunk.cloneAsJsonObject());
+                                });
             };
         } else if (chatModel instanceof DashscopeModelSpecification) {
             transformer = fragment -> {
                 return QwenKit.parseStreamFragmentToChunk(fragment)
-                        .compose(chunk -> {
-                            return Future.succeededFuture(chunk.cloneAsJsonObject());
-                        });
+                              .compose(chunk -> {
+                                  return Future.succeededFuture(chunk.cloneAsJsonObject());
+                              });
             };
         } else {
             throw new IllegalArgumentException("model is not supported");
@@ -164,21 +161,21 @@ public class MirageKit {
             AigcMix.getVerboseLogger().info("MirageSDK.requestSync POST " + url + "\n" + body);
 
             return webClient.postAbs(url)
-                    .sendJsonObject(body)
-                    .compose(bufferHttpResponse -> {
-                        if (bufferHttpResponse.statusCode() != 200) {
-                            return Future.failedFuture(new Exception("Status Code:" + bufferHttpResponse.statusCode()
-                                    + "; " + bufferHttpResponse.bodyAsString()));
-                        }
+                            .sendJsonObject(body)
+                            .compose(bufferHttpResponse -> {
+                                if (bufferHttpResponse.statusCode() != 200) {
+                                    return Future.failedFuture(new Exception("Status Code:" + bufferHttpResponse.statusCode()
+                                            + "; " + bufferHttpResponse.bodyAsString()));
+                                }
 
-                        AigcMix.getVerboseLogger()
-                                .info("MirageSDK.requestSync::bufferHttpResponse | "
-                                        + bufferHttpResponse.bodyAsString());
+                                AigcMix.getVerboseLogger()
+                                       .info("MirageSDK.requestSync::bufferHttpResponse | "
+                                               + bufferHttpResponse.bodyAsString());
 
-                        var resp = bufferHttpResponse.bodyAsJsonObject();
-                        MixChatResponse mixChatResponse = MixChatResponse.wrap(resp.getJsonObject("data"));
-                        return Future.succeededFuture(mixChatResponse);
-                    });
+                                var resp = bufferHttpResponse.bodyAsJsonObject();
+                                MixChatResponse mixChatResponse = MixChatResponse.wrap(resp.getJsonObject("data"));
+                                return Future.succeededFuture(mixChatResponse);
+                            });
         });
     }
 
@@ -189,8 +186,44 @@ public class MirageKit {
      * @param mixChatRequest        MixChatRequest 对象，包含模型与元数据
      * @param fragmentDataProcessor 片段数据处理器，入参为片段 Json 字符串，返回 Future<Void>
      */
-    public Future<Void> requestStream(boolean useNyaCode, MixChatRequest mixChatRequest,
-            Function<String, Future<Void>> fragmentDataProcessor) {
+    public Future<Void> requestStreamRaw(
+            boolean useNyaCode,
+            MixChatRequest mixChatRequest,
+            Function<String, Future<Void>> fragmentDataProcessor
+    ) {
+        var body = buildRequestBody(useNyaCode, mixChatRequest);
+
+        ChatModel chatModel = mixChatRequest.getChatModel();
+        Function<String, Future<JsonObject>> transformerOfFragmentToData = getTransformerOfFragmentToDataForChatModel(
+                chatModel);
+
+        return ServiceAdapter.callStreamWithCutter(
+                new HttpClientOptions()
+                        .setKeepAlive(true)
+                        .setSsl(true)
+                        .setDefaultHost(getMirageDomain())
+                        .setDefaultPort(443),
+                client -> client
+                        .request(HttpMethod.POST, "/mirage/aigc/mix/stream-raw")
+                        .compose(httpClientRequest -> {
+                            httpClientRequest.putHeader("Content-Type", "application/json");
+                            return httpClientRequest
+                                    .send(body.toString());
+                        }),
+                fragment -> {
+                    return transformerOfFragmentToData.apply(fragment)
+                                                      .compose(jsonObject -> {
+                                                          return fragmentDataProcessor.apply(jsonObject.toString());
+                                                      });
+                },
+                mixChatRequest.getTimeout());
+    }
+
+    public Future<Void> requestStream(
+            boolean useNyaCode,
+            MixChatRequest mixChatRequest,
+            Function<MixChatResponseChunk, Future<Void>> chunkProcessor
+    ) {
         var body = buildRequestBody(useNyaCode, mixChatRequest);
 
         ChatModel chatModel = mixChatRequest.getChatModel();
@@ -212,9 +245,10 @@ public class MirageKit {
                         }),
                 fragment -> {
                     return transformerOfFragmentToData.apply(fragment)
-                            .compose(jsonObject -> {
-                                return fragmentDataProcessor.apply(jsonObject.toString());
-                            });
+                                                      .compose(jsonObject -> {
+                                                          MixChatResponseChunk chunk = MixChatResponseChunk.wrap(jsonObject);
+                                                          return chunkProcessor.apply(chunk);
+                                                      });
                 },
                 mixChatRequest.getTimeout());
     }

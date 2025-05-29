@@ -196,6 +196,26 @@ class MixChatMessageImpl extends JsonifiableEntityImpl<MixChatMessage>
         return DoubaoMessageInVisionRequest.wrap(j);
     }
 
+    @Override
+    public Integer getIndex() {
+        return readInteger("index");
+    }
+
+    @Override
+    public MixChatMessage setIndex(Integer index) {
+        return write("index", index);
+    }
+
+    @Override
+    public String getFinishReason() {
+        return readString("finish_reason");
+    }
+
+    @Override
+    public MixChatMessage setFinishReason(String finishReason) {
+        return write("finish_reason", finishReason);
+    }
+
     @Nonnull
     @Override
     public MixChatMessage getImplementation() {

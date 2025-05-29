@@ -28,4 +28,9 @@ class MixChatResponseImpl extends JsonifiableEntityImpl<MixChatResponse> impleme
         JsonObject message = readJsonObject(KEY_MESSAGE);
         return MixChatMessage.wrap(message);
     }
+
+    @Override
+    public MixChatResponse setMessage(MixChatMessage message) {
+        return write(KEY_MESSAGE, message.toJsonObject());
+    }
 }

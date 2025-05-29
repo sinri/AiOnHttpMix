@@ -106,4 +106,12 @@ public interface MixChatMessage extends JsonifiableEntity<MixChatMessage> {
     QwenMessage toQwenMessageInVisionChatRequest();
 
     DoubaoMessage toDoubaoMessageInVisionChatRequest();
+
+    Integer getIndex();
+
+    MixChatMessage setIndex(Integer index);
+
+    String getFinishReason();
+
+    MixChatMessage setFinishReason(String finishReason);
 }

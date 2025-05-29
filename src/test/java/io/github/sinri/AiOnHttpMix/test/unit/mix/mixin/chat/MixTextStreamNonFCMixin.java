@@ -9,7 +9,7 @@ import io.vertx.core.Future;
 public interface MixTextStreamNonFCMixin extends MixCoreMixin {
     default Future<Void> toTestStream(SupportedModelEnum supportedModelEnum) {
         return getMixChatKit()
-                .chatStream(
+                .chatStreamRaw(
                         MixChatRequest.create()
                                       .setSupportedModelEnum(supportedModelEnum)
                                       .addMessage(MixChatMessage.create()

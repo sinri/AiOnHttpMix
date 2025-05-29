@@ -17,7 +17,7 @@ public class MirageStreamNonFCUnitTest extends AbstractMirageUnitTest {
     }
 
     private Future<Void> act(SupportedModelEnum supportedModelEnum) {
-        return getMirageKit().requestStream(
+        return getMirageKit().requestStreamRaw(
                                      true,
                                      buildMirageRequestEntity()
                                              .setSupportedModelEnum(supportedModelEnum),

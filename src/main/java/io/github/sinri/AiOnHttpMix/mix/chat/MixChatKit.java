@@ -2,6 +2,7 @@ package io.github.sinri.AiOnHttpMix.mix.chat;
 
 import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.response.stream.MixChatResponseChunk;
 import io.github.sinri.AiOnHttpMix.mix.service.MixServiceAdapter;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -68,10 +69,16 @@ public class MixChatKit {
      * @param fragmentDataHandler 处理每个流式片段的回调函数，参数为 JsonObject，返回 Future<Void>
      * @return 异步返回 Void，表示流式处理完成
      */
-    public Future<Void> chatStream(MixChatRequest request, Function<JsonObject, Future<Void>> fragmentDataHandler) {
+    public Future<Void> chatStreamRaw(MixChatRequest request, Function<JsonObject, Future<Void>> fragmentDataHandler) {
         Objects.requireNonNull(adapter, "adapter is not set");
         request.setStream(true);
-        return adapter.requestStream(request, fragmentDataHandler);
+        return adapter.requestStreamRaw(request, fragmentDataHandler);
+    }
+
+    public Future<Void> chatStream(MixChatRequest request, Function<MixChatResponseChunk, Future<Void>> chunkHandler) {
+        Objects.requireNonNull(adapter, "adapter is not set");
+        request.setStream(true);
+        return adapter.requestStream(request, chunkHandler);
     }
 
     /**
@@ -83,6 +90,6 @@ public class MixChatKit {
     public Future<MixChatResponse> chatStream(MixChatRequest request) {
         Objects.requireNonNull(adapter, "adapter is not set");
         request.setStream(true);
-        return adapter.requestStream(request);
+        return adapter.requestStreamRaw(request);
     }
 }

@@ -6,18 +6,14 @@ import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenRes
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutput;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.sync.QwenResponseOutputChoice;
 import io.github.sinri.AiOnHttpMix.utils.StreamPieceCollector;
-import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
-import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolCall;
-import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.ToolCallStreamPieceCollector;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class QwenResponseBuffer implements StreamPieceCollector<QwenResponseChunk, QwenResponse> {
     private final UsageBuffer usageBuffer;
@@ -105,7 +101,7 @@ public class QwenResponseBuffer implements StreamPieceCollector<QwenResponseChun
         private final Map<Integer, ContentOfTextBuffer> contentBufferMap;
         private final StringBuilder content;
         private final StringBuilder reasoningContent;
-        private final Map<Integer, ToolCallBuffer> toolCallBufferMap;
+        private final Map<Integer, ToolCallStreamPieceCollector> toolCallBufferMap;
         private String role;
 
         public MessageBuffer() {
@@ -138,7 +134,7 @@ public class QwenResponseBuffer implements StreamPieceCollector<QwenResponseChun
             List<ToolCall> toolCalls = message.getToolCalls();
             for (int i = 0; i < toolCalls.size(); i++) {
                 ToolCall toolCall = toolCalls.get(i);
-                toolCallBufferMap.computeIfAbsent(i, x -> new ToolCallBuffer())
+                toolCallBufferMap.computeIfAbsent(i, x -> new ToolCallStreamPieceCollector())
                                  .accept(toolCall);
             }
         }
@@ -164,7 +160,7 @@ public class QwenResponseBuffer implements StreamPieceCollector<QwenResponseChun
             if (!toolCallBufferMap.isEmpty()) {
                 JsonArray toolCallArray = new JsonArray();
                 for (int i = 0; i < toolCallBufferMap.size(); i++) {
-                    ToolCallBuffer toolCallBuffer = toolCallBufferMap.get(i);
+                    ToolCallStreamPieceCollector toolCallBuffer = toolCallBufferMap.get(i);
                     toolCallArray.add(toolCallBuffer.build().toJsonObject());
                 }
                 x.put("tool_calls", toolCallArray);
@@ -188,66 +184,6 @@ public class QwenResponseBuffer implements StreamPieceCollector<QwenResponseChun
         public QwenVisionContent build() {
             return QwenVisionContent.wrap(new JsonObject()
                     .put("text", textBuilder.toString()));
-        }
-    }
-
-    public static class ToolCallBuffer implements StreamPieceCollector<ToolCall, ToolCall> {
-        private final FunctionToolCallBuffer functionToolCallBuffer;
-        private String toolCallId;
-        private Integer index;
-        private String type;
-
-        public ToolCallBuffer() {
-            functionToolCallBuffer = new FunctionToolCallBuffer();
-        }
-
-        public void accept(ToolCall toolCall) {
-            String id = toolCall.getId();
-            if (!Keel.stringHelper().isNullOrBlank(id)) {
-                toolCallId = id;
-            }
-            index = toolCall.getIndex();
-            type = toolCall.getType();
-            FunctionToolCall function = toolCall.getFunction();
-            functionToolCallBuffer.accept(function);
-        }
-
-        @Override
-        public ToolCall build() {
-            return new CommonToolCall(new JsonObject()
-                    .put("id", toolCallId)
-                    .put("index", index)
-                    .put("type", type)
-                    .put("function", functionToolCallBuffer.build().cloneAsJsonObject())
-            );
-        }
-    }
-
-    public static class FunctionToolCallBuffer implements StreamPieceCollector<FunctionToolCall, CommonFunctionToolCall> {
-        private final StringBuilder nameBuffer = new StringBuilder();
-        private final StringBuilder argumentsBuffer = new StringBuilder();
-
-        public FunctionToolCallBuffer() {
-
-        }
-
-        public void accept(FunctionToolCall functionToolCall) {
-            String name = functionToolCall.getName();
-            if (name != null) {
-                nameBuffer.append(name);
-            }
-            String arguments = functionToolCall.getArguments();
-            if (arguments != null) {
-                argumentsBuffer.append(arguments);
-            }
-        }
-
-        @Override
-        public CommonFunctionToolCall build() {
-            return new CommonFunctionToolCall(new JsonObject()
-                    .put("name", nameBuffer.toString())
-                    .put("arguments", argumentsBuffer.toString())
-            );
         }
     }
 

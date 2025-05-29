@@ -37,8 +37,13 @@ import java.util.List;
  */
 public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
 
+    static MixChatResponse create() {
+        return new MixChatResponseImpl();
+    }
+
     /**
      * 将 JsonObject 包装为 MixChatResponse 实例。
+     *
      * @param jsonObject 原始 JSON 对象
      * @return MixChatResponse 实例
      */
@@ -48,9 +53,10 @@ public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
 
     /**
      * 处理工具调用（ToolCall）列表，并设置到 MixChatMessage。
-     * @param toolCalls 工具调用列表
+     *
+     * @param toolCalls      工具调用列表
      * @param mixChatMessage 目标 MixChatMessage
-     * @param <T> ToolCall 子类型
+     * @param <T>            ToolCall 子类型
      */
     private static <T extends ToolCall> void handleToolCalls(List<T> toolCalls, MixChatMessage mixChatMessage) {
         if (!toolCalls.isEmpty()) {
@@ -67,6 +73,7 @@ public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
 
     /**
      * 根据 MixChatMessage 构建 MixChatResponse。
+     *
      * @param message 标准化的 MixChatMessage
      * @return MixChatResponse 实例
      */
@@ -79,6 +86,7 @@ public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
     /**
      * 将 OpenAI GPTResponse 转换为 MixChatResponse。
      * 只取第一个 choice。
+     *
      * @param resp OpenAI GPTResponse 响应对象
      * @return MixChatResponse 实例
      */
@@ -102,6 +110,7 @@ public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
     /**
      * 将 DoubaoResponse 转换为 MixChatResponse。
      * 只取第一个 choice。
+     *
      * @param resp DoubaoResponse 响应对象
      * @return MixChatResponse 实例
      */
@@ -125,6 +134,7 @@ public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
     /**
      * 将 QwenResponse 转换为 MixChatResponse。
      * 只取第一个 choice。
+     *
      * @param resp QwenResponse 响应对象
      * @return MixChatResponse 实例
      */
@@ -160,7 +170,10 @@ public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
 
     /**
      * 获取标准化后的 MixChatMessage。
+     *
      * @return MixChatMessage 实例
      */
     MixChatMessage getMessage();
+
+    MixChatResponse setMessage(MixChatMessage message);
 }

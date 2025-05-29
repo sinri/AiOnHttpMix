@@ -4,16 +4,15 @@ import io.github.sinri.AiOnHttpMix.provider.volces.doubao.message.DoubaoMessageI
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponse;
 import io.github.sinri.AiOnHttpMix.provider.volces.doubao.response.sync.DoubaoResponseChoice;
 import io.github.sinri.AiOnHttpMix.utils.StreamPieceCollector;
-import io.github.sinri.AiOnHttpMix.utils.tools.FunctionToolCall;
-import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolCall;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.ToolCallStreamPieceCollector;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
@@ -109,7 +108,7 @@ public class DoubaoResponseBuffer implements StreamPieceCollector<DoubaoResponse
     private static class DoubaoMessageInResponseBuffer implements StreamPieceCollector<DoubaoResponseChunkChoiceDelta, DoubaoMessageInResponse> {
         private final StringBuilder reasoningContentBuffer = new StringBuilder();
         private final StringBuilder contentBuffer = new StringBuilder();
-        private final Map<Integer, DoubaoToolCallBuffer> toolCallBufferMap;
+        private final Map<Integer, ToolCallStreamPieceCollector> toolCallBufferMap;
         private String role;
 
         public DoubaoMessageInResponseBuffer() {
@@ -131,7 +130,7 @@ public class DoubaoResponseBuffer implements StreamPieceCollector<DoubaoResponse
             List<CommonToolCall> toolCalls = delta.getToolCalls();
             if (toolCalls != null) {
                 for (int i = 0; i < toolCalls.size(); i++) {
-                    toolCallBufferMap.computeIfAbsent(i, x -> new DoubaoToolCallBuffer())
+                    toolCallBufferMap.computeIfAbsent(i, x -> new ToolCallStreamPieceCollector())
                                      .accept(toolCalls.get(i));
                 }
             }
@@ -147,9 +146,9 @@ public class DoubaoResponseBuffer implements StreamPieceCollector<DoubaoResponse
             if (!toolCallBufferMap.isEmpty()) {
                 JsonArray a = new JsonArray();
                 for (int i = 0; i < toolCallBufferMap.size(); i++) {
-                    DoubaoToolCallBuffer doubaoToolCallBuffer = toolCallBufferMap.get(i);
-                    CommonToolCall doubaoToolCall = doubaoToolCallBuffer.build();
-                    a.add(doubaoToolCall.cloneAsJsonObject());
+                    ToolCallStreamPieceCollector doubaoToolCallBuffer = toolCallBufferMap.get(i);
+                    ToolCall doubaoToolCall = doubaoToolCallBuffer.build();
+                    a.add(doubaoToolCall.toJsonObject());
                 }
                 j.put("tool_calls", a);
             }
@@ -158,62 +157,4 @@ public class DoubaoResponseBuffer implements StreamPieceCollector<DoubaoResponse
         }
     }
 
-    private static class DoubaoToolCallBuffer implements StreamPieceCollector<CommonToolCall, CommonToolCall> {
-        private final DoubaoFunctionToolCallBuffer functionToolCallBuffer = new DoubaoFunctionToolCallBuffer();
-        private String toolCallId;
-        private String type;
-        private Integer index;
-
-        public void accept(CommonToolCall doubaoToolCall) {
-            if (toolCallId == null) {
-                toolCallId = doubaoToolCall.getId();
-            }
-            if (type == null) {
-                type = doubaoToolCall.getType();
-            }
-            if (index == null) {
-                index = doubaoToolCall.getIndex();
-            }
-            if (Objects.equals("function", type)) {
-                FunctionToolCall function = doubaoToolCall.getFunction();
-                functionToolCallBuffer.accept(function);
-            }
-        }
-
-        @Override
-        public CommonToolCall build() {
-            JsonObject j = new JsonObject();
-            j.put("index", index);
-            j.put("id", toolCallId);
-            j.put("type", type);
-            if (Objects.equals("function", type)) {
-                j.put("function", functionToolCallBuffer.build().toJsonObject());
-            }
-            return new CommonToolCall(j);
-        }
-    }
-
-    private static class DoubaoFunctionToolCallBuffer implements StreamPieceCollector<FunctionToolCall, FunctionToolCall> {
-        private final StringBuilder nameBuffer = new StringBuilder();
-        private final StringBuilder argumentsBuffer = new StringBuilder();
-
-        public void accept(FunctionToolCall functionToolCall) {
-            String name = functionToolCall.getName();
-            if (!Keel.stringHelper().isNullOrBlank(name)) {
-                nameBuffer.append(name);
-            }
-            String arguments = functionToolCall.getArguments();
-            if (!Keel.stringHelper().isNullOrBlank(arguments)) {
-                argumentsBuffer.append(arguments);
-            }
-        }
-
-        @Override
-        public FunctionToolCall build() {
-            JsonObject j = new JsonObject();
-            j.put("name", nameBuffer.toString());
-            j.put("arguments", argumentsBuffer.toString());
-            return new CommonFunctionToolCall(j);
-        }
-    }
 }

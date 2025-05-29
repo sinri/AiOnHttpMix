@@ -5,6 +5,7 @@ import io.github.sinri.AiOnHttpMix.mirage.MirageConfigElement;
 import io.github.sinri.AiOnHttpMix.mirage.MirageKit;
 import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
+import io.github.sinri.AiOnHttpMix.mix.chat.response.stream.MixChatResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPTResponseBuffer;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.response.stream.GPTResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.dashscope.qwen.response.stream.QwenResponseBuffer;
@@ -70,15 +71,15 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
     /**
      * 流式请求接口，支持自定义分片数据处理。
      *
-     * @param request 聊天请求对象
+     * @param request             聊天请求对象
      * @param fragmentDataHandler 分片数据处理函数，接收 JsonObject 类型的分片数据
      * @return 返回处理完成的 Future<Void>
      */
     @Override
-    public Future<Void> requestStream(MixChatRequest request, Function<JsonObject, Future<Void>> fragmentDataHandler) {
-        return mirageKit.requestStream(true, request, fragmentData -> {
+    public Future<Void> requestStreamRaw(MixChatRequest request, Function<JsonObject, Future<Void>> fragmentDataHandler) {
+        return mirageKit.requestStreamRaw(true, request, fragmentData -> {
             AigcMix.getVerboseLogger()
-                   .debug("MirageMixServiceAdapter.requestStream with fragment data: \n" + fragmentData);
+                   .debug("MirageMixServiceAdapter.requestStreamRaw with fragment data: \n" + fragmentData);
             try {
                 Objects.requireNonNull(fragmentData);
                 var j = new JsonObject(fragmentData);
@@ -87,6 +88,15 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
                 AigcMix.getVerboseLogger().exception(throwable);
                 return Future.succeededFuture();
             }
+        });
+    }
+
+    @Override
+    public Future<Void> requestStream(MixChatRequest request, Function<MixChatResponseChunk, Future<Void>> chunkHandler) {
+        return mirageKit.requestStream(true, request, chunk -> {
+            AigcMix.getVerboseLogger()
+                   .debug("MirageMixServiceAdapter.requestStream with chunk", chunk.toJsonObject());
+            return chunkHandler.apply(chunk);
         });
     }
 
@@ -100,11 +110,11 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
      * @throws IllegalArgumentException 如果模型类型不被支持
      */
     @Override
-    public Future<MixChatResponse> requestStream(MixChatRequest request) {
+    public Future<MixChatResponse> requestStreamRaw(MixChatRequest request) {
         ChatModel chatModel = request.getChatModel();
         if (chatModel instanceof GPTModelSpecification) {
             GPTResponseBuffer buffer = new GPTResponseBuffer();
-            return mirageKit.requestStream(
+            return mirageKit.requestStreamRaw(
                                     true,
                                     request,
                                     fragmentData -> {
@@ -119,7 +129,7 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
                             });
         } else if (chatModel instanceof VolcesModelSpecification) {
             DoubaoResponseBuffer buffer = new DoubaoResponseBuffer();
-            return mirageKit.requestStream(
+            return mirageKit.requestStreamRaw(
                                     true,
                                     request,
                                     fragmentData -> {
@@ -134,7 +144,7 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
                             });
         } else if (chatModel instanceof DashscopeModelSpecification) {
             QwenResponseBuffer buffer = new QwenResponseBuffer();
-            return mirageKit.requestStream(
+            return mirageKit.requestStreamRaw(
                                     true,
                                     request,
                                     fragmentData -> {
