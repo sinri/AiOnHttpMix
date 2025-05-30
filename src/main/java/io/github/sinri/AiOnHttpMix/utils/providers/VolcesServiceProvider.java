@@ -7,6 +7,8 @@ package io.github.sinri.AiOnHttpMix.utils.providers;
  */
 public class VolcesServiceProvider implements ServiceProvider {
     public static final String PROVIDER_NAME = "Volces";
+    public static final String pathOfV3ChatCompletions = "/api/v3/chat/completions";
+    public static final String hostOfV3ChatCompletions = "ark.cn-beijing.volces.com";
 
     VolcesServiceProvider() {
 

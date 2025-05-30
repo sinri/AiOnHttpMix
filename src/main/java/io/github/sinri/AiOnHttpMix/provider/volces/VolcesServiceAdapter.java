@@ -4,6 +4,7 @@ import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.utils.AbnormalResponse;
 import io.github.sinri.AiOnHttpMix.utils.ServiceAdapter;
 import io.github.sinri.AiOnHttpMix.utils.models.ChatModel;
+import io.github.sinri.AiOnHttpMix.utils.providers.VolcesServiceProvider;
 import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
 import io.github.sinri.AiOnHttpMix.utils.specification.VolcesModelSpecification;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
@@ -56,7 +57,7 @@ public class VolcesServiceAdapter implements ServiceAdapter {
     public Future<JsonObject> request(ChatModel chatModel, JsonObject requestPayload, String requestId) {
         assertModelCompatible(chatModel);
 
-        String url = "https://" + VolcesModelSpecification.hostOfV3ChatCompletions + VolcesModelSpecification.pathOfV3ChatCompletions;
+        String url = "https://" + VolcesServiceProvider.hostOfV3ChatCompletions + VolcesServiceProvider.pathOfV3ChatCompletions;
 
         requestPayload.put("model", toModelMappedDeploymentId(chatModel));
 
@@ -98,9 +99,9 @@ public class VolcesServiceAdapter implements ServiceAdapter {
                 new HttpClientOptions()
                         .setKeepAlive(true)
                         .setSsl(true)
-                        .setDefaultHost(VolcesModelSpecification.hostOfV3ChatCompletions)
+                        .setDefaultHost(VolcesServiceProvider.hostOfV3ChatCompletions)
                         .setDefaultPort(443),
-                client -> client.request(HttpMethod.POST, VolcesModelSpecification.pathOfV3ChatCompletions)
+                client -> client.request(HttpMethod.POST, VolcesServiceProvider.pathOfV3ChatCompletions)
                                 .compose(httpClientRequest -> {
                                     httpClientRequest
                                             .putHeader("Content-Type", "application/json")

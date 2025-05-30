@@ -14,6 +14,10 @@ public abstract class VolcesDeepSeekTextModelSeries extends VolcesTextModelSerie
     public static final String MODEL_NAME_OF_DEEPSEEK_V3_250324 = "deepseek-v3-250324";
 
     public static final String MODEL_NAME_OF_DEEPSEEK_R1_250120 = "deepseek-r1-250120";
+    /**
+     * @since 2.0.1
+     */
+    public static final String MODEL_NAME_OF_DEEPSEEK_R1_250528 = "deepseek-r1-250528";
 
     public static VolcesDeepSeekTextModelSeries model(String modelName) {
         return new VolcesDeepSeekTextModelSeries() {
