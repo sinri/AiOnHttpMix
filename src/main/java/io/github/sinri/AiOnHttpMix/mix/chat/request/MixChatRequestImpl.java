@@ -141,13 +141,13 @@ class MixChatRequestImpl extends JsonifiableEntityImpl<MixChatRequest> implement
         return write("stream", stream);
     }
 
-    private boolean isStream() {
+    public boolean isStream() {
         Boolean stream = readBoolean("stream");
         return Boolean.TRUE.equals(stream);
     }
 
     @Override
-    public MixChatRequest addMessage(MixChatMessage message) {
+    public MixChatRequest addMessage(@Nonnull MixChatMessage message) {
         ensureJsonArray("messages")
                 .add(message.toJsonObject());
         return this;

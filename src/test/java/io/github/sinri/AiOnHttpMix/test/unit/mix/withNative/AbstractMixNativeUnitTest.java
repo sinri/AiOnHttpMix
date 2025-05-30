@@ -13,8 +13,7 @@ public abstract class AbstractMixNativeUnitTest extends KeelUnitTest {
     public AbstractMixNativeUnitTest() {
         super();
         serviceAdapter = new NativeMixServiceAdapter(Keel.getConfiguration().extract("provider"));
-        mixChatKit = new MixChatKit();
-        mixChatKit.setAdapter(serviceAdapter);
+        mixChatKit = MixChatKit.create(serviceAdapter);
     }
 
     public NativeMixServiceAdapter getServiceAdapter() {

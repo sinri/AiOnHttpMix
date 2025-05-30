@@ -1,5 +1,6 @@
 package io.github.sinri.AiOnHttpMix.mix.service;
 
+import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.stream.MixChatResponseBuffer;
@@ -104,6 +105,7 @@ public abstract class MixServiceAdapter {
     public Future<MixChatResponse> requestStream(MixChatRequest request) {
         MixChatResponseBuffer buffer = new MixChatResponseBuffer();
         return this.requestStream(request, chunk -> {
+                       AigcMix.getVerboseLogger().debug("MixServiceAdapter.requestStream handle chunk", chunk.toJsonObject());
                        buffer.accept(chunk);
                        return Future.succeededFuture();
                    })

@@ -6,7 +6,7 @@ import io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum;
 import io.vertx.core.Future;
 import org.junit.Test;
 
-public class MirageStreamNonFCUnitTest extends AbstractMirageUnitTest {
+public class MirageStreamRawNonFCUnitTest extends AbstractMirageUnitTest {
     private MixChatRequest buildMirageRequestEntity() {
         MixChatRequest request = MixChatRequest.create();
         request.addMessage(MixChatMessage.create()
@@ -17,7 +17,7 @@ public class MirageStreamNonFCUnitTest extends AbstractMirageUnitTest {
     }
 
     private Future<Void> act(SupportedModelEnum supportedModelEnum) {
-        return getMirageKit().requestStream(
+        return getMirageKit().requestStreamRaw(
                                      true,
                                      buildMirageRequestEntity()
                                              .setSupportedModelEnum(supportedModelEnum),

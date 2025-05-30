@@ -3,18 +3,40 @@ package io.github.sinri.AiOnHttpMix.test.unit.mirage;
 import io.github.sinri.AiOnHttpMix.mix.chat.message.MixChatMessage;
 import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum;
+import io.github.sinri.AiOnHttpMix.utils.tools.FunctionParameterDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonFunctionToolDefinition;
+import io.github.sinri.AiOnHttpMix.utils.tools.common.CommonToolDefinition;
 import io.vertx.core.Future;
+import io.vertx.json.schema.common.dsl.SchemaType;
 import org.junit.Test;
 
-public class MirageStreamNonFCUnitTest extends AbstractMirageUnitTest {
+import java.util.List;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
+
+public class MirageStreamFCUnitTest extends AbstractMirageUnitTest {
     private MixChatRequest buildMirageRequestEntity() {
         MixChatRequest request = MixChatRequest.create();
-        request.addMessage(MixChatMessage.create()
-                                         .setRole("user")
-                                         .setTextContent("介绍一下上野公园")
-        );
+        request
+                .addMessage(MixChatMessage.create()
+                                          .setRole("user")
+                                          .setTextContent("今天是 " + Keel.datetimeHelper().getCurrentDate())
+                )
+                .addMessage(MixChatMessage.create()
+                                          .setRole("user")
+                                          .setTextContent("今天的上野公园天气如何，适合游玩吗")
+                );
+        request.addTool(new CommonToolDefinition(new CommonFunctionToolDefinition()
+                .name("query_weather")
+                .description("查询某城市（地区）的天气")
+                .parameters(List.of(
+                        new FunctionParameterDefinition(SchemaType.STRING, "place", "地点，一般到一个城市或者地区"),
+                        new FunctionParameterDefinition(SchemaType.STRING, "date", "日期，Y-m-d")
+                ))
+        ));
         return request;
     }
+
 
     private Future<Void> act(SupportedModelEnum supportedModelEnum) {
         return getMirageKit().requestStream(

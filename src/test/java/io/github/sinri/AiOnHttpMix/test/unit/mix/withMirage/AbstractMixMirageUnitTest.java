@@ -2,7 +2,6 @@ package io.github.sinri.AiOnHttpMix.test.unit.mix.withMirage;
 
 import io.github.sinri.AiOnHttpMix.mix.chat.MixChatKit;
 import io.github.sinri.AiOnHttpMix.mix.service.MirageMixServiceAdapter;
-import io.github.sinri.AiOnHttpMix.mix.service.NativeMixServiceAdapter;
 import io.github.sinri.keel.facade.tesuto.unit.KeelUnitTest;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
@@ -14,8 +13,7 @@ public class AbstractMixMirageUnitTest extends KeelUnitTest {
     public AbstractMixMirageUnitTest() {
         super();
         serviceAdapter = new MirageMixServiceAdapter(Keel.getConfiguration().extract("provider"));
-        mixChatKit = new MixChatKit();
-        mixChatKit.setAdapter(serviceAdapter);
+        mixChatKit = MixChatKit.create(serviceAdapter);
     }
 
     public MirageMixServiceAdapter getServiceAdapter() {

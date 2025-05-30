@@ -6,6 +6,7 @@ import io.github.sinri.AiOnHttpMix.utils.StreamPieceCollector;
 import io.github.sinri.AiOnHttpMix.utils.tools.ToolCall;
 import io.github.sinri.AiOnHttpMix.utils.tools.common.ToolCallStreamPieceCollector;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,14 @@ public class MixChatResponseBuffer implements StreamPieceCollector<MixChatRespon
             message.setReasoningContent(reasoningContentBuffer.toString());
             message.setIndex(index);
             message.setFinishReason(finishReason);
+
+            List<ToolCall> tcList = new ArrayList<>();
+            for (int i = 0; i < tcMap.size(); i++) {
+                ToolCall tc = tcMap.get(i).build();
+                tcList.add(tc);
+            }
+            message.setToolCalls(tcList);
+
             return message;
         }
     }
