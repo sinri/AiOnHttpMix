@@ -12,8 +12,7 @@ public interface MixVisionSyncNonFCMixin extends MixVisionCoreMixin {
 
     default Future<Void> toTestSync(SupportedModelEnum supportedModelEnum) {
         return getMixChatKit()
-                .chat(MixChatRequest.create()
-                                    .setSupportedModelEnum(supportedModelEnum)
+                .chat(MixChatRequest.create(supportedModelEnum)
                                     .addMessage(MixChatMessage.create()
                                                               .setRole("user")
                                                               .setVisionContent(List.of(

@@ -4,6 +4,7 @@ import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.stream.MixChatResponseChunk;
 import io.github.sinri.AiOnHttpMix.mix.service.MixServiceAdapter;
+import io.github.sinri.AiOnHttpMix.mix.service.SupportedModelEnum;
 import io.github.sinri.AiOnHttpMix.mix.tools.MixFunctionAdapter;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -20,8 +21,10 @@ import java.util.function.Function;
  * 典型用法：
  *
  * <pre>
+ * {@code
  * MixChatKit kit = new MixChatKit().setAdapter(adapter);
  * Future<MixChatResponse> response = kit.chat(request);
+ * }
  * </pre>
  */
 public interface MixChatKit {
@@ -59,8 +62,8 @@ public interface MixChatKit {
      */
     Future<MixChatResponse> chat(MixChatRequest request);
 
-    default Future<MixChatResponse> chat(Handler<MixChatRequest> requestHandler) {
-        MixChatRequest request = MixChatRequest.create();
+    default Future<MixChatResponse> chat(SupportedModelEnum supportedModelEnum, Handler<MixChatRequest> requestHandler) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         requestHandler.handle(request);
         return chat(request);
     }
@@ -69,21 +72,21 @@ public interface MixChatKit {
      * 发起一次流式聊天请求，处理每个片段数据。
      *
      * @param request             聊天请求参数，方法内会自动设置为流式
-     * @param fragmentDataHandler 处理每个流式片段的回调函数，参数为 JsonObject，返回 Future<Void>
+     * @param fragmentDataHandler 处理每个流式片段的回调函数，参数为 JsonObject
      * @return 异步返回 Void，表示流式处理完成
      */
     Future<Void> chatStreamRaw(MixChatRequest request, Function<JsonObject, Future<Void>> fragmentDataHandler);
 
-    default Future<Void> chatStreamRaw(Handler<MixChatRequest> requestHandler, Function<JsonObject, Future<Void>> fragmentDataHandler) {
-        MixChatRequest request = MixChatRequest.create();
+    default Future<Void> chatStreamRaw(SupportedModelEnum supportedModelEnum, Handler<MixChatRequest> requestHandler, Function<JsonObject, Future<Void>> fragmentDataHandler) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         requestHandler.handle(request);
         return chatStreamRaw(request, fragmentDataHandler);
     }
 
     Future<Void> chatStream(MixChatRequest request, Function<MixChatResponseChunk, Future<Void>> chunkHandler);
 
-    default Future<Void> chatStream(Handler<MixChatRequest> requestHandler, Function<MixChatResponseChunk, Future<Void>> chunkHandler) {
-        MixChatRequest request = MixChatRequest.create();
+    default Future<Void> chatStream(SupportedModelEnum supportedModelEnum, Handler<MixChatRequest> requestHandler, Function<MixChatResponseChunk, Future<Void>> chunkHandler) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         requestHandler.handle(request);
         return chatStream(request, chunkHandler);
     }
@@ -96,16 +99,16 @@ public interface MixChatKit {
      */
     Future<MixChatResponse> chatStream(MixChatRequest request);
 
-    default Future<MixChatResponse> chatStream(Handler<MixChatRequest> requestHandler) {
-        MixChatRequest request = MixChatRequest.create();
+    default Future<MixChatResponse> chatStream(SupportedModelEnum supportedModelEnum, Handler<MixChatRequest> requestHandler) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         requestHandler.handle(request);
         return chatStream(request);
     }
 
     Future<MixChatResponse> chatStreamRaw(MixChatRequest request);
 
-    default Future<MixChatResponse> chatStreamRaw(Handler<MixChatRequest> requestHandler) {
-        MixChatRequest request = MixChatRequest.create();
+    default Future<MixChatResponse> chatStreamRaw(SupportedModelEnum supportedModelEnum, Handler<MixChatRequest> requestHandler) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         requestHandler.handle(request);
         return chatStreamRaw(request);
     }

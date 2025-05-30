@@ -15,8 +15,8 @@ import java.util.List;
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class MirageStreamFCUnitTest extends AbstractMirageUnitTest {
-    private MixChatRequest buildMirageRequestEntity() {
-        MixChatRequest request = MixChatRequest.create();
+    private MixChatRequest buildMirageRequestEntity(SupportedModelEnum supportedModelEnum) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         request
                 .addMessage(MixChatMessage.create()
                                           .setRole("user")
@@ -41,8 +41,7 @@ public class MirageStreamFCUnitTest extends AbstractMirageUnitTest {
     private Future<Void> act(SupportedModelEnum supportedModelEnum) {
         return getMirageKit().requestStream(
                                      true,
-                                     buildMirageRequestEntity()
-                                             .setSupportedModelEnum(supportedModelEnum),
+                                     buildMirageRequestEntity(supportedModelEnum),
                                      fragmentData -> {
                                          getUnitTestLogger().info("fragment data: \n" + fragmentData);
                                          return Future.succeededFuture();

@@ -25,17 +25,10 @@ public interface QwenRequestOcrOptions extends JsonifiableEntity<QwenRequestOcrO
     /**
      * 内置任务：信息抽取
      *
-     * @param task_config 表示需要模型抽取的字段，可以是任意形式的JSON结构，最多可嵌套3层JSON 对象。<br>
-     *                    您只需要填写JSON对象的key，value保持为空即可。<br>
-     *                    示例值：{@code {
-     *                    "result_schema" : {
-     *                    "收件人信息" : {
-     *                    "收件人姓名" : "",
-     *                    "收件人电话号码" : "",
-     *                    "收件人地址":""
-     *                    }
-     *                    }
-     *                    }
+     * @param task_config 表示需要模型抽取的字段，可以是任意形式的JSON结构，最多可嵌套3层JSON 对象。<br/>
+     *                    您只需要填写JSON对象的key，value保持为空即可。<br/>
+     *                    示例值
+     *                    {@code {"result_schema": {"收件人信息": {"收件人姓名": "","收件人电话号码": "","收件人地址": ""}}}}
      */
     static QwenRequestOcrOptions createKeyInformationExtractionTask(JsonObject task_config) {
         return new QwenRequestParametersImpl.QwenRequestOcrOptionsImpl("key_information_extraction", task_config);

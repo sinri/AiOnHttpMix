@@ -12,8 +12,7 @@ public interface MixVisionStreamNonFCMixin extends MixVisionCoreMixin {
     default Future<Void> toTestStream(SupportedModelEnum supportedModelEnum) {
         return getMixChatKit()
                 .chatStreamRaw(
-                        MixChatRequest.create()
-                                      .setSupportedModelEnum(supportedModelEnum)
+                        MixChatRequest.create(supportedModelEnum)
                                       .addMessage(MixChatMessage.create()
                                                                 .setRole("user")
                                                                 .setVisionContent(List.of(

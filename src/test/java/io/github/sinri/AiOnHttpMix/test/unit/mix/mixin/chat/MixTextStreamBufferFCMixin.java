@@ -24,8 +24,7 @@ public interface MixTextStreamBufferFCMixin extends MixCoreMixin {
         return Future.succeededFuture()
                      .compose(round1 -> {
                          return getMixChatKit().chatStream(MixChatRequest
-                                 .create()
-                                 .setSupportedModelEnum(supportedModelEnum)
+                                 .create(supportedModelEnum)
                                  .addMessage(MixChatMessage.create()
                                                            .setRole("user")
                                                            .setTextContent("2010年8月1日柯桥有没有下雨")
@@ -66,8 +65,7 @@ public interface MixTextStreamBufferFCMixin extends MixCoreMixin {
                      .compose(toolCallOutput -> {
                          ToolCall toolCall = toolCallRef.get();
                          return getMixChatKit().chatStream(MixChatRequest
-                                 .create()
-                                 .setSupportedModelEnum(supportedModelEnum)
+                                 .create(supportedModelEnum)
                                  .addMessage(MixChatMessage.create()
                                                            .setRole("user")
                                                            .setTextContent("2010年8月1日柯桥有没有下雨")

@@ -12,7 +12,6 @@ import io.github.sinri.AiOnHttpMix.utils.specification.ModelSpecification;
  *   <li>{@link TextModel} —— 仅具备文本对话能力的大语言模型</li>
  *   <li>{@link VisionModel} —— 具备视觉理解能力的多模态大语言模型</li>
  * </ul>
- * </p>
  *
  * @since 2.0.0
  */

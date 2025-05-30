@@ -10,8 +10,7 @@ public interface MixTextStreamBufferNonFCMixin extends MixCoreMixin {
     default Future<Void> toTestStreamBuffer(SupportedModelEnum supportedModelEnum) {
         return getMixChatKit()
                 .chatStream(
-                        MixChatRequest.create()
-                                      .setSupportedModelEnum(supportedModelEnum)
+                        MixChatRequest.create(supportedModelEnum)
                                       .addMessage(MixChatMessage.create()
                                                                 .setRole("user")
                                                                 .setTextContent("文明VI里面埃里温城邦的加成是什么")

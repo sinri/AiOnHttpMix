@@ -9,8 +9,7 @@ import io.vertx.core.Future;
 public interface MixTextSyncNonFCMixin extends MixCoreMixin {
     default Future<Void> toTestSync(SupportedModelEnum supportedModelEnum) {
         return getMixChatKit()
-                .chat(MixChatRequest.create()
-                                    .setSupportedModelEnum(supportedModelEnum)
+                .chat(MixChatRequest.create(supportedModelEnum)
                                     .addMessage(MixChatMessage.create()
                                                               .setRole("user")
                                                               .setTextContent("文明VI里面埃里温城邦的加成是什么")

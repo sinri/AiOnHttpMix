@@ -55,8 +55,8 @@ public abstract class MixServiceAdapter {
      * @param requestHandler 请求处理器
      * @return 响应对象的 Future
      */
-    public Future<MixChatResponse> request(Handler<MixChatRequest> requestHandler) {
-        MixChatRequest request = MixChatRequest.create();
+    public Future<MixChatResponse> request(SupportedModelEnum supportedModelEnum, Handler<MixChatRequest> requestHandler) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         requestHandler.handle(request);
         return request(request);
     }
@@ -75,8 +75,8 @@ public abstract class MixServiceAdapter {
      *
      * @param requestHandler 请求处理器
      */
-    public Future<MixChatResponse> requestStreamRaw(Handler<MixChatRequest> requestHandler) {
-        MixChatRequest request = MixChatRequest.create();
+    public Future<MixChatResponse> requestStreamRaw(SupportedModelEnum supportedModelEnum, Handler<MixChatRequest> requestHandler) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         requestHandler.handle(request);
         return requestStreamRaw(request);
     }
@@ -105,7 +105,8 @@ public abstract class MixServiceAdapter {
     public Future<MixChatResponse> requestStream(MixChatRequest request) {
         MixChatResponseBuffer buffer = new MixChatResponseBuffer();
         return this.requestStream(request, chunk -> {
-                       AigcMix.getVerboseLogger().debug("MixServiceAdapter.requestStream handle chunk", chunk.toJsonObject());
+                       AigcMix.getVerboseLogger()
+                              .debug("MixServiceAdapter.requestStream handle MixChatResponseChunk", chunk.toJsonObject());
                        buffer.accept(chunk);
                        return Future.succeededFuture();
                    })

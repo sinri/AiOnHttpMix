@@ -7,8 +7,8 @@ import io.vertx.core.Future;
 import org.junit.Test;
 
 public class MirageStreamRawNonFCUnitTest extends AbstractMirageUnitTest {
-    private MixChatRequest buildMirageRequestEntity() {
-        MixChatRequest request = MixChatRequest.create();
+    private MixChatRequest buildMirageRequestEntity(SupportedModelEnum supportedModelEnum) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         request.addMessage(MixChatMessage.create()
                                          .setRole("user")
                                          .setTextContent("介绍一下上野公园")
@@ -19,8 +19,7 @@ public class MirageStreamRawNonFCUnitTest extends AbstractMirageUnitTest {
     private Future<Void> act(SupportedModelEnum supportedModelEnum) {
         return getMirageKit().requestStreamRaw(
                                      true,
-                                     buildMirageRequestEntity()
-                                             .setSupportedModelEnum(supportedModelEnum),
+                                     buildMirageRequestEntity(supportedModelEnum),
                                      fragmentData -> {
                                          getUnitTestLogger().info("fragment data: \n" + fragmentData);
                                          return Future.succeededFuture();

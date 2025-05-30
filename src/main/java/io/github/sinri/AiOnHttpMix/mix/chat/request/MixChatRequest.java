@@ -26,9 +26,11 @@ public interface MixChatRequest extends JsonifiableEntity<MixChatRequest> {
      * 创建一个空的 MixChatRequest 实例。
      *
      * @return 新的 MixChatRequest 实例
+     * @since 2.0.0
      */
-    static MixChatRequest create() {
-        return new MixChatRequestImpl();
+    static MixChatRequest create(@Nonnull SupportedModelEnum supportedModelEnum) {
+        return new MixChatRequestImpl()
+                .setSupportedModelEnum(supportedModelEnum);
     }
 
     /**
@@ -37,7 +39,7 @@ public interface MixChatRequest extends JsonifiableEntity<MixChatRequest> {
      * @param jsonObject 包含请求参数的 JsonObject
      * @return 包装后的 MixChatRequest 实例
      */
-    static MixChatRequest wrap(JsonObject jsonObject) {
+    static MixChatRequest wrap(@Nonnull JsonObject jsonObject) {
         return new MixChatRequestImpl(jsonObject);
     }
 
@@ -54,7 +56,7 @@ public interface MixChatRequest extends JsonifiableEntity<MixChatRequest> {
      * @param supportedModelEnum 支持的模型枚举
      * @return 当前 MixChatRequest 实例
      */
-    MixChatRequest setSupportedModelEnum(SupportedModelEnum supportedModelEnum);
+    MixChatRequest setSupportedModelEnum(@Nonnull SupportedModelEnum supportedModelEnum);
 
     /**
      * 获取当前请求所选用的聊天模型对象。

@@ -26,7 +26,7 @@ class MixChatRequestImpl extends JsonifiableEntityImpl<MixChatRequest> implement
     }
 
     @Override
-    public MixChatRequest setSupportedModelEnum(SupportedModelEnum supportedModelEnum) {
+    public MixChatRequest setSupportedModelEnum(@Nonnull SupportedModelEnum supportedModelEnum) {
         return write("model", supportedModelEnum.name());
     }
 

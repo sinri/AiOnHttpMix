@@ -25,8 +25,7 @@ public interface MixVisionSyncFCMixin extends MixVisionCoreMixin {
 
         AtomicReference<ToolCall> toolCallRef = new AtomicReference<>();
 
-        MixChatRequest mixChatRequest = MixChatRequest.create()
-                                                      .setSupportedModelEnum(supportedModelEnum)
+        MixChatRequest mixChatRequest = MixChatRequest.create(supportedModelEnum)
                                                       .addMessage(MixChatMessage.create()
                                                                                 .setRole("user")
                                                                                 .setVisionContent(List.of(

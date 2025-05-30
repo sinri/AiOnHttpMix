@@ -13,8 +13,8 @@ public class MirageSyncNonFCUnitTest extends AbstractMirageUnitTest {
         AigcMix.enableVerboseLogger();
     }
 
-    private MixChatRequest buildMirageRequestEntity() {
-        MixChatRequest request = MixChatRequest.create();
+    private MixChatRequest buildMirageRequestEntity(SupportedModelEnum supportedModelEnum) {
+        MixChatRequest request = MixChatRequest.create(supportedModelEnum);
         request.addMessage(MixChatMessage.create()
                                          .setRole("user")
                                          .setTextContent("介绍一下上野公园")
@@ -24,8 +24,7 @@ public class MirageSyncNonFCUnitTest extends AbstractMirageUnitTest {
 
     private Future<Void> act(SupportedModelEnum supportedModelEnum) {
         return getMirageKit()
-                .requestSync(true, buildMirageRequestEntity()
-                        .setSupportedModelEnum(supportedModelEnum))
+                .requestSync(true, buildMirageRequestEntity(supportedModelEnum))
                 .compose(resp -> {
                     getUnitTestLogger().info("resp", resp.cloneAsJsonObject());
 

@@ -26,14 +26,12 @@ import java.util.List;
  * <p>
  * 该接口提供了多种静态工厂方法用于将不同厂商的响应对象转换为 MixChatResponse，
  * 并对工具调用（ToolCall）等内容进行适配和处理。
- * </p>
  * <p>
  * 典型用法：
  * <pre>
  *     MixChatResponse response = MixChatResponse.from(gptResponse);
  *     MixChatMessage message = response.getMessage();
  * </pre>
- * </p>
  */
 public interface MixChatResponse extends UnmodifiableJsonifiableEntity {
 

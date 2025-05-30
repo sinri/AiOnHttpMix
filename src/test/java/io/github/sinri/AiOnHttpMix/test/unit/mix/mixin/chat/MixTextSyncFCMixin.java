@@ -26,8 +26,7 @@ public interface MixTextSyncFCMixin extends MixCoreMixin {
         AtomicReference<ToolCall> toolCallRef = new AtomicReference<>();
         return Future.succeededFuture()
                      .compose(round1 -> {
-                         return getMixChatKit().chat(MixChatRequest.create()
-                                                                   .setSupportedModelEnum(supportedModelEnum)
+                         return getMixChatKit().chat(MixChatRequest.create(supportedModelEnum)
                                                                    .addMessage(MixChatMessage.create()
                                                                                              .setRole("user")
                                                                                              .setTextContent("2010年8月1日柯桥有没有下雨")
@@ -67,8 +66,7 @@ public interface MixTextSyncFCMixin extends MixCoreMixin {
                      })
                      .compose(toolCallOutput -> {
                          ToolCall toolCall = toolCallRef.get();
-                         return getMixChatKit().chat(MixChatRequest.create()
-                                                                   .setSupportedModelEnum(supportedModelEnum)
+                         return getMixChatKit().chat(MixChatRequest.create(supportedModelEnum)
                                                                    .addMessage(MixChatMessage.create()
                                                                                              .setRole("user")
                                                                                              .setTextContent("2010年8月1日柯桥有没有下雨")

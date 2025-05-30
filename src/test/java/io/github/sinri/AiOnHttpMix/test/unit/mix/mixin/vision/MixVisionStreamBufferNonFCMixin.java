@@ -11,8 +11,7 @@ import java.util.List;
 public interface MixVisionStreamBufferNonFCMixin extends MixVisionCoreMixin {
     default Future<Void> toTestStreamBuffer(SupportedModelEnum supportedModelEnum) {
         return getMixChatKit()
-                .chatStream(MixChatRequest.create()
-                                          .setSupportedModelEnum(supportedModelEnum)
+                .chatStream(MixChatRequest.create(supportedModelEnum)
                                           .addMessage(MixChatMessage.create()
                                                                     .setRole("user")
                                                                     .setVisionContent(List.of(

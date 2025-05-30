@@ -73,7 +73,6 @@ public class MirageMixServiceAdapter extends MixServiceAdapter {
      *
      * @param request             聊天请求对象
      * @param fragmentDataHandler 分片数据处理函数，接收 JsonObject 类型的分片数据
-     * @return 返回处理完成的 Future<Void>
      */
     @Override
     public Future<Void> requestStreamRaw(MixChatRequest request, Function<JsonObject, Future<Void>> fragmentDataHandler) {

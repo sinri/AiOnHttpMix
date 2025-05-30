@@ -184,7 +184,7 @@ public class MirageKit {
      *
      * @param useNyaCode            是否使用 NyaCode 编码
      * @param mixChatRequest        MixChatRequest 对象，包含模型与元数据
-     * @param fragmentDataProcessor 片段数据处理器，入参为片段 Json 字符串，返回 Future<Void>
+     * @param fragmentDataProcessor 片段数据处理器，入参为片段 Json 字符串
      */
     public Future<Void> requestStreamRaw(
             boolean useNyaCode,

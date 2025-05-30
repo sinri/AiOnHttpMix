@@ -3,7 +3,6 @@ package io.github.sinri.AiOnHttpMix.mix.service;
 import io.github.sinri.AiOnHttpMix.AigcMix;
 import io.github.sinri.AiOnHttpMix.mix.chat.request.MixChatRequest;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.MixChatResponse;
-import io.github.sinri.AiOnHttpMix.mix.chat.response.stream.MixChatResponseBuffer;
 import io.github.sinri.AiOnHttpMix.mix.chat.response.stream.MixChatResponseChunk;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.OpenAIServiceAdapter;
 import io.github.sinri.AiOnHttpMix.provider.azure.openai.gpt.GPTKit;
@@ -85,7 +84,7 @@ public class NativeMixServiceAdapter extends MixServiceAdapter {
      * 处理流式聊天请求，将每个分片数据通过 fragmentDataHandler 处理。
      *
      * @param request             聊天请求，包含模型、消息等信息
-     * @param fragmentDataHandler 分片数据处理函数，接收每个分片的 JsonObject，返回 Future<Void>
+     * @param fragmentDataHandler 分片数据处理函数，接收每个分片的 JsonObject
      * @return Future，异步返回处理完成的信号
      * @throws IllegalArgumentException 如果模型类型不被支持
      */
